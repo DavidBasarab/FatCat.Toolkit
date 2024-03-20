@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using FatCat.Fakes;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Threading;
@@ -97,7 +98,11 @@ public class ClientWorker(IThread thread, IToolkitHubClientFactory hubFactory, I
 
 		for (var i = 0; i < 17; i++)
 		{
-			await SendDataToHub(hubConnection);
+			await SendMessageToHub(hubConnection);
+
+			await thread.Sleep(1.Seconds());
+
+			await SendDataBuffer(hubConnection);
 
 			await thread.Sleep(1.Seconds());
 		}
@@ -127,7 +132,29 @@ public class ClientWorker(IThread thread, IToolkitHubClientFactory hubFactory, I
 		return responseMessage;
 	}
 
-	private static async Task SendDataToHub(IToolkitHubClientConnection hubConnection)
+	private static async Task SendDataBuffer(IToolkitHubClientConnection hubConnection)
+	{
+		var dataBuffer = Faker.Create<List<byte>>(1024).ToArray();
+
+		ConsoleLog.WriteCyan($"Going to send data message of length {dataBuffer.Length}");
+
+		var watch = Stopwatch.StartNew();
+
+		await hubConnection.SendDataBufferNoResponse(
+			new ToolkitMessage { Data = "Junk", MessageType = 123 },
+			dataBuffer
+		);
+
+		watch.Stop();
+
+		ConsoleLog.WriteYellow($"Send DataBuffer Message Took <{watch.Elapsed}>");
+
+		// ConsoleLog.WriteCyan(
+		// 	$"Response from server was {JsonConvert.SerializeObject(response, Formatting.Indented)}"
+		// );
+	}
+
+	private static async Task SendMessageToHub(IToolkitHubClientConnection hubConnection)
 	{
 		await hubConnection.SendNoResponse(
 			new ToolkitMessage

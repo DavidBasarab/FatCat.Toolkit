@@ -242,25 +242,25 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 		bearerToken = token;
 	}
 
-	private void EnsureAccept(HttpClient httpClient)
+	private void EnsureAccept(HttpRequestMessage request)
 	{
 		if (Accept is not null)
 		{
-			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Accept));
+			request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Accept));
 		}
 		else
 		{
-			httpClient.DefaultRequestHeaders.Accept.Clear();
+			request.Headers.Accept.Clear();
 		}
 	}
 
-	private void EnsureAuthorization(HttpClient httpClient)
+	private void EnsureAuthorization(HttpRequestMessage request)
 	{
 		if (bearerToken is not null)
 		{
 			logger.Debug($"Adding Bearer Token := <{bearerToken}>");
 
-			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+			request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 		}
 		else if (basicUsername is not null && basicPassword is not null)
 		{
@@ -270,14 +270,11 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 				Encoding.UTF8.GetBytes($"{basicUsername}:{basicPassword}")
 			);
 
-			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-				"Basic",
-				encodedUsernameAndPassword
-			);
+			request.Headers.Authorization = new AuthenticationHeaderValue("Basic", encodedUsernameAndPassword);
 		}
 		else
 		{
-			httpClient.DefaultRequestHeaders.Authorization = null;
+			request.Headers.Authorization = null;
 		}
 	}
 
@@ -293,14 +290,14 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 		var httpClient = localClient ?? HttpClientFactory.Get();
 
-		EnsureAccept(httpClient);
-		EnsureAuthorization(httpClient);
-
 		var requestUri = GetFullUrl(url);
 
 		logger.Debug($"Creating request message to Uri := <{requestUri}>");
 
 		var requestMessage = new HttpRequestMessage(httpMethod, requestUri);
+
+		EnsureAccept(requestMessage);
+		EnsureAuthorization(requestMessage);
 
 		if (data.IsNotNullOrEmpty())
 		{

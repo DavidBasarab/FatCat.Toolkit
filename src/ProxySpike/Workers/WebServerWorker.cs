@@ -17,7 +17,7 @@ public class WebServerWorker : ISpikeWorker<ServerOptions>
 
 		var applicationSettings = new ToolkitWebApplicationSettings
 		{
-			Options = WebApplicationOptions.Https | WebApplicationOptions.SignalR,
+			Options = WebApplicationOptions.SignalR,
 			TlsCertificate = new CertificationSettings
 			{
 				Location = @"C:\DevelopmentCert\DevelopmentCert.pfx",

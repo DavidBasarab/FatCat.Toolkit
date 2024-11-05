@@ -2,7 +2,7 @@ using System.Net.Sockets;
 
 namespace FatCat.Toolkit.Communication;
 
-internal abstract class ClientConnection(
+public abstract class ClientConnection(
 	IFatTcpServer server,
 	TcpClient client,
 	string clientId,
@@ -29,7 +29,7 @@ internal abstract class ClientConnection(
 
 	protected abstract Task<Stream> GetStream();
 
-	private async Task ReceivingThread()
+	protected virtual async Task ReceivingThread()
 	{
 		var stream = await GetStream();
 		var buffer = new byte[bufferSize];

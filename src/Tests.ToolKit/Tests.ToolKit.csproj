@@ -23,25 +23,25 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj"/>
-        <ProjectReference Include="..\ToolKit\ToolKit.csproj"/>
+        <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
+        <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FakeItEasy" Version="8.1.0" />
-        <PackageReference Include="FatCat.Fakes" Version="1.0.26" />
-        <PackageReference Include="FluentAssertions" Version="6.12.0"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-        <PackageReference Include="xunit" Version="2.7.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
+        <PackageReference Include="FakeItEasy" Version="8.3.0" />
+        <PackageReference Include="FatCat.Fakes" Version="1.0.27" />
+        <PackageReference Include="FluentAssertions" Version="6.12.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Include="xunit" Version="2.9.2" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Data\ResourceItemToGet.txt"/>
-        <EmbeddedResource Include="Data\ResourceItemToGet.txt"/>
+        <None Remove="Data\ResourceItemToGet.txt" />
+        <EmbeddedResource Include="Data\ResourceItemToGet.txt" />
     </ItemGroup>
 
 </Project>

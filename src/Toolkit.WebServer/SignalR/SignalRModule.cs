@@ -8,8 +8,6 @@ public class SignalRModule : Module
 {
 	protected override void Load(ContainerBuilder builder)
 	{
-		ConsoleLog.WriteCyan("Loading toolkit Module!!!!!");
-
 		builder.RegisterType<ToolkitHubClientFactory>().As<IToolkitHubClientFactory>().SingleInstance();
 
 		builder.RegisterType<ToolkitHubServer>().As<IToolkitHubServer>().SingleInstance();

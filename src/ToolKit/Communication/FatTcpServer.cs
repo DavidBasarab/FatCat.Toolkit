@@ -27,19 +27,19 @@ public abstract class FatTcpServer(IGenerator generator, IFatTcpLogger logger)
 		TcpMessageReceivedEvent?.Invoke(data);
 	}
 
-	public void Start(ushort port, int receiveBufferSize = 1024)
+	public void Start(ushort serverPort, int receiveBufferSize = 1024)
 	{
-		Start(port, Encoding.Unicode, receiveBufferSize);
+		Start(serverPort, Encoding.Unicode, receiveBufferSize);
 	}
 
-	public void Start(ushort port, Encoding encoding, int receiveBufferSize = 1024)
+	public void Start(ushort serverPort, Encoding serverEncoding, int receiveBufferSize = 1024)
 	{
 		cancelSource = new CancellationTokenSource();
 		cancelToken = cancelSource.Token;
 
-		this.port = port;
+		port = serverPort;
 		bufferSize = receiveBufferSize;
-		this.encoding = encoding;
+		encoding = serverEncoding;
 
 		Task.Factory.StartNew(ServerThread, TaskCreationOptions.LongRunning);
 	}
@@ -49,7 +49,7 @@ public abstract class FatTcpServer(IGenerator generator, IFatTcpLogger logger)
 		Dispose();
 	}
 
-	internal abstract ClientConnection GetClientConnection(TcpClient client, string clientId);
+	protected abstract ClientConnection GetClientConnection(TcpClient client, string clientId);
 
 	private async Task ServerThread()
 	{

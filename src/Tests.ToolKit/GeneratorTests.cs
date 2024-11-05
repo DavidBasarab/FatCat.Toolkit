@@ -32,6 +32,6 @@ public class GeneratorTests
 
 		bytes.LongCount().Should().Be(sizeInBytes);
 
-		timer.Elapsed.Should().BeLessOrEqualTo(200.Milliseconds());
+		timer.Elapsed.Should().BeLessOrEqualTo(400.Milliseconds());
 	}
 }

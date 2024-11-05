@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
+using FatCat.Toolkit.WebServer.Injection.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FatCat.Toolkit.WebServer.Injection;

@@ -4,11 +4,10 @@ namespace FatCat.Toolkit.Web.Api;
 public enum WebApplicationOptions
 {
 	None = 0,
-	Https = 1,
-	FileSystem = 2,
-	SignalR = 4,
-	Authentication = 8,
-	HttpsRedirection = 16,
-	Cors = 32,
-	CommonOptions = Cors | HttpsRedirection | Https
+	FileSystem = 1,
+	SignalR = 2,
+	Authentication = 4,
+	HttpsRedirection = 8,
+	Cors = 16,
+	CommonOptions = Cors | HttpsRedirection,
 }

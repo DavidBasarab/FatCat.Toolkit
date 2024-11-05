@@ -16,7 +16,7 @@ public interface IFatTcpClient
 
 	void Disconnect();
 
-	Task Send(byte[] bytes);
+	void Send(byte[] bytes);
 
-	Task Send(string message, Encoding encoding = null);
+	void Send(string message, Encoding encoding = null);
 }

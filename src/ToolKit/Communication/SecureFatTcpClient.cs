@@ -1,11 +1,12 @@
 ﻿using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using FatCat.Toolkit.Threading;
 
 namespace FatCat.Toolkit.Communication;
 
-public class SecureFatTcpClient(X509Certificate certificate, IFatTcpLogger logger)
-	: FatTcpClient(logger),
+public class SecureFatTcpClient(X509Certificate certificate, IFatTcpLogger logger, IThread thread)
+	: FatTcpClient(logger, thread),
 		IFatTcpClient
 {
 	protected override Stream GetStream()

@@ -1,24 +1,28 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using FakeItEasy;
+using FatCat.Fakes;
 using FatCat.Toolkit;
 using FatCat.Toolkit.Communication;
 using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Logging;
+using FatCat.Toolkit.Threading;
 using Humanizer;
+using Thread = FatCat.Toolkit.Threading.Thread;
 
 namespace OneOff;
 
-public class TcpWorker : SpikeWorker
+public class TcpWorker(ISimpleTcpSender tcpSender, IGenerator generator, IThread thread) : SpikeWorker
 {
 	private const int TcpPort = 24329;
-	private readonly IGenerator generator;
-	private readonly ISimpleTcpSender tcpSender;
+	private readonly ISimpleTcpSender tcpSender = tcpSender;
 	private IFatTcpClient fatTcpClient;
 	private IFatTcpServer fatTcpServer;
+	private static int numberOfErrors = 0;
 
-	public TcpWorker(ISimpleTcpSender tcpSender, IGenerator generator)
+	public static int NumberOfErrors
 	{
-		this.tcpSender = tcpSender;
-		this.generator = generator;
+		get => numberOfErrors;
 	}
 
 	public override async Task DoWork()
@@ -27,9 +31,13 @@ public class TcpWorker : SpikeWorker
 
 		var cert = new X509Certificate2(@"C:\DevelopmentCert\DevelopmentCert.pfx", "basarab_cert");
 
-		if (Program.Args.Any())
+		if (Program.Args.Length != 0)
 		{
-			fatTcpClient = new SecureFatTcpClient(cert, new ConsoleFatTcpLogger());
+			fatTcpClient = new SecureFatTcpClient(
+				cert,
+				new ConsoleFatTcpLogger(),
+				new Thread(new ToolkitLogger())
+			);
 
 			fatTcpClient.Reconnect = true;
 
@@ -37,20 +45,48 @@ public class TcpWorker : SpikeWorker
 
 			await fatTcpClient.Connect(host, TcpPort);
 
-			for (var i = 0; i < 8500000; i++)
+			for (var i = 0; i < 5; i++)
 			{
-				var message = $"{i:X} This is a	message | {DateTime.Now:T}";
-
-				var bytes = Encoding.UTF8.GetBytes(message);
-
-				await fatTcpClient.Send(bytes);
-
-				await Task.Delay(1.Milliseconds());
+				thread.Run(SendMessages);
 			}
 		}
 		else
 		{
 			StartServer(cert);
+		}
+	}
+
+	private async Task SendMessages()
+	{
+		for (var i = 0; i < 8500000; i++)
+		{
+			await SendMessage(i);
+		}
+	}
+
+	private async Task SendMessage(int i)
+	{
+		try
+		{
+			var message =
+				$"{i:X} This is a	message | {DateTime.Now:T} | ExtraData {Faker.RandomString(length: Faker.RandomInt(10, 200))}";
+
+			var bytes = Encoding.UTF8.GetBytes(message);
+
+			fatTcpClient.Send(bytes);
+
+			var delayTime = Faker.RandomInt(0, 123);
+
+			if (i % 15 != 0)
+			{
+				await Task.Delay(delayTime.Milliseconds());
+			}
+		}
+		catch (Exception ex)
+		{
+			ConsoleLog.WriteException(ex);
+
+			Interlocked.Increment(ref numberOfErrors);
 		}
 	}
 

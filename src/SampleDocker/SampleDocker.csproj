@@ -29,13 +29,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj"/>
-        <ProjectReference Include="..\ToolKit\ToolKit.csproj"/>
+        <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
+        <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Identity" Version="1.10.4"/>
-        <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1"/>
+        <PackageReference Include="Azure.Identity" Version="1.13.1" />
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
     </ItemGroup>
 
 </Project>

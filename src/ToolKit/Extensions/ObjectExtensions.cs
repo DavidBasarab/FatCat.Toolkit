@@ -14,8 +14,8 @@ public static class ObjectExtensions
 			return null;
 		}
 
-		var json = JsonConvert.SerializeObject(objectToCopy, JsonOperations.JsonSettings);
+		var json = JsonConvert.SerializeObject(objectToCopy, JsonOperations.DefaultSettings);
 
-		return JsonConvert.DeserializeObject<T>(json, JsonOperations.JsonSettings);
+		return JsonConvert.DeserializeObject<T>(json, JsonOperations.DefaultSettings);
 	}
 }

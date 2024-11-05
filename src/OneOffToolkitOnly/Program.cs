@@ -27,15 +27,15 @@ public static class Program
 				ScopeOptions.SetLifetimeScope
 			);
 
-			ConnectClient(args);
+			// ConnectClient(args);
 
-			// var worker = SystemScope.Container.Resolve<UriWorker>();
+			var worker = SystemScope.Container.Resolve<TestCallerIssueWorker>();
+
+			await worker.DoWork(args);
+
+			// var consoleUtilities = SystemScope.Container.Resolve<IConsoleUtilities>();
 			//
-			// await worker.DoWork();
-
-			var consoleUtilities = SystemScope.Container.Resolve<IConsoleUtilities>();
-
-			consoleUtilities.WaitForExit();
+			// consoleUtilities.WaitForExit();
 		}
 		catch (Exception ex)
 		{

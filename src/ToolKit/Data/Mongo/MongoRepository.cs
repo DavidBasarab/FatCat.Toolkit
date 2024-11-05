@@ -37,7 +37,7 @@ public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongo
 	{
 		EnsureCollection();
 
-		await Collection!.InsertOneAsync(item);
+		await Collection.InsertOneAsync(item);
 
 		return item;
 	}

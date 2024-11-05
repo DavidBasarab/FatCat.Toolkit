@@ -1,4 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
+using FatCat.Toolkit.Logging;
+using Thread = FatCat.Toolkit.Threading.Thread;
 
 namespace FatCat.Toolkit.Communication;
 
@@ -17,7 +19,7 @@ public class TcpFactory : ITcpFactory
 {
 	public IFatTcpClient CreateOpenTcpClient()
 	{
-		return new OpenFatTcpClient(new ConsoleFatTcpLogger());
+		return new OpenFatTcpClient(new ConsoleFatTcpLogger(), new Thread(new ToolkitLogger()));
 	}
 
 	public IFatTcpServer CreateOpenTcpServer()
@@ -27,7 +29,7 @@ public class TcpFactory : ITcpFactory
 
 	public IFatTcpClient CreateSecureTcpClient(X509Certificate certificate)
 	{
-		return new SecureFatTcpClient(certificate, new ConsoleFatTcpLogger());
+		return new SecureFatTcpClient(certificate, new ConsoleFatTcpLogger(), new Thread(new ToolkitLogger()));
 	}
 
 	public IFatTcpServer CreateSecureTcpServer(X509Certificate certificate)

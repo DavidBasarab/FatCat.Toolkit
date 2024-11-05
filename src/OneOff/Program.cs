@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Autofac;
+using FatCat.Toolkit;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Logging;
@@ -36,9 +37,15 @@ public static class Program
 
 			RunServer(args);
 
-			// var worker = SystemScope.Container.Resolve<WebResultWorker>();
+			// var worker = SystemScope.Container.Resolve<TcpWorker>();
 			//
 			// await worker.DoWork();
+			//
+			// var consoleUtilities = SystemScope.Container.Resolve<IConsoleUtilities>();
+			//
+			// consoleUtilities.WaitForExit();
+			//
+			// ConsoleLog.WriteCyan($"Number of errors: {TcpWorker.NumberOfErrors}");
 		}
 		catch (Exception ex)
 		{

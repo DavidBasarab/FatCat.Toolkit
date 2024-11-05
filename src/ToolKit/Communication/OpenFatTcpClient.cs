@@ -1,6 +1,8 @@
-﻿namespace FatCat.Toolkit.Communication;
+﻿using FatCat.Toolkit.Threading;
 
-public class OpenFatTcpClient(IFatTcpLogger logger) : FatTcpClient(logger), IFatTcpClient
+namespace FatCat.Toolkit.Communication;
+
+public class OpenFatTcpClient(IFatTcpLogger logger, IThread thread) : FatTcpClient(logger, thread), IFatTcpClient
 {
 	protected override Stream GetStream()
 	{

@@ -16,7 +16,7 @@ public class ToolkitUser : EqualObject
 			Name = contextUser.Identity?.Name,
 			AuthenticationType = contextUser.Identity?.AuthenticationType,
 			IsAuthenticated = contextUser.Identity?.IsAuthenticated ?? false,
-			Claims = contextUser.Claims.Select(ToolkitClaim.Create).ToList()
+			Claims = contextUser.Claims.Select(ToolkitClaim.Create).ToList(),
 		};
 	}
 

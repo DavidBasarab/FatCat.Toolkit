@@ -266,6 +266,6 @@ public static class ConsoleLog
 		None = 0,
 		Before = 1,
 		After = 2,
-		Both = Before | After
+		Both = Before | After,
 	}
 }

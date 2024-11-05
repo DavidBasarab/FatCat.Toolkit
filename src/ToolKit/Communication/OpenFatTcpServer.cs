@@ -6,7 +6,7 @@ public class OpenFatTcpServer(IGenerator generator, IFatTcpLogger logger)
 	: FatTcpServer(generator, logger),
 		IFatTcpServer
 {
-	internal override ClientConnection GetClientConnection(TcpClient client, string clientId)
+	protected override ClientConnection GetClientConnection(TcpClient client, string clientId)
 	{
 		return new OpenClientConnection(this, client, clientId, bufferSize, logger, cancelToken);
 	}

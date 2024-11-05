@@ -13,8 +13,8 @@ public interface ICatBounce
 
 public class CatBounce(TimeSpan interval) : ICatBounce
 {
-	private readonly DebounceDispatcher debounceDispatcher = new((int)interval.TotalMilliseconds);
-	private readonly ThrottleDispatcher throttleDispatcher = new((int)interval.TotalMilliseconds);
+	private readonly DebounceDispatcher debounceDispatcher = new(interval);
+	private readonly ThrottleDispatcher throttleDispatcher = new(interval);
 
 	public void Debounce(Action action)
 	{

@@ -7,7 +7,7 @@ public class SecureFatTcpServer(X509Certificate certificate, IGenerator generato
 	: FatTcpServer(generator, logger),
 		IFatTcpServer
 {
-	internal override ClientConnection GetClientConnection(TcpClient client, string clientId)
+	protected override ClientConnection GetClientConnection(TcpClient client, string clientId)
 	{
 		return new SecureClientConnection(certificate, this, client, clientId, bufferSize, logger, cancelToken);
 	}

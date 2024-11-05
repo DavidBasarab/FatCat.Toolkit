@@ -32,7 +32,7 @@ public class SimpleResponse : EqualObject
 		{
 			Content = Text,
 			ContentType = ContentType,
-			StatusCode = HttpStatusCode
+			StatusCode = HttpStatusCode,
 		};
 	}
 }

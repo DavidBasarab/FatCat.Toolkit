@@ -1,17 +1,21 @@
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Text;
 using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Threading;
 using Humanizer;
 
 namespace FatCat.Toolkit.Communication;
 
-public abstract class FatTcpClient(IFatTcpLogger logger)
+public abstract class FatTcpClient(IFatTcpLogger logger, IThread thread)
 {
 	private byte[] buffer;
 	private int bufferSize;
 	private CancellationTokenSource cancelSource;
 	private CancellationToken cancelToken;
 	private string host;
+
+	private readonly ConcurrentBag<byte[]> messagesToSend = [];
 	private ushort port;
 	private Stream stream;
 	protected TcpClient tcpClient;
@@ -52,7 +56,33 @@ public abstract class FatTcpClient(IFatTcpLogger logger)
 		ShutdownSocket();
 	}
 
-	public async Task Send(byte[] bytes)
+	public void Send(byte[] bytes)
+	{
+		if (!Connected)
+		{
+			return;
+		}
+
+		messagesToSend.Add(bytes);
+	}
+
+	public void Send(string message, Encoding encoding = null)
+	{
+		encoding ??= Encoding.UTF8;
+
+		var bytes = encoding.GetBytes(message);
+
+		Send(bytes);
+	}
+
+	protected abstract Stream GetStream();
+
+	protected virtual void OnOnMessageReceived(byte[] data)
+	{
+		TcpMessageReceivedEvent?.Invoke(data);
+	}
+
+	private async Task SendMessage(byte[] bytes)
 	{
 		if (!Connected || tcpClient is null || stream is null)
 		{
@@ -81,20 +111,19 @@ public abstract class FatTcpClient(IFatTcpLogger logger)
 		}
 	}
 
-	public Task Send(string message, Encoding encoding = null)
+	private async Task SendingThread()
 	{
-		encoding ??= Encoding.UTF8;
-
-		var bytes = encoding.GetBytes(message);
-
-		return Send(bytes);
-	}
-
-	protected abstract Stream GetStream();
-
-	protected virtual void OnOnMessageReceived(byte[] data)
-	{
-		TcpMessageReceivedEvent?.Invoke(data);
+		while (!cancelToken.IsCancellationRequested)
+		{
+			if (messagesToSend.TryTake(out var bytes))
+			{
+				await SendMessage(bytes);
+			}
+			else
+			{
+				await thread.Sleep(1.Milliseconds(), cancelToken);
+			}
+		}
 	}
 
 	private async Task CreateSocket()
@@ -129,6 +158,8 @@ public abstract class FatTcpClient(IFatTcpLogger logger)
 			Connected = true;
 
 			logger.WriteInformation($"Connection succeed for <{host}:{port}>");
+
+			thread.Run(SendingThread);
 		}
 		catch (IOException)
 		{

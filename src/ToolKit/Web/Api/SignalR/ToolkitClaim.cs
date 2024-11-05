@@ -11,7 +11,7 @@ public class ToolkitClaim : EqualObject
 			Issuer = claim.Issuer,
 			Type = claim.Type,
 			Value = claim.Value,
-			OriginalIssuer = claim.OriginalIssuer
+			OriginalIssuer = claim.OriginalIssuer,
 		};
 	}
 

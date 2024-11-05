@@ -2,8 +2,10 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using Fasterflect;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace FatCat.Toolkit.Data.Mongo;
@@ -23,6 +25,11 @@ public class MongoConnection : IMongoConnection
 
 	private readonly ConcurrentDictionary<string, IMongoDatabase> databases = new();
 
+	static MongoConnection()
+	{
+		BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+	}
+
 	public MongoConnection(List<Assembly> dataAssemblies)
 	{
 		ConventionRegistry.Register(
@@ -30,9 +37,6 @@ public class MongoConnection : IMongoConnection
 			new ConventionPack { new IgnoreExtraElementsConvention(true) },
 			_ => true
 		);
-
-		// Yse if want to represent enums as strings
-		// ConventionRegistry.Register(nameof(EnumRepresentationConvention), new ConventionPack { new EnumRepresentationConvention(BsonType.String) }, _ => true);
 
 		foreach (var assembly in dataAssemblies)
 		{
@@ -58,10 +62,7 @@ public class MongoConnection : IMongoConnection
 			return database;
 		}
 
-		if (connectionString == null)
-		{
-			connectionString = NotSetConnectionString;
-		}
+		connectionString ??= NotSetConnectionString;
 
 		if (!connections.TryGetValue(connectionString, out var mongoClient))
 		{
@@ -71,6 +72,8 @@ public class MongoConnection : IMongoConnection
 					: MongoClientSettings.FromConnectionString(connectionString);
 
 			mongoClient = new MongoClient(settings);
+
+			connections.TryAdd(connectionString, mongoClient);
 		}
 
 		var newDatabaseConnection = mongoClient.GetDatabase(databaseName);

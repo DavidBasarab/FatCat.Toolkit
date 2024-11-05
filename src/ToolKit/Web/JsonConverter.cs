@@ -61,7 +61,7 @@ public class JsonConverter : IJsonConvert
 		return new JsonSerializerSettings
 		{
 			Converters = new List<Newtonsoft.Json.JsonConverter> { new StringEnumConverter() },
-			NullValueHandling = nullValueHandling
+			NullValueHandling = nullValueHandling,
 		};
 	}
 }

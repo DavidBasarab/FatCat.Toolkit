@@ -15,6 +15,6 @@ public class CertificationSettings : EqualObject
 			return null;
 		}
 
-		return new X509Certificate2(Location, Password);
+		return X509CertificateLoader.LoadPkcs12FromFile(Location, Password);
 	}
 }

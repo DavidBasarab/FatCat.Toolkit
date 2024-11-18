@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Autofac;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Extensions;
@@ -29,8 +28,6 @@ internal sealed class ApplicationStartUp
 {
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
 	{
-		ServicePointManager.ServerCertificateValidationCallback = (_, _, _, _) => true;
-
 		app.Use(CaptureMiddlewareExceptions);
 
 		app.UseFileServer();
@@ -47,7 +44,7 @@ internal sealed class ApplicationStartUp
 
 		app.UseEndpoints(endpoints => endpoints.MapControllers());
 
-		app.Use(async (context, next) => await next.Invoke());
+		app.Use(async (_, next) => await next.Invoke());
 
 		SystemScope.Container.LifetimeScope = app.ApplicationServices.GetAutofacRoot();
 

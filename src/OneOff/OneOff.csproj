@@ -3,9 +3,10 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <DebugType>full</DebugType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup>

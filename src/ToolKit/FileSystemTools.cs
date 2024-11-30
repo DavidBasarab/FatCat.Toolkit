@@ -6,6 +6,8 @@ public interface IFileSystemTools
 {
 	Task AppendToFile(string path, string text);
 
+	void AppendToFileSync(string path, string text);
+
 	void DeleteDirectory(string path, bool recursive = true);
 
 	bool DeleteFile(string path);
@@ -32,13 +34,21 @@ public interface IFileSystemTools
 
 	Task<byte[]> ReadAllBytes(string path);
 
+	byte[] ReadAllBytesSync(string path);
+
 	Task<List<string>> ReadAllLines(string path);
 
+	List<string> ReadAllLinesSync(string path);
+
 	Task<string> ReadAllText(string path);
+
+	string ReadAllTextSync(string path);
 
 	Task WriteAllBytes(string path, byte[] bytes);
 
 	Task WriteAllText(string path, string text);
+
+	void WriteAllTextSync(string path, string text);
 }
 
 public class FileSystemTools(IFileSystem fileSystem) : IFileSystemTools
@@ -48,6 +58,13 @@ public class FileSystemTools(IFileSystem fileSystem) : IFileSystemTools
 		EnsureFile(path);
 
 		await fileSystem.File.AppendAllTextAsync(path, text);
+	}
+
+	public void AppendToFileSync(string path, string text)
+	{
+		EnsureFile(path);
+
+		fileSystem.File.AppendAllText(path, text);
 	}
 
 	public void DeleteDirectory(string path, bool recursive = true)
@@ -106,7 +123,7 @@ public class FileSystemTools(IFileSystem fileSystem) : IFileSystemTools
 	{
 		if (!DirectoryExists(path))
 		{
-			return new();
+			return new List<string>();
 		}
 
 		var directories = fileSystem.Directory.GetDirectories(path);
@@ -123,7 +140,7 @@ public class FileSystemTools(IFileSystem fileSystem) : IFileSystemTools
 	{
 		if (!DirectoryExists(directoryPath))
 		{
-			return new();
+			return new List<string>();
 		}
 
 		var files = fileSystem.Directory.GetFiles(directoryPath);
@@ -164,14 +181,19 @@ public class FileSystemTools(IFileSystem fileSystem) : IFileSystemTools
 
 	public async Task<byte[]> ReadAllBytes(string path)
 	{
-		return FileDoesNotExist(path) ? Array.Empty<byte>() : await fileSystem.File.ReadAllBytesAsync(path);
+		return FileDoesNotExist(path) ? [] : await fileSystem.File.ReadAllBytesAsync(path);
+	}
+
+	public byte[] ReadAllBytesSync(string path)
+	{
+		return FileDoesNotExist(path) ? [] : fileSystem.File.ReadAllBytes(path);
 	}
 
 	public async Task<List<string>> ReadAllLines(string path)
 	{
 		if (!fileSystem.File.Exists(path))
 		{
-			return new List<string>();
+			return [];
 		}
 
 		var lines = await fileSystem.File.ReadAllLinesAsync(path);
@@ -179,9 +201,26 @@ public class FileSystemTools(IFileSystem fileSystem) : IFileSystemTools
 		return lines.ToList();
 	}
 
+	public List<string> ReadAllLinesSync(string path)
+	{
+		if (!fileSystem.File.Exists(path))
+		{
+			return [];
+		}
+
+		var lines = fileSystem.File.ReadAllLines(path);
+
+		return lines.ToList();
+	}
+
 	public async Task<string> ReadAllText(string path)
 	{
 		return FileDoesNotExist(path) ? string.Empty : await fileSystem.File.ReadAllTextAsync(path);
+	}
+
+	public string ReadAllTextSync(string path)
+	{
+		return FileDoesNotExist(path) ? string.Empty : fileSystem.File.ReadAllText(path);
 	}
 
 	public async Task WriteAllBytes(string path, byte[] bytes)
@@ -196,6 +235,13 @@ public class FileSystemTools(IFileSystem fileSystem) : IFileSystemTools
 		EnsureFile(path);
 
 		await fileSystem.File.WriteAllTextAsync(path, text);
+	}
+
+	public void WriteAllTextSync(string path, string text)
+	{
+		EnsureFile(path);
+
+		fileSystem.File.WriteAllText(path, text);
 	}
 
 	private bool FileDoesNotExist(string path)

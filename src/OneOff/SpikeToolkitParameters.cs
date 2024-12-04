@@ -12,7 +12,10 @@ public class SpikeToolkitParameters : IToolkitTokenParameters
 	{
 		ConsoleLog.WriteCyan("Getting token parameters");
 
-		var cert = new X509Certificate2(@"C:\DevelopmentCert\DevelopmentCert.pfx", "basarab_cert");
+		var cert = X509CertificateLoader.LoadPkcs12FromFile(
+			@"C:\DevelopmentCert\DevelopmentCert.pfx",
+			"basarab_cert"
+		);
 
 		return new TokenValidationParameters
 		{

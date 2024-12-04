@@ -34,7 +34,10 @@ public class GetSampleToken : Endpoint
 
 	private SecurityTokenDescriptor GetSecurityTokenDescriptorCommon(ClaimsIdentity user)
 	{
-		var cert = new X509Certificate2(@"C:\DevelopmentCert\DevelopmentCert.pfx", "basarab_cert");
+		var cert = X509CertificateLoader.LoadPkcs12FromFile(
+			@"C:\DevelopmentCert\DevelopmentCert.pfx",
+			"basarab_cert"
+		);
 
 		return new SecurityTokenDescriptor
 		{

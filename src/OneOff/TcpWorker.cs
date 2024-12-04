@@ -29,7 +29,10 @@ public class TcpWorker(ISimpleTcpSender tcpSender, IGenerator generator, IThread
 	{
 		ConsoleLog.Write("Going to play with TCP Stuff");
 
-		var cert = new X509Certificate2(@"C:\DevelopmentCert\DevelopmentCert.pfx", "basarab_cert");
+		var cert = X509CertificateLoader.LoadPkcs12FromFile(
+			@"C:\DevelopmentCert\DevelopmentCert.pfx",
+			"basarab_cert"
+		);
 
 		if (Program.Args.Length != 0)
 		{

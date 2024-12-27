@@ -36,7 +36,7 @@
         <NoWarn>CS8002,CS1700;IL2121;CS8618;IL2121;CS8603</NoWarn>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="8.1.1" />
+        <PackageReference Include="Autofac" Version="8.2.0" />
         <PackageReference Include="CSharpier.MsBuild" Version="0.30.3">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -40,7 +40,7 @@
         <NoWarn>CS8002,CS1700;IL2121;CS8618;IL2121;CS8603</NoWarn>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="8.1.1" />
+        <PackageReference Include="Autofac" Version="8.2.0" />
         <PackageReference Include="FakeItEasy" Version="8.3.0" />
         <PackageReference Include="fasterflect" Version="3.0.0" />
         <PackageReference Include="FatCat.Fakes" Version="1.0.27" />

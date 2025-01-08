@@ -37,7 +37,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Autofac" Version="8.2.0" />
-        <PackageReference Include="CSharpier.MsBuild" Version="0.30.4">
+        <PackageReference Include="CSharpier.MsBuild" Version="0.30.5">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

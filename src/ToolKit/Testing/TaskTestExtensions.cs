@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 
 namespace FatCat.Toolkit.Testing;
@@ -12,7 +13,7 @@ public static class TaskTestExtensions
 }
 
 public class TaskTestAssertions<T>(Task<T> subject)
-	: ReferenceTypeAssertions<Task<T>, TaskTestAssertions<T>>(subject)
+	: ReferenceTypeAssertions<Task<T>, TaskTestAssertions<T>>(subject, AssertionChain.GetOrCreate())
 {
 	protected override string Identifier
 	{

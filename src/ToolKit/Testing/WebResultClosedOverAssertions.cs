@@ -2,6 +2,7 @@ using System.Net;
 using FatCat.Toolkit.Web;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
+using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 
 namespace FatCat.Toolkit.Testing;
@@ -24,7 +25,10 @@ public static class FatWebResponseClosedOverAssertions
 }
 
 public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
-	: ReferenceTypeAssertions<FatWebResponse<T>, FatWebResponseClosedOverAssertions<T>>(result)
+	: ReferenceTypeAssertions<FatWebResponse<T>, FatWebResponseClosedOverAssertions<T>>(
+		result,
+		AssertionChain.GetOrCreate()
+	)
 	where T : class
 {
 	protected override string Identifier
@@ -34,7 +38,7 @@ public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
 
 	public FatWebResponseClosedOverAssertions<T> Be(FatWebResponse<T> expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -73,7 +77,7 @@ public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
 
 	public FatWebResponseClosedOverAssertions<T> BeEquivalentTo(FatWebResponse expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -154,7 +158,7 @@ public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
 
 	public FatWebResponseClosedOverAssertions<T> HaveContentEquivalentTo(
 		T expectedContent,
-		Func<EquivalencyAssertionOptions<T>, EquivalencyAssertionOptions<T>> config
+		Func<EquivalencyOptions<T>, EquivalencyOptions<T>> config
 	)
 	{
 		Subject.Should().NotBeNull("FatWebResponse should never be null");

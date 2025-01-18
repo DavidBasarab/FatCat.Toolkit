@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 
 namespace FatCat.Toolkit.Testing;
@@ -21,7 +22,7 @@ public static class FatResultAssertionsExtensions
 }
 
 public class FatResultAssertions<T>(FatResult<T> subject)
-	: ReferenceTypeAssertions<FatResult<T>, FatResultAssertions<T>>(subject)
+	: ReferenceTypeAssertions<FatResult<T>, FatResultAssertions<T>>(subject, AssertionChain.GetOrCreate())
 {
 	protected override string Identifier
 	{
@@ -30,7 +31,7 @@ public class FatResultAssertions<T>(FatResult<T> subject)
 
 	public FatResultAssertions<T> Be(FatResult<T> expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
 
 		return this;
 	}

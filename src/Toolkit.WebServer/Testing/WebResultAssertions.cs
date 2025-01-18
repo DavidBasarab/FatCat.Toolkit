@@ -2,6 +2,7 @@
 using System.Net;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
+using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 
 namespace FatCat.Toolkit.WebServer.Testing;
@@ -22,7 +23,7 @@ public static class WebResultAssertionsExtensions
 }
 
 public class WebResultAssertions(WebResult result)
-	: ReferenceTypeAssertions<WebResult, WebResultAssertions>(result)
+	: ReferenceTypeAssertions<WebResult, WebResultAssertions>(result, AssertionChain.GetOrCreate())
 {
 	protected override string Identifier
 	{
@@ -31,7 +32,7 @@ public class WebResultAssertions(WebResult result)
 
 	public WebResultAssertions Be(WebResult expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -82,7 +83,7 @@ public class WebResultAssertions(WebResult result)
 
 	public WebResultAssertions BeEquivalentTo(WebResult expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -166,7 +167,7 @@ public class WebResultAssertions(WebResult result)
 
 	public WebResultAssertions HaveContentEquivalentTo<TContentType>(
 		TContentType expectedContent,
-		Func<EquivalencyAssertionOptions<TContentType>, EquivalencyAssertionOptions<TContentType>> config
+		Func<EquivalencyOptions<TContentType>, EquivalencyOptions<TContentType>> config
 	)
 	{
 		Subject.Should().NotBeNull("WebResult should never be null");

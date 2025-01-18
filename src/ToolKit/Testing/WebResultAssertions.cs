@@ -3,6 +3,7 @@ using System.Net;
 using FatCat.Toolkit.Web;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
+using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 
 namespace FatCat.Toolkit.Testing;
@@ -22,19 +23,17 @@ public static class FatCatWebResponseAssertionsExtensions
 	}
 }
 
-public class FatWebResponseAssertions : ReferenceTypeAssertions<FatWebResponse, FatWebResponseAssertions>
+public class FatWebResponseAssertions(FatWebResponse result)
+	: ReferenceTypeAssertions<FatWebResponse, FatWebResponseAssertions>(result, AssertionChain.GetOrCreate())
 {
 	protected override string Identifier
 	{
 		get => "Web Results assertions";
 	}
 
-	public FatWebResponseAssertions(FatWebResponse result)
-		: base(result) { }
-
 	public FatWebResponseAssertions Be(FatWebResponse expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -71,7 +70,7 @@ public class FatWebResponseAssertions : ReferenceTypeAssertions<FatWebResponse, 
 
 	public FatWebResponseAssertions BeEquivalentTo(FatWebResponse expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -155,7 +154,7 @@ public class FatWebResponseAssertions : ReferenceTypeAssertions<FatWebResponse, 
 
 	public FatWebResponseAssertions HaveContentEquivalentTo<TContentType>(
 		TContentType expectedContent,
-		Func<EquivalencyAssertionOptions<TContentType>, EquivalencyAssertionOptions<TContentType>> config
+		Func<EquivalencyOptions<TContentType>, EquivalencyOptions<TContentType>> config
 	)
 	{
 		Subject.Should().NotBeNull("FatWebResponse should never be null");

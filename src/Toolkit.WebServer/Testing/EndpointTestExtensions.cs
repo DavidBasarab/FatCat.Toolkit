@@ -1,5 +1,4 @@
-﻿#nullable enable
-using FatCat.Toolkit.Extensions;
+﻿using FatCat.Toolkit.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
@@ -17,7 +16,7 @@ public static class EndpointTestExtensions
 }
 
 public class EndpointAssertions(Endpoint endpoint)
-	: ReferenceTypeAssertions<Endpoint, EndpointAssertions>(endpoint)
+	: ReferenceTypeAssertions<Endpoint, EndpointAssertions>(endpoint, AssertionChain.GetOrCreate())
 {
 	private readonly Endpoint endpoint = endpoint;
 
@@ -74,7 +73,7 @@ public class EndpointAssertions(Endpoint endpoint)
 		}
 		else
 		{
-			Execute.Assertion
+			CurrentAssertionChain
 				.ForCondition(hasExpectedTemplate)
 				.FailWith(
 					$@"
@@ -86,7 +85,7 @@ Expected to find: {expectedTemplate} in:
 		return new AndConstraint<EndpointAssertions>(this);
 	}
 
-	private static List<TAttribute>? GetAttributes<TAttribute>(string methodName, Type controllerType)
+	private static List<TAttribute> GetAttributes<TAttribute>(string methodName, Type controllerType)
 		where TAttribute : Attribute
 	{
 		var method = controllerType.GetMethod(methodName);

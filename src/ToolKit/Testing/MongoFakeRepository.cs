@@ -1,4 +1,3 @@
-#nullable enable
 using System.Linq.Expressions;
 using FakeItEasy;
 using FatCat.Fakes;
@@ -56,7 +55,7 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 		SetUpGetByFilter();
 	}
 
-	public void Connect(string? connectionString = null, string? databaseName = null)
+	public void Connect(string connectionString = null, string databaseName = null)
 	{
 		repository.Connect(connectionString, databaseName);
 	}
@@ -91,22 +90,22 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 		return await repository.GetAllByFilter(filter);
 	}
 
-	public async Task<T?> GetByFilter(Expression<Func<T, bool>> filter)
+	public async Task<T> GetByFilter(Expression<Func<T, bool>> filter)
 	{
 		return await repository.GetByFilter(filter);
 	}
 
-	public async Task<T?> GetById(string id)
+	public async Task<T> GetById(string id)
 	{
 		return await repository.GetById(id);
 	}
 
-	public async Task<T?> GetById(ObjectId id)
+	public async Task<T> GetById(ObjectId id)
 	{
 		return await repository.GetById(id);
 	}
 
-	public async Task<T?> GetFirst()
+	public async Task<T> GetFirst()
 	{
 		return await repository.GetFirst();
 	}
@@ -214,6 +213,11 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 	public void VerifyGetById()
 	{
 		A.CallTo(() => repository.GetById(ItemId)).MustHaveHappened();
+	}
+
+	public void VerifyGetById(string id)
+	{
+		A.CallTo(() => repository.GetById(id)).MustHaveHappened();
 	}
 
 	public void VerifyGetFirst()

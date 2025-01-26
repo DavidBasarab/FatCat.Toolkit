@@ -253,7 +253,7 @@ public static class StringExtensions
 	{
 		if (value == null)
 		{
-			return Array.Empty<byte>();
+			return [];
 		}
 
 		var returnValue = new List<byte>();

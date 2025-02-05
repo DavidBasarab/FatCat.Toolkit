@@ -25,10 +25,7 @@ public static class FatWebResponseClosedOverAssertions
 }
 
 public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
-	: ReferenceTypeAssertions<FatWebResponse<T>, FatWebResponseClosedOverAssertions<T>>(
-		result,
-		AssertionChain.GetOrCreate()
-	)
+	: ReferenceTypeAssertions<FatWebResponse<T>, FatWebResponseClosedOverAssertions<T>>(result)
 	where T : class
 {
 	protected override string Identifier
@@ -38,7 +35,7 @@ public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
 
 	public FatWebResponseClosedOverAssertions<T> Be(FatWebResponse<T> expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -77,7 +74,7 @@ public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
 
 	public FatWebResponseClosedOverAssertions<T> BeEquivalentTo(FatWebResponse expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -101,7 +98,7 @@ public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
 
 	public FatWebResponseClosedOverAssertions<T> BeOk()
 	{
-		return HaveOneOfStatusCode(new[] { HttpStatusCode.OK, HttpStatusCode.NoContent });
+		return HaveOneOfStatusCode([HttpStatusCode.OK, HttpStatusCode.NoContent]);
 	}
 
 	public FatWebResponseClosedOverAssertions<T> BeSuccessful()
@@ -158,7 +155,7 @@ public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
 
 	public FatWebResponseClosedOverAssertions<T> HaveContentEquivalentTo(
 		T expectedContent,
-		Func<EquivalencyOptions<T>, EquivalencyOptions<T>> config
+		Func<EquivalencyAssertionOptions<T>, EquivalencyAssertionOptions<T>> config
 	)
 	{
 		Subject.Should().NotBeNull("FatWebResponse should never be null");

@@ -24,7 +24,7 @@ public static class FatCatWebResponseAssertionsExtensions
 }
 
 public class FatWebResponseAssertions(FatWebResponse result)
-	: ReferenceTypeAssertions<FatWebResponse, FatWebResponseAssertions>(result, AssertionChain.GetOrCreate())
+	: ReferenceTypeAssertions<FatWebResponse, FatWebResponseAssertions>(result)
 {
 	protected override string Identifier
 	{
@@ -33,7 +33,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions Be(FatWebResponse expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -70,7 +70,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions BeEquivalentTo(FatWebResponse expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -154,7 +154,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions HaveContentEquivalentTo<TContentType>(
 		TContentType expectedContent,
-		Func<EquivalencyOptions<TContentType>, EquivalencyOptions<TContentType>> config
+		Func<EquivalencyAssertionOptions<TContentType>, EquivalencyAssertionOptions<TContentType>> config
 	)
 	{
 		Subject.Should().NotBeNull("FatWebResponse should never be null");

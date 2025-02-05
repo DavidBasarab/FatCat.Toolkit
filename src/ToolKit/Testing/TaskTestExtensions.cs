@@ -13,7 +13,7 @@ public static class TaskTestExtensions
 }
 
 public class TaskTestAssertions<T>(Task<T> subject)
-	: ReferenceTypeAssertions<Task<T>, TaskTestAssertions<T>>(subject, AssertionChain.GetOrCreate())
+	: ReferenceTypeAssertions<Task<T>, TaskTestAssertions<T>>(subject)
 {
 	protected override string Identifier
 	{

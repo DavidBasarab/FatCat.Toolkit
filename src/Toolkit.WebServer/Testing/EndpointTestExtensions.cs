@@ -16,7 +16,7 @@ public static class EndpointTestExtensions
 }
 
 public class EndpointAssertions(Endpoint endpoint)
-	: ReferenceTypeAssertions<Endpoint, EndpointAssertions>(endpoint, AssertionChain.GetOrCreate())
+	: ReferenceTypeAssertions<Endpoint, EndpointAssertions>(endpoint)
 {
 	private readonly Endpoint endpoint = endpoint;
 
@@ -73,8 +73,8 @@ public class EndpointAssertions(Endpoint endpoint)
 		}
 		else
 		{
-			CurrentAssertionChain
-				.ForCondition(hasExpectedTemplate)
+			Execute
+				.Assertion.ForCondition(hasExpectedTemplate)
 				.FailWith(
 					$@"
 Expected to find: {expectedTemplate} in:

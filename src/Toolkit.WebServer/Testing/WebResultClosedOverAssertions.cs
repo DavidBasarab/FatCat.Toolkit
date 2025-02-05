@@ -25,7 +25,7 @@ public static class WebResultClosedOverAssertions
 }
 
 public class WebResultClosedOverAssertions<T>(WebResult<T> result)
-	: ReferenceTypeAssertions<WebResult<T>, WebResultClosedOverAssertions<T>>(result, AssertionChain.GetOrCreate())
+	: ReferenceTypeAssertions<WebResult<T>, WebResultClosedOverAssertions<T>>(result)
 	where T : class
 {
 	protected override string Identifier
@@ -35,7 +35,7 @@ public class WebResultClosedOverAssertions<T>(WebResult<T> result)
 
 	public WebResultClosedOverAssertions<T> Be(WebResult<T> expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -88,7 +88,7 @@ public class WebResultClosedOverAssertions<T>(WebResult<T> result)
 
 	public WebResultClosedOverAssertions<T> BeEquivalentTo(WebResult expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -169,7 +169,7 @@ public class WebResultClosedOverAssertions<T>(WebResult<T> result)
 
 	public WebResultClosedOverAssertions<T> HaveContentEquivalentTo(
 		T expectedContent,
-		Func<EquivalencyOptions<T>, EquivalencyOptions<T>> config
+		Func<EquivalencyAssertionOptions<T>, EquivalencyAssertionOptions<T>> config
 	)
 	{
 		Subject.Should().NotBeNull("WebResult should never be null");

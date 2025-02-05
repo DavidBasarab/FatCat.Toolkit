@@ -23,7 +23,7 @@ public static class WebResultAssertionsExtensions
 }
 
 public class WebResultAssertions(WebResult result)
-	: ReferenceTypeAssertions<WebResult, WebResultAssertions>(result, AssertionChain.GetOrCreate())
+	: ReferenceTypeAssertions<WebResult, WebResultAssertions>(result)
 {
 	protected override string Identifier
 	{
@@ -32,7 +32,7 @@ public class WebResultAssertions(WebResult result)
 
 	public WebResultAssertions Be(WebResult expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -83,7 +83,7 @@ public class WebResultAssertions(WebResult result)
 
 	public WebResultAssertions BeEquivalentTo(WebResult expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}
@@ -167,7 +167,7 @@ public class WebResultAssertions(WebResult result)
 
 	public WebResultAssertions HaveContentEquivalentTo<TContentType>(
 		TContentType expectedContent,
-		Func<EquivalencyOptions<TContentType>, EquivalencyOptions<TContentType>> config
+		Func<EquivalencyAssertionOptions<TContentType>, EquivalencyAssertionOptions<TContentType>> config
 	)
 	{
 		Subject.Should().NotBeNull("WebResult should never be null");

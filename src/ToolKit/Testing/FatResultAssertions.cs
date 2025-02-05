@@ -22,7 +22,7 @@ public static class FatResultAssertionsExtensions
 }
 
 public class FatResultAssertions<T>(FatResult<T> subject)
-	: ReferenceTypeAssertions<FatResult<T>, FatResultAssertions<T>>(subject, AssertionChain.GetOrCreate())
+	: ReferenceTypeAssertions<FatResult<T>, FatResultAssertions<T>>(subject)
 {
 	protected override string Identifier
 	{
@@ -31,7 +31,7 @@ public class FatResultAssertions<T>(FatResult<T> subject)
 
 	public FatResultAssertions<T> Be(FatResult<T> expectedResult)
 	{
-		new ObjectAssertions(Subject, CurrentAssertionChain).BeEquivalentTo(expectedResult);
+		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
 
 		return this;
 	}

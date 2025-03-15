@@ -1,7 +1,7 @@
 ﻿using FatCat.Toolkit;
 using FatCat.Toolkit.Console;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class GeneratorWorker(IGenerator generator)
 {

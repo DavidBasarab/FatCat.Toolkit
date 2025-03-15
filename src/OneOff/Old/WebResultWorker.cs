@@ -3,7 +3,7 @@ using FatCat.Toolkit;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.WebServer;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class SomeObject : EqualObject
 {

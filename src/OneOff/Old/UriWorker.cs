@@ -4,7 +4,7 @@ using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.Web;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class UriWorker : SpikeWorker
 {

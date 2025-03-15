@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class TestGetWithQueryStringListEndpoint : Endpoint
 {

@@ -5,6 +5,7 @@ using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.WebServer;
+using OneOff.Old;
 using OneOffLib;
 using Thread = FatCat.Toolkit.Threading.Thread;
 
@@ -35,17 +36,15 @@ public static class Program
 				ScopeOptions.SetLifetimeScope
 			);
 
-			RunServer(args);
+			// RunServer(args);
 
-			// var worker = SystemScope.Container.Resolve<TcpWorker>();
-			//
-			// await worker.DoWork();
-			//
+			var worker = SystemScope.Container.Resolve<RetryWorker>();
+			
+			await worker.DoWork();
+			
 			// var consoleUtilities = SystemScope.Container.Resolve<IConsoleUtilities>();
 			//
 			// consoleUtilities.WaitForExit();
-			//
-			// ConsoleLog.WriteCyan($"Number of errors: {TcpWorker.NumberOfErrors}");
 		}
 		catch (Exception ex)
 		{

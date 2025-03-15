@@ -4,7 +4,7 @@ using FatCat.Toolkit.Threading;
 using Humanizer;
 using Newtonsoft.Json;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class CacheWorker
 {

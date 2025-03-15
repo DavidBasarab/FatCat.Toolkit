@@ -1,6 +1,6 @@
 using FatCat.Toolkit.Data.Mongo;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class Customer : MongoObject
 {

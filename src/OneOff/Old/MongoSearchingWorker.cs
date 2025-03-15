@@ -3,7 +3,7 @@ using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Data.Mongo;
 using MongoDB.Driver;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 [Flags]
 public enum SearchFlags

@@ -1,4 +1,4 @@
-namespace OneOff;
+namespace OneOff.Old;
 
 public abstract class SpikeWorker
 {

@@ -2,7 +2,7 @@
 using FatCat.Toolkit.Threading;
 using Humanizer;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class FIfoThreadWorker
 {

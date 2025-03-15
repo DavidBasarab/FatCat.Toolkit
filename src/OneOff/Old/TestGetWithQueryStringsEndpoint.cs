@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class QueryRequest : EqualObject
 {

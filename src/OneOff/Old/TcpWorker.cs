@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using FakeItEasy;
 using FatCat.Fakes;
 using FatCat.Toolkit;
 using FatCat.Toolkit.Communication;
@@ -10,7 +9,7 @@ using FatCat.Toolkit.Threading;
 using Humanizer;
 using Thread = FatCat.Toolkit.Threading.Thread;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class TcpWorker(ISimpleTcpSender tcpSender, IGenerator generator, IThread thread) : SpikeWorker
 {

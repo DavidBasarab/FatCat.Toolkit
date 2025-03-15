@@ -9,7 +9,7 @@ using FatCat.Toolkit.Web.Api.SignalR;
 using FatCat.Toolkit.WebServer;
 using Newtonsoft.Json;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class ServerWorker(IThread thread)
 {

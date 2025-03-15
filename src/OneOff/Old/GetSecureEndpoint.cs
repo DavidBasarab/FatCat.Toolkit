@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Endpoint = FatCat.Toolkit.WebServer.Endpoint;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class GetSecureEndpoint(IHttpContextAccessor httpContextAccessor) : Endpoint
 {

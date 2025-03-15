@@ -2,7 +2,7 @@
 using FatCat.Toolkit.Web;
 using Humanizer;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class WebCallerWorker : SpikeWorker
 {

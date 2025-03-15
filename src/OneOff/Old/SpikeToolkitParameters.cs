@@ -4,7 +4,7 @@ using FatCat.Toolkit.WebServer;
 using Humanizer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace OneOff;
+namespace OneOff.Old;
 
 public class SpikeToolkitParameters : IToolkitTokenParameters
 {

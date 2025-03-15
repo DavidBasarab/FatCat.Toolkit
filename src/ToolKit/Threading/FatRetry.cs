@@ -21,7 +21,7 @@ public interface IFatRetry
 	/// <param name="maxRetries">Max retries defaults to 10</param>
 	/// <param name="delay">Delay between retries defaults to 5 seconds</param>
 	/// <returns></returns>
-	Task<bool> Execute(Func<bool> action, int maxRetries = 10, TimeSpan delay = default);
+	bool Execute(Func<bool> action, int maxRetries = 10, TimeSpan delay = default);
 }
 
 [ExcludeFromCodeCoverage(Justification = "This is a simple wrapper around a retry pattern")]
@@ -52,8 +52,8 @@ public class FatRetry : IFatRetry
 		return success;
 	}
 
-	public Task<bool> Execute(Func<bool> action, int maxRetries = 10, TimeSpan delay = default)
+	public bool Execute(Func<bool> action, int maxRetries = 10, TimeSpan delay = default)
 	{
-		return Execute(() => Task.FromResult(action()), maxRetries, delay);
+		return Execute(() => Task.FromResult(action()), maxRetries, delay).Result;
 	}
 }

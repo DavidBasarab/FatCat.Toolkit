@@ -1,11 +1,12 @@
 ﻿using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Threading;
+using Humanizer;
 
 namespace OneOff;
 
 public class RetryWorker(IFatRetry fatRetry)
 {
-	private int maxRetry = 5;
+	private int maxRetry = 75;
 	private int counter;
 
 	public bool TestMethod()
@@ -28,7 +29,7 @@ public class RetryWorker(IFatRetry fatRetry)
 	{
 		ConsoleLog.WriteMagenta("Testing FatRetry");
 
-		var result = await fatRetry.Execute(TestMethod);
+		var result = await fatRetry.Execute(TestMethodAsync, delay: 10.Milliseconds());
 
 		ConsoleLog.WriteMagenta($"Result of FatRetry: {result}");
 	}

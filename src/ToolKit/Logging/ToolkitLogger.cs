@@ -17,28 +17,45 @@ public interface IToolkitLogger
 
 public class ToolkitLogger : IToolkitLogger
 {
+	public static bool Enabled { get; set; } = false;
+
 	public void Debug(string message)
 	{
-		ConsoleLog.WriteGray(message);
+		if (Enabled)
+		{
+			ConsoleLog.WriteGray(message);
+		}
 	}
 
 	public void Error(string message)
 	{
-		ConsoleLog.WriteRed(message);
+		if (Enabled)
+		{
+			ConsoleLog.WriteRed(message);
+		}
 	}
 
 	public void Exception(Exception ex)
 	{
-		ConsoleLog.WriteException(ex);
+		if (Enabled)
+		{
+			ConsoleLog.WriteException(ex);
+		}
 	}
 
 	public void Information(string message)
 	{
-		ConsoleLog.WriteGreen(message);
+		if (Enabled)
+		{
+			ConsoleLog.WriteGreen(message);
+		}
 	}
 
 	public void Warning(string message)
 	{
-		ConsoleLog.WriteYellow(message);
+		if (Enabled)
+		{
+			ConsoleLog.WriteYellow(message);
+		}
 	}
 }

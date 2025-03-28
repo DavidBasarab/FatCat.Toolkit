@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolkit.WebServer", "Toolki
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneOffToolkitOnly", "OneOffToolkitOnly\OneOffToolkitOnly.csproj", "{7F9F9C01-5813-485C-836B-05080EA9B538}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneOffBlazor", "OneOffBlazor\OneOffBlazor.csproj", "{527A29E4-302A-4DCE-8054-84502AFB7679}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{7F9F9C01-5813-485C-836B-05080EA9B538}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F9F9C01-5813-485C-836B-05080EA9B538}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F9F9C01-5813-485C-836B-05080EA9B538}.Release|Any CPU.Build.0 = Release|Any CPU
+		{527A29E4-302A-4DCE-8054-84502AFB7679}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{527A29E4-302A-4DCE-8054-84502AFB7679}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{527A29E4-302A-4DCE-8054-84502AFB7679}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{527A29E4-302A-4DCE-8054-84502AFB7679}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

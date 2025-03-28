@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using FatCat.Toolkit.Console;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -9,6 +10,8 @@ public static class Program
 {
 	public static async Task Main(string[] args)
 	{
+		ConsoleLog.ConsoleAccess = new BlazorConsoleAccess();
+
 		var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 		builder.ConfigureContainer(new AutofacServiceProviderFactory(ConfigureContainer));
@@ -26,5 +29,6 @@ public static class Program
 	private static void ConfigureContainer(ContainerBuilder builder)
 	{
 		Console.WriteLine("Configuring Autofac container...");
+		ConsoleLog.WriteMagenta("Trying to see if this will work");
 	}
 }

@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject ITestingService TestingService
 
 <PageTitle>Jesus is LORD</PageTitle>
 
@@ -8,6 +9,12 @@
     Welcome to your new app.
 </div>
 
+<button @onclick="OnClick">Do Test</button>
+
+@code
+{
+    void OnClick() { TestingService.PrintAMessage(); }
+}
 
 
 

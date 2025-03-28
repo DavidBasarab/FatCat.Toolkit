@@ -7,7 +7,7 @@
         <AssemblyName>FatCat.Toolkit.WebServer</AssemblyName>
         <DebugType>full</DebugType>
         <LangVersion>default</LangVersion>
-    <VersionPrefix>1.0.93</VersionPrefix>
+    <VersionPrefix>1.0.94</VersionPrefix>
         <Authors>David Basarab</Authors>
         <PackageTags>tools</PackageTags>
         <PackageProjectUrl>https://github.com/DavidBasarab/FatCat.Toolkit</PackageProjectUrl>
@@ -48,12 +48,15 @@
         <PackageReference Include="Humanizer.Core" Version="2.14.1" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.3" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
-        <PackageReference Include="MongoDB.Driver" Version="3.2.1" />
+        <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="System.IO.Abstractions" Version="22.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Injection\" />
     </ItemGroup>
 </Project>

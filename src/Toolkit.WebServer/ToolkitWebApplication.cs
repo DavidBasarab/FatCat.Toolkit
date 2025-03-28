@@ -2,7 +2,6 @@
 using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Threading;
-using FatCat.Toolkit.WebServer.Injection;
 using Humanizer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,7 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Injection;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -20,15 +21,25 @@ public static class Program
 		builder.RootComponents.Add<HeadOutlet>("head::after");
 
 		builder.Services.AddScoped(
-			sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) }
-		);
+									sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) }
+								);
 
 		await builder.Build().RunAsync();
 	}
 
 	private static void ConfigureContainer(ContainerBuilder builder)
 	{
-		Console.WriteLine("Configuring Autofac container...");
-		ConsoleLog.WriteMagenta("Trying to see if this will work");
+		ConsoleLog.Write("Initialize System Scope...");
+
+		SystemScope.Initialize(
+								builder,
+								[
+									typeof(OneOffModule).Assembly,
+									typeof(Program).Assembly,
+									typeof(ConsoleLog).Assembly,
+								]
+							);
+
+		ConsoleLog.Write("System Scope initialized.");
 	}
 }

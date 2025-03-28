@@ -11,7 +11,7 @@ public static class Program
 {
 	public static async Task Main(string[] args)
 	{
-		ConsoleLog.ConsoleAccess = new BlazorConsoleAccess();
+		ConsoleLog.ConsoleAccess = new NoColorConsoleAccess();
 
 		var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

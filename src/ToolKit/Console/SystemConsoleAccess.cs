@@ -7,7 +7,7 @@ public interface IConsoleAccess
 
 public class SystemConsoleAccess : IConsoleAccess
 {
-	private readonly object lockObject = new();
+	private readonly Lock lockObject = new();
 
 	public void WriteLineWithColor(ConsoleColor color, string message)
 	{
@@ -27,4 +27,12 @@ public class SystemConsoleAccess : IConsoleAccess
 public class NoOpConsoleAccess : IConsoleAccess
 {
 	public void WriteLineWithColor(ConsoleColor color, string message) { }
+}
+
+public class NoColorConsoleAccess : IConsoleAccess
+{
+	public void WriteLineWithColor(ConsoleColor color, string message)
+	{
+		System.Console.WriteLine(message);
+	}
 }

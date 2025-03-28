@@ -27,7 +27,7 @@ using System.Globalization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 
-namespace FatCat.Toolkit.WebServer.Injection.Helpers
+namespace FatCat.Toolkit.Injection.Helpers
 {
 	/// <summary>
 	/// Extension methods for use with the <see cref="AutofacServiceProvider"/>.

@@ -27,7 +27,7 @@ using System.Diagnostics.CodeAnalysis;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FatCat.Toolkit.WebServer.Injection.Helpers
+namespace FatCat.Toolkit.Injection.Helpers
 {
 	/// <summary>
 	/// Autofac implementation of the ASP.NET Core <see cref="IServiceScopeFactory"/>.

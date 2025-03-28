@@ -56,4 +56,7 @@
     <ItemGroup>
         <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Injection\" />
+    </ItemGroup>
 </Project>

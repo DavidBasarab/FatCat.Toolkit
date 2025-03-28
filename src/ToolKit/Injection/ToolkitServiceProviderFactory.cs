@@ -1,8 +1,8 @@
 ﻿using Autofac;
-using FatCat.Toolkit.WebServer.Injection.Helpers;
+using FatCat.Toolkit.Injection.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FatCat.Toolkit.WebServer.Injection;
+namespace FatCat.Toolkit.Injection;
 
 public class AutofacOptions
 {

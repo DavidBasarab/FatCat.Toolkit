@@ -29,7 +29,7 @@ using Autofac;
 using Autofac.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FatCat.Toolkit.WebServer.Injection.Helpers
+namespace FatCat.Toolkit.Injection.Helpers
 {
 	/// <summary>
 	/// Extension methods for registering ASP.NET Core dependencies with Autofac.

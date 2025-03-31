@@ -57,7 +57,7 @@ internal sealed class ApplicationStartUp
 
 		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.Cors))
 		{
-			app.UseCors();
+			app.UseCors(ToolkitWebApplication.CorsPolicyName);
 		}
 
 		app.UseAuthorization();

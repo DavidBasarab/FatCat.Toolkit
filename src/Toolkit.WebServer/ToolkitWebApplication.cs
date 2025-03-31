@@ -12,6 +12,8 @@ namespace FatCat.Toolkit.WebServer;
 
 public static class ToolkitWebApplication
 {
+	public const string CorsPolicyName = "AllOrigins";
+
 	public static ToolkitWebApplicationSettings Settings { get; private set; } = null!;
 
 	public static bool IsOptionSet(WebApplicationOptions option)
@@ -42,6 +44,14 @@ public static class ToolkitWebApplication
 		);
 
 		var app = builder.Build();
+
+		builder.Services.AddCors(policy =>
+		{
+			policy.AddPolicy(
+				CorsPolicyName,
+				builder => builder.SetIsOriginAllowedToAllowWildcardSubdomains().AllowAnyOrigin()
+			);
+		});
 
 		applicationStartUp.Configure(app, app.Environment, app.Services.GetRequiredService<ILoggerFactory>());
 

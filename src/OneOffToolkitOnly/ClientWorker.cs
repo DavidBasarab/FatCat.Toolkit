@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Net;
 using FatCat.Fakes;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Threading;

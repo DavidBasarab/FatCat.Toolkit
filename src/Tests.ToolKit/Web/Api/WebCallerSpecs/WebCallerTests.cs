@@ -122,7 +122,7 @@ public abstract class WebCallerTests
 	[Fact]
 	public async Task DoACallWithAnExtraSlashOnUrl()
 	{
-		webCaller = new(new Uri("https://httpbin.org/"), new JsonOperations(), A.Fake<IToolkitLogger>());
+		webCaller = new WebCaller(new Uri("https://httpbin.org/"), new JsonOperations(), A.Fake<IToolkitLogger>());
 
 		await MakeCall(BasicPath);
 	}

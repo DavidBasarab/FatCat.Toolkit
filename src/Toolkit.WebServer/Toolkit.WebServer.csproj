@@ -7,7 +7,7 @@
         <AssemblyName>FatCat.Toolkit.WebServer</AssemblyName>
         <DebugType>full</DebugType>
         <LangVersion>default</LangVersion>
-    <VersionPrefix>1.0.96</VersionPrefix>
+    <VersionPrefix>1.0.97</VersionPrefix>
         <Authors>David Basarab</Authors>
         <PackageTags>tools</PackageTags>
         <PackageProjectUrl>https://github.com/DavidBasarab/FatCat.Toolkit</PackageProjectUrl>
@@ -20,14 +20,14 @@
 
     <PropertyGroup>
         <NoWarn>$(NoWarn);NETSDK1206</NoWarn>
-    </PropertyGroup>    
+    </PropertyGroup>
 
     <ItemGroup>
-        <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
+        <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true"/>
     </ItemGroup>
 
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
     </ItemGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -40,23 +40,24 @@
         <NoWarn>CS8002,CS1700;IL2121;CS8618;IL2121;CS8603</NoWarn>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="8.2.0" />
-        <PackageReference Include="FakeItEasy" Version="8.3.0" />
-        <PackageReference Include="fasterflect" Version="3.0.0" />
-        <PackageReference Include="FatCat.Fakes" Version="1.0.29" />
-        <PackageReference Include="FluentAssertions" Version="7.0.0" />
-        <PackageReference Include="Humanizer.Core" Version="2.14.1" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.3" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
-        <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="System.IO.Abstractions" Version="22.0.12" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
+        <PackageReference Include="Autofac" Version="8.2.0"/>
+        <PackageReference Include="CSharpVitamins.ShortGuid" Version="2.0.0"/>
+        <PackageReference Include="FakeItEasy" Version="8.3.0"/>
+        <PackageReference Include="fasterflect" Version="3.0.0"/>
+        <PackageReference Include="FatCat.Fakes" Version="1.0.29"/>
+        <PackageReference Include="FluentAssertions" Version="7.0.0"/>
+        <PackageReference Include="Humanizer.Core" Version="2.14.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.3"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3"/>
+        <PackageReference Include="MongoDB.Driver" Version="3.3.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="System.IO.Abstractions" Version="22.0.12"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
+        <ProjectReference Include="..\ToolKit\ToolKit.csproj"/>
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Injection\" />
+        <Folder Include="Injection\"/>
     </ItemGroup>
 </Project>

@@ -2,7 +2,6 @@ using System.Net;
 using FatCat.Toolkit.Web;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
-using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 
 namespace FatCat.Toolkit.Testing;

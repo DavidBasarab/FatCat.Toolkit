@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using Autofac;
-using FatCat.Toolkit;
+﻿using Autofac;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Logging;
@@ -26,34 +24,28 @@ public static class Program
 		try
 		{
 			SystemScope.Initialize(
-				new ContainerBuilder(),
-				[
-					typeof(OneOffModule).Assembly,
-					typeof(Program).Assembly,
-					typeof(ConsoleLog).Assembly,
-					typeof(ToolkitWebServerModule).Assembly
-				],
-				ScopeOptions.SetLifetimeScope
-			);
+									new ContainerBuilder(),
+									[
+										typeof(OneOffModule).Assembly,
+										typeof(Program).Assembly,
+										typeof(ConsoleLog).Assembly,
+										typeof(ToolkitWebServerModule).Assembly
+									],
+									ScopeOptions.SetLifetimeScope
+								);
 
 			RunServer(args);
 
 			// var worker = SystemScope.Container.Resolve<RetryWorker>();
 			//
 			// await worker.DoWork();
-			
+
 			// var consoleUtilities = SystemScope.Container.Resolve<IConsoleUtilities>();
 			//
 			// consoleUtilities.WaitForExit();
 		}
-		catch (Exception ex)
-		{
-			ConsoleLog.WriteException(ex);
-		}
+		catch (Exception ex) { ConsoleLog.WriteException(ex); }
 	}
 
-	private static void RunServer(string[] args)
-	{
-		new ServerWorker(new Thread(new ToolkitLogger())).DoWork(args);
-	}
+	private static void RunServer(string[] args) { new ServerWorker(new Thread(new ToolkitLogger())).DoWork(args); }
 }

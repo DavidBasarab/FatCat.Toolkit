@@ -6,8 +6,17 @@ namespace OneOff;
 
 public class RetryWorker(IFatRetry fatRetry)
 {
-	private int maxRetry = 75;
+	private readonly int maxRetry = 75;
 	private int counter;
+
+	public async Task DoWork()
+	{
+		ConsoleLog.WriteMagenta("Testing FatRetry");
+
+		var result = await fatRetry.Execute(TestMethodAsync, delay: 10.Milliseconds());
+
+		ConsoleLog.WriteMagenta($"Result of FatRetry: {result}");
+	}
 
 	public bool TestMethod()
 	{
@@ -23,14 +32,5 @@ public class RetryWorker(IFatRetry fatRetry)
 		await Task.CompletedTask;
 
 		return TestMethod();
-	}
-
-	public async Task DoWork()
-	{
-		ConsoleLog.WriteMagenta("Testing FatRetry");
-
-		var result = await fatRetry.Execute(TestMethodAsync, delay: 10.Milliseconds());
-
-		ConsoleLog.WriteMagenta($"Result of FatRetry: {result}");
 	}
 }

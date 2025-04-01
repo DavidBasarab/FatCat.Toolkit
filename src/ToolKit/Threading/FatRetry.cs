@@ -6,7 +6,7 @@ namespace FatCat.Toolkit.Threading;
 public interface IFatRetry
 {
 	/// <summary>
-	/// Will execute async function until it returns true or maxRetries is reached
+	///  Will execute async function until it returns true or maxRetries is reached
 	/// </summary>
 	/// <param name="action">Action to execute</param>
 	/// <param name="maxRetries">Max retries defaults to 10</param>
@@ -15,7 +15,7 @@ public interface IFatRetry
 	Task<bool> Execute(Func<Task<bool>> action, int maxRetries = 10, TimeSpan delay = default);
 
 	/// <summary>
-	/// Will execute function until it returns true or maxRetries is reached
+	///  Will execute function until it returns true or maxRetries is reached
 	/// </summary>
 	/// <param name="action">Action to execute</param>
 	/// <param name="maxRetries">Max retries defaults to 10</param>

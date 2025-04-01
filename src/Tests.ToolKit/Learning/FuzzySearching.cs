@@ -7,47 +7,47 @@ public class FuzzySearching
 {
 	private readonly List<SearchObject> searchList =
 	[
-		new SearchObject
+		new()
 		{
 			FirstName = "Joe",
 			LastName = "Burrow"
 		},
-		new SearchObject
+		new()
 		{
 			FirstName = "Ja'Marr",
 			LastName = "Chase"
 		},
-		new SearchObject
+		new()
 		{
 			FirstName = "Joe",
 			LastName = "Mixon"
 		},
-		new SearchObject
+		new()
 		{
 			FirstName = "Joe",
 			LastName = "Montana"
 		},
-		new SearchObject
+		new()
 		{
 			FirstName = "Zack",
 			LastName = "Taylor"
 		},
-		new SearchObject
+		new()
 		{
 			FirstName = "Jason",
 			LastName = "Taylor"
 		},
-		new SearchObject
+		new()
 		{
 			FirstName = "Trader",
 			LastName = "Joe"
 		},
-		new SearchObject
+		new()
 		{
 			FirstName = "Taylor",
 			LastName = "Zack"
 		},
-		new SearchObject
+		new()
 		{
 			FirstName = "Taylor",
 			LastName = "Jason"

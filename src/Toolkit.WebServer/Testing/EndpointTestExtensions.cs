@@ -73,8 +73,8 @@ public class EndpointAssertions(Endpoint endpoint)
 		}
 		else
 		{
-			Execute
-				.Assertion.ForCondition(hasExpectedTemplate)
+			Execute.Assertion
+				.ForCondition(hasExpectedTemplate)
 				.FailWith(
 					$@"
 Expected to find: {expectedTemplate} in:

@@ -1,6 +1,3 @@
 namespace OneOffBlazor;
 
-public class OneOffModule
-{
-	
-}
+public class OneOffModule { }

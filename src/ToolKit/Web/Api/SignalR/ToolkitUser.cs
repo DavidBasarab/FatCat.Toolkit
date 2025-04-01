@@ -11,7 +11,7 @@ public class ToolkitUser : EqualObject
 			return new ToolkitUser();
 		}
 
-		return new()
+		return new ToolkitUser
 		{
 			Name = contextUser.Identity?.Name,
 			AuthenticationType = contextUser.Identity?.AuthenticationType,

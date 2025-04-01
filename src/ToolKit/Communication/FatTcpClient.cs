@@ -9,13 +9,12 @@ namespace FatCat.Toolkit.Communication;
 
 public abstract class FatTcpClient(IFatTcpLogger logger, IThread thread)
 {
+	private readonly ConcurrentBag<byte[]> messagesToSend = [];
 	private byte[] buffer;
 	private int bufferSize;
 	private CancellationTokenSource cancelSource;
 	private CancellationToken cancelToken;
 	private string host;
-
-	private readonly ConcurrentBag<byte[]> messagesToSend = [];
 	private ushort port;
 	private Stream stream;
 	protected TcpClient tcpClient;
@@ -80,50 +79,6 @@ public abstract class FatTcpClient(IFatTcpLogger logger, IThread thread)
 	protected virtual void OnOnMessageReceived(byte[] data)
 	{
 		TcpMessageReceivedEvent?.Invoke(data);
-	}
-
-	private async Task SendMessage(byte[] bytes)
-	{
-		if (!Connected || tcpClient is null || stream is null)
-		{
-			return;
-		}
-
-		try
-		{
-			logger.WriteDebug($"Sending {bytes.Length} bytes to {host}:{port}");
-
-			await stream.WriteAsync(bytes, cancelToken);
-
-			logger.WriteDebug($"Done sending {bytes.Length} bytes to {host}:{port}");
-		}
-		catch (SocketException)
-		{
-			ShutdownSocket();
-
-			await TryReconnect();
-		}
-		catch (IOException)
-		{
-			ShutdownSocket();
-
-			await TryReconnect();
-		}
-	}
-
-	private async Task SendingThread()
-	{
-		while (!cancelToken.IsCancellationRequested)
-		{
-			if (messagesToSend.TryTake(out var bytes))
-			{
-				await SendMessage(bytes);
-			}
-			else
-			{
-				await thread.Sleep(1.Milliseconds(), cancelToken);
-			}
-		}
 	}
 
 	private async Task CreateSocket()
@@ -198,6 +153,50 @@ public abstract class FatTcpClient(IFatTcpLogger logger, IThread thread)
 		catch (Exception e)
 		{
 			ConsoleLog.WriteException(e);
+		}
+	}
+
+	private async Task SendingThread()
+	{
+		while (!cancelToken.IsCancellationRequested)
+		{
+			if (messagesToSend.TryTake(out var bytes))
+			{
+				await SendMessage(bytes);
+			}
+			else
+			{
+				await thread.Sleep(1.Milliseconds(), cancelToken);
+			}
+		}
+	}
+
+	private async Task SendMessage(byte[] bytes)
+	{
+		if (!Connected || tcpClient is null || stream is null)
+		{
+			return;
+		}
+
+		try
+		{
+			logger.WriteDebug($"Sending {bytes.Length} bytes to {host}:{port}");
+
+			await stream.WriteAsync(bytes, cancelToken);
+
+			logger.WriteDebug($"Done sending {bytes.Length} bytes to {host}:{port}");
+		}
+		catch (SocketException)
+		{
+			ShutdownSocket();
+
+			await TryReconnect();
+		}
+		catch (IOException)
+		{
+			ShutdownSocket();
+
+			await TryReconnect();
 		}
 	}
 

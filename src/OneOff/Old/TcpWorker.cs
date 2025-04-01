@@ -14,15 +14,16 @@ namespace OneOff.Old;
 public class TcpWorker(ISimpleTcpSender tcpSender, IGenerator generator, IThread thread) : SpikeWorker
 {
 	private const int TcpPort = 24329;
-	private readonly ISimpleTcpSender tcpSender = tcpSender;
-	private IFatTcpClient fatTcpClient;
-	private IFatTcpServer fatTcpServer;
-	private static int numberOfErrors = 0;
+	private static int numberOfErrors;
 
 	public static int NumberOfErrors
 	{
 		get => numberOfErrors;
 	}
+
+	private readonly ISimpleTcpSender tcpSender = tcpSender;
+	private IFatTcpClient fatTcpClient;
+	private IFatTcpServer fatTcpServer;
 
 	public override async Task DoWork()
 	{
@@ -58,14 +59,6 @@ public class TcpWorker(ISimpleTcpSender tcpSender, IGenerator generator, IThread
 		}
 	}
 
-	private async Task SendMessages()
-	{
-		for (var i = 0; i < 8500000; i++)
-		{
-			await SendMessage(i);
-		}
-	}
-
 	private async Task SendMessage(int i)
 	{
 		try
@@ -89,6 +82,14 @@ public class TcpWorker(ISimpleTcpSender tcpSender, IGenerator generator, IThread
 			ConsoleLog.WriteException(ex);
 
 			Interlocked.Increment(ref numberOfErrors);
+		}
+	}
+
+	private async Task SendMessages()
+	{
+		for (var i = 0; i < 8500000; i++)
+		{
+			await SendMessage(i);
 		}
 	}
 

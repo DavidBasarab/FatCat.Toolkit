@@ -6,11 +6,11 @@ namespace FatCat.Toolkit.Json;
 
 public interface IJsonOperations
 {
+	JsonSerializerSettings JsonSettings { get; set; }
+
 	T Deserialize<T>(string json);
 
 	string Serialize(object dataObject);
-
-	JsonSerializerSettings JsonSettings { get; set; }
 }
 
 public class JsonOperations : IJsonOperations

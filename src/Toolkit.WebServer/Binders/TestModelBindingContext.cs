@@ -39,7 +39,7 @@ public class TestModelBindingContext(TestValueProvider testValueProvider) : Mode
 	}
 
 	public TestModelBindingContext()
-		: this(new()) { }
+		: this(new TestValueProvider()) { }
 
 	public void AddTestValues(string name, string value)
 	{

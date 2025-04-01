@@ -20,7 +20,7 @@ public class ServerWorker(IThread thread)
 	{
 		applicationSettings = new ToolkitWebApplicationSettings
 		{
-			Options = WebApplicationOptions.SignalR,
+			Options = WebApplicationOptions.SignalR | WebApplicationOptions.Cors,
 			TlsCertificate = new CertificationSettings
 			{
 				Location = @"C:\DevelopmentCert\DevelopmentCert.pfx",

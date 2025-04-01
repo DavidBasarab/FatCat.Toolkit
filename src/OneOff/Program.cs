@@ -36,11 +36,11 @@ public static class Program
 				ScopeOptions.SetLifetimeScope
 			);
 
-			// RunServer(args);
+			RunServer(args);
 
-			var worker = SystemScope.Container.Resolve<RetryWorker>();
-			
-			await worker.DoWork();
+			// var worker = SystemScope.Container.Resolve<RetryWorker>();
+			//
+			// await worker.DoWork();
 			
 			// var consoleUtilities = SystemScope.Container.Resolve<IConsoleUtilities>();
 			//

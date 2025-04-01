@@ -35,6 +35,18 @@ public static class ToolkitWebApplication
 
 		builder.Services.AddHttpContextAccessor();
 
+		builder.Services.AddCors(options =>
+		{
+			options.AddPolicy(
+				CorsPolicyName,
+				policy =>
+					policy
+						.AllowAnyOrigin() // Allows all domains
+						.AllowAnyMethod() // Allows all HTTP methods
+						.AllowAnyHeader()
+			);
+		});
+
 		var applicationStartUp = new ApplicationStartUp();
 
 		applicationStartUp.ConfigureServices(builder.Services);
@@ -44,14 +56,6 @@ public static class ToolkitWebApplication
 		);
 
 		var app = builder.Build();
-
-		builder.Services.AddCors(policy =>
-		{
-			policy.AddPolicy(
-				CorsPolicyName,
-				builder => builder.SetIsOriginAllowedToAllowWildcardSubdomains().AllowAnyOrigin()
-			);
-		});
 
 		applicationStartUp.Configure(app, app.Environment, app.Services.GetRequiredService<ILoggerFactory>());
 

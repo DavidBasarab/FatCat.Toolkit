@@ -28,6 +28,11 @@ internal sealed class ApplicationStartUp
 {
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
 	{
+		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.Cors))
+		{
+			app.UseCors(ToolkitWebApplication.CorsPolicyName);
+		}
+
 		app.Use(CaptureMiddlewareExceptions);
 
 		app.UseFileServer();
@@ -53,11 +58,6 @@ internal sealed class ApplicationStartUp
 		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.HttpsRedirection))
 		{
 			app.UseHttpsRedirection();
-		}
-
-		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.Cors))
-		{
-			app.UseCors(ToolkitWebApplication.CorsPolicyName);
 		}
 
 		app.UseAuthorization();

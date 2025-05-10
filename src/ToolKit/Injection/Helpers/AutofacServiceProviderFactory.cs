@@ -8,7 +8,7 @@ namespace FatCat.Toolkit.Injection.Helpers;
 /// </summary>
 public class AutofacServiceProviderFactory : IServiceProviderFactory<ContainerBuilder>
 {
-	private readonly Action<ContainerBuilder> _configurationAction;
+	private readonly Action<ContainerBuilder> configurationAction;
 
 	/// <summary>
 	///  Initializes a new instance of the <see cref="AutofacServiceProviderFactory" /> class.
@@ -19,7 +19,7 @@ public class AutofacServiceProviderFactory : IServiceProviderFactory<ContainerBu
 	/// </param>
 	public AutofacServiceProviderFactory(Action<ContainerBuilder> configurationAction = null)
 	{
-		_configurationAction = configurationAction ?? (builder => { });
+		this.configurationAction = configurationAction ?? (_ => { });
 	}
 
 	/// <summary>
@@ -33,7 +33,7 @@ public class AutofacServiceProviderFactory : IServiceProviderFactory<ContainerBu
 
 		builder.Populate(services);
 
-		_configurationAction(builder);
+		configurationAction(builder);
 
 		return builder;
 	}
@@ -51,6 +51,10 @@ public class AutofacServiceProviderFactory : IServiceProviderFactory<ContainerBu
 		}
 
 		var container = containerBuilder.Build();
+
+		var systemScope = container.Resolve<ISystemScope>();
+
+		systemScope.LifetimeScope ??= container;
 
 		return new AutofacServiceProvider(container);
 	}

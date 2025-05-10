@@ -21,6 +21,8 @@ public interface ISystemScope
 
 	bool TryResolve<TItem>(out TItem instance)
 		where TItem : class;
+
+	ILifetimeScope LifetimeScope { get; set; }
 }
 
 public class SystemScope : ISystemScope

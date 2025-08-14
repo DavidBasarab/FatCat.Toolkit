@@ -70,10 +70,8 @@ public interface IWebCaller
 	void UserBearerToken(string token);
 }
 
-public class WebCaller : IWebCaller
+public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger logger) : IWebCaller
 {
-	private readonly IJsonOperations jsonOperations;
-	private readonly IToolkitLogger logger;
 	private string basicPassword;
 	private string basicUsername;
 	private string bearerToken;
@@ -82,27 +80,9 @@ public class WebCaller : IWebCaller
 
 	public string Accept { get; set; }
 
-	public Uri BaseUri { get; }
+	public Uri BaseUri { get; } = uri;
 
 	public TimeSpan Timeout { get; set; } = 30.Seconds();
-
-	public WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger logger)
-	{
-		this.jsonOperations = jsonOperations;
-		this.logger = logger;
-		BaseUri = uri;
-
-		this.jsonOperations.JsonSettings = new JsonSerializerSettings
-		{
-			TypeNameHandling = TypeNameHandling.Auto,
-			NullValueHandling = NullValueHandling.Ignore,
-			Converters = new List<Newtonsoft.Json.JsonConverter>
-			{
-				new StringEnumConverter(),
-				new ObjectIdConverter(),
-			},
-		};
-	}
 
 	public void ClearAuthorization()
 	{
@@ -170,14 +150,14 @@ public class WebCaller : IWebCaller
 
 	public async Task<FatWebResponse> Post<T>(string url, T data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data);
+		var json = jsonOperations.Serialize(data, GetJsonSerializer());
 
 		return await SendWebRequest(HttpMethod.Post, url, timeout, json, "application/json");
 	}
 
 	public async Task<FatWebResponse> Post<T>(string url, List<T> data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data);
+		var json = jsonOperations.Serialize(data, GetJsonSerializer());
 
 		return await SendWebRequest(HttpMethod.Post, url, timeout, json, "application/json");
 	}
@@ -199,14 +179,14 @@ public class WebCaller : IWebCaller
 
 	public Task<FatWebResponse> Put<T>(string url, T data)
 	{
-		var json = jsonOperations.Serialize(data);
+		var json = jsonOperations.Serialize(data, GetJsonSerializer());
 
 		return SendWebRequest(HttpMethod.Put, url, Timeout, json);
 	}
 
 	public Task<FatWebResponse> Put<T>(string url, List<T> data)
 	{
-		var json = jsonOperations.Serialize(data);
+		var json = jsonOperations.Serialize(data, GetJsonSerializer());
 
 		return SendWebRequest(HttpMethod.Put, url, Timeout, json);
 	}
@@ -228,14 +208,14 @@ public class WebCaller : IWebCaller
 
 	public Task<FatWebResponse> Put<T>(string url, T data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data);
+		var json = jsonOperations.Serialize(data, GetJsonSerializer());
 
 		return SendWebRequest(HttpMethod.Put, url, timeout, json);
 	}
 
 	public Task<FatWebResponse> Put<T>(string url, List<T> data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data);
+		var json = jsonOperations.Serialize(data, GetJsonSerializer());
 
 		return SendWebRequest(HttpMethod.Put, url, timeout, json);
 	}
@@ -300,6 +280,16 @@ public class WebCaller : IWebCaller
 		{
 			request.Headers.Authorization = null;
 		}
+	}
+
+	private static JsonSerializer GetJsonSerializer()
+	{
+		return new JsonSerializer
+		{
+			Converters = { new StringEnumConverter(), new ObjectIdConverter() },
+			TypeNameHandling = TypeNameHandling.Auto,
+			NullValueHandling = NullValueHandling.Ignore,
+		};
 	}
 
 	private async Task<FatWebResponse> SendWebRequest(

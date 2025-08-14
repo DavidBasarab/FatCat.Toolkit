@@ -1,12 +1,10 @@
-#nullable enable
 using FatCat.Toolkit.Json;
-using Newtonsoft.Json;
 
 namespace FatCat.Toolkit.Extensions;
 
 public static class ObjectExtensions
 {
-	public static T? DeepCopy<T>(this T? objectToCopy)
+	public static T DeepCopy<T>(this T objectToCopy)
 		where T : class
 	{
 		if (objectToCopy == null)
@@ -14,8 +12,10 @@ public static class ObjectExtensions
 			return null;
 		}
 
-		var json = JsonConvert.SerializeObject(objectToCopy, JsonOperations.DefaultSettings);
+		var jsonOperations = new JsonOperations();
 
-		return JsonConvert.DeserializeObject<T>(json, JsonOperations.DefaultSettings);
+		var json = jsonOperations.Serialize(objectToCopy);
+
+		return jsonOperations.Deserialize<T>(json);
 	}
 }

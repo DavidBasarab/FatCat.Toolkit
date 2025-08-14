@@ -1,13 +1,10 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using FatCat.Toolkit.Data.Mongo;
 using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Logging;
 using Humanizer;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace FatCat.Toolkit.Web;
 
@@ -150,14 +147,14 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 	public async Task<FatWebResponse> Post<T>(string url, T data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data, GetJsonSerializer());
+		var json = jsonOperations.Serialize(data);
 
 		return await SendWebRequest(HttpMethod.Post, url, timeout, json, "application/json");
 	}
 
 	public async Task<FatWebResponse> Post<T>(string url, List<T> data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data, GetJsonSerializer());
+		var json = jsonOperations.Serialize(data);
 
 		return await SendWebRequest(HttpMethod.Post, url, timeout, json, "application/json");
 	}
@@ -179,14 +176,14 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 	public Task<FatWebResponse> Put<T>(string url, T data)
 	{
-		var json = jsonOperations.Serialize(data, GetJsonSerializer());
+		var json = jsonOperations.Serialize(data);
 
 		return SendWebRequest(HttpMethod.Put, url, Timeout, json);
 	}
 
 	public Task<FatWebResponse> Put<T>(string url, List<T> data)
 	{
-		var json = jsonOperations.Serialize(data, GetJsonSerializer());
+		var json = jsonOperations.Serialize(data);
 
 		return SendWebRequest(HttpMethod.Put, url, Timeout, json);
 	}
@@ -208,14 +205,14 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 	public Task<FatWebResponse> Put<T>(string url, T data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data, GetJsonSerializer());
+		var json = jsonOperations.Serialize(data);
 
 		return SendWebRequest(HttpMethod.Put, url, timeout, json);
 	}
 
 	public Task<FatWebResponse> Put<T>(string url, List<T> data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data, GetJsonSerializer());
+		var json = jsonOperations.Serialize(data);
 
 		return SendWebRequest(HttpMethod.Put, url, timeout, json);
 	}
@@ -280,16 +277,6 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 		{
 			request.Headers.Authorization = null;
 		}
-	}
-
-	private static JsonSerializer GetJsonSerializer()
-	{
-		return new JsonSerializer
-		{
-			Converters = { new StringEnumConverter(), new ObjectIdConverter() },
-			TypeNameHandling = TypeNameHandling.Auto,
-			NullValueHandling = NullValueHandling.Ignore,
-		};
 	}
 
 	private async Task<FatWebResponse> SendWebRequest(

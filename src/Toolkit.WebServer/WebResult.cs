@@ -1,9 +1,9 @@
 using System.Net;
 using FatCat.Toolkit.Extensions;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Newtonsoft.Json;
 
 namespace FatCat.Toolkit.WebServer;
 
@@ -37,7 +37,7 @@ public class WebResult<T> : IActionResult
 
 	public static WebResult<T> Ok(T item)
 	{
-		return new WebResult<T>(WebResult.Ok(JsonConvert.SerializeObject(item)));
+		return new WebResult<T>(WebResult.Ok(new JsonOperations().Serialize(item)));
 	}
 
 	public WebResult BaseResult { get; }
@@ -222,13 +222,13 @@ public class WebResult : IActionResult
 		: this(content!.IsNullOrEmpty() ? HttpStatusCode.NoContent : HttpStatusCode.OK, content) { }
 
 	public WebResult(HttpStatusCode statusCode, EqualObject resultObject)
-		: this(statusCode, Web.Json.Serialize(resultObject)) { }
+		: this(statusCode, new JsonOperations().Serialize(resultObject)) { }
 
 	public WebResult(HttpStatusCode statusCode, IEnumerable<EqualObject> returnList)
-		: this(statusCode, Web.Json.Serialize(returnList)) { }
+		: this(statusCode, new JsonOperations().Serialize(returnList)) { }
 
 	public WebResult(IEnumerable<EqualObject> returnList)
-		: this(HttpStatusCode.OK, Web.Json.Serialize(returnList)) { }
+		: this(HttpStatusCode.OK, new JsonOperations().Serialize(returnList)) { }
 
 	public WebResult(FatWebResponse webResponse)
 		: this(webResponse.StatusCode, webResponse.Content)
@@ -237,7 +237,7 @@ public class WebResult : IActionResult
 	}
 
 	public WebResult(HttpStatusCode statusCode, ModelStateDictionary modelState)
-		: this(statusCode, Web.Json.Serialize(new SerializableError(modelState))) { }
+		: this(statusCode, new JsonOperations().Serialize(new SerializableError(modelState))) { }
 
 	public WebResult(HttpStatusCode statusCode, string content)
 	{
@@ -263,7 +263,7 @@ public class WebResult : IActionResult
 		{
 			Content = Content,
 			StatusCode = (int?)StatusCode,
-			ContentType = ContentType
+			ContentType = ContentType,
 		};
 
 		await result.ExecuteResultAsync(context);

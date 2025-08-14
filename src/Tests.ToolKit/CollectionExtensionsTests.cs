@@ -21,14 +21,14 @@ public class CollectionExtensionsTests
 	{
 		var firstList = new List<ComparableTestItem>
 		{
-			new() { Number = 1, AName = "One", },
-			new() { Number = 2, AName = "Two" }
+			new() { Number = 1, AName = "One" },
+			new() { Number = 2, AName = "Two" },
 		};
 
 		var secondList = new List<ComparableTestItem>
 		{
 			new() { Number = 2, AName = "Two" },
-			new() { Number = 1, AName = "One", }
+			new() { Number = 1, AName = "One" },
 		};
 
 		firstList.ListsAreEqual(secondList).Should().BeTrue();
@@ -39,14 +39,14 @@ public class CollectionExtensionsTests
 	{
 		var firstList = new List<TestItem>
 		{
-			new() { Number = 1, AName = "One", },
-			new() { Number = 2, AName = "Two" }
+			new() { Number = 1, AName = "One" },
+			new() { Number = 2, AName = "Two" },
 		};
 
 		var secondList = new List<TestItem>
 		{
-			new() { Number = 1, AName = "One", },
-			new() { Number = 2, AName = "Two" }
+			new() { Number = 1, AName = "One" },
+			new() { Number = 2, AName = "Two" },
 		};
 
 		firstList.ListsAreEqual(secondList).Should().BeTrue();

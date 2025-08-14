@@ -158,7 +158,7 @@ public class ClientWorker(IThread thread, IToolkitHubClientFactory hubFactory, I
 			{
 				Data = $"This is from the client - <{Faker.RandomString()}>",
 				MessageType = 13,
-				ConnectionId = "ConnectionId"
+				ConnectionId = "ConnectionId",
 			}
 		);
 	}

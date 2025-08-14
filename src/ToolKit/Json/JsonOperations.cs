@@ -1,155 +1,180 @@
-using System.Text;
-using FatCat.Toolkit.Data.Mongo;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace FatCat.Toolkit.Json;
 
 public interface IJsonOperations
 {
+	T Deserialize<T>(string json, JsonSerializerOptions options);
+
 	T Deserialize<T>(string json);
 
-	T Deserialize<T>(string json, JsonSerializer serializer);
+	T DeserializeFromStream<T>(Stream input, JsonSerializerOptions options = null, bool leaveOpen = false);
 
-	T Deserialize<T>(string json, IContractResolver contractResolver);
+	T DeserializeFromStreamAsync<T>(
+		Stream input,
+		JsonSerializerOptions options = null,
+		bool leaveOpen = false,
+		CancellationToken ct = default
+	);
 
-	T Deserialize<T>(string json, TypeNameHandling typeNameHandling);
-
-	T Deserialize<T>(string json, params JsonConverter[] converters);
-
-	JsonSerializer GetDefaultSerializer();
+	JsonSerializerOptions GetDefaultOptions(bool indented = false);
 
 	string Serialize(object source);
 
-	string Serialize(object source, JsonSerializer serializer);
+	string Serialize(object source, JsonSerializerOptions options);
 
-	string Serialize(object source, Formatting formatting);
+	string Serialize(object source, bool indented);
 
-	string Serialize(object source, Formatting formatting, TypeNameHandling typeNameHandling);
+	void SerializeToStream(
+		object source,
+		Stream output,
+		JsonSerializerOptions options = null,
+		bool leaveOpen = false
+	);
 
-	string Serialize(object source, Formatting formatting, bool includeNullProperties);
+	void SerializeToStreamAsync(
+		object source,
+		Stream output,
+		JsonSerializerOptions options = null,
+		bool leaveOpen = false,
+		CancellationToken ct = default
+	);
+
+	bool TryDeserialize<T>(string json, out T value, JsonSerializerOptions options = null);
 }
 
-public class JsonOperations : IJsonOperations
+public sealed class JsonOperations : IJsonOperations
 {
+	public T Deserialize<T>(string json, JsonSerializerOptions options)
+	{
+		return JsonSerializer.Deserialize<T>(json, options ?? GetDefaultOptions());
+	}
+
 	public T Deserialize<T>(string json)
 	{
-		return DoDeserialize<T>(json, GetDefaultSerializer());
+		return Deserialize<T>(json, null);
 	}
 
-	public T Deserialize<T>(string json, JsonSerializer serializer)
+	public T DeserializeFromStream<T>(Stream input, JsonSerializerOptions options = null, bool leaveOpen = false)
 	{
-		return DoDeserialize<T>(json, serializer);
-	}
-
-	public T Deserialize<T>(string json, IContractResolver contractResolver)
-	{
-		var serializer = GetDefaultSerializer();
-
-		serializer.ContractResolver = contractResolver;
-
-		return DoDeserialize<T>(json, serializer);
-	}
-
-	public T Deserialize<T>(string json, TypeNameHandling typeNameHandling)
-	{
-		var serializer = GetDefaultSerializer();
-
-		serializer.TypeNameHandling = typeNameHandling;
-
-		return DoDeserialize<T>(json, serializer);
-	}
-
-	public T Deserialize<T>(string json, params JsonConverter[] converters)
-	{
-		var serializer = new JsonSerializer
+		// Sync read – buffer into memory
+		using (var ms = new MemoryStream())
 		{
-			Converters = { new StringEnumConverter() },
-			TypeNameHandling = TypeNameHandling.Auto,
-			NullValueHandling = NullValueHandling.Ignore,
-		};
+			input.CopyTo(ms);
 
-		foreach (var jsonConverter in converters)
+			if (!leaveOpen)
+			{
+				input.Dispose();
+			}
+
+			return JsonSerializer.Deserialize<T>(ms.ToArray(), options ?? GetDefaultOptions());
+		}
+	}
+
+	public T DeserializeFromStreamAsync<T>(
+		Stream input,
+		JsonSerializerOptions options = null,
+		bool leaveOpen = false,
+		CancellationToken ct = default
+	)
+	{
+		var result = JsonSerializer
+			.DeserializeAsync<T>(input, options ?? GetDefaultOptions(), ct)
+			.AsTask()
+			.GetAwaiter()
+			.GetResult();
+
+		if (!leaveOpen)
 		{
-			serializer.Converters.Add(jsonConverter);
+			input.Dispose();
 		}
 
-		return DoDeserialize<T>(json, serializer);
+		return result;
 	}
 
-	public JsonSerializer GetDefaultSerializer()
+	public JsonSerializerOptions GetDefaultOptions(bool indented = false)
 	{
-		return new JsonSerializer
+		var opts = new JsonSerializerOptions
 		{
-			Converters = { new StringEnumConverter(), new ObjectIdConverter() },
-			TypeNameHandling = TypeNameHandling.None,
-			NullValueHandling = NullValueHandling.Ignore,
+			WriteIndented = indented,
+			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+			PropertyNameCaseInsensitive = true,
 		};
+
+		opts.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+		opts.Converters.Add(new ObjectIdJsonConverter());
+
+		return opts;
+	}
+
+	public string Serialize(object source, JsonSerializerOptions options)
+	{
+		return JsonSerializer.Serialize(source, options ?? GetDefaultOptions());
 	}
 
 	public string Serialize(object source)
 	{
-		return DoSerialize(source, GetDefaultSerializer());
+		return Serialize(source, GetDefaultOptions());
 	}
 
-	public string Serialize(object source, JsonSerializer serializer)
+	public string Serialize(object source, bool indented)
 	{
-		return DoSerialize(source, serializer);
+		return Serialize(source, GetDefaultOptions(indented));
 	}
 
-	public string Serialize(object source, Formatting formatting)
+	public void SerializeToStream(
+		object source,
+		Stream output,
+		JsonSerializerOptions options = null,
+		bool leaveOpen = false
+	)
 	{
-		var serializer = GetDefaultSerializer();
+		using (
+			var writer = new Utf8JsonWriter(
+				output,
+				new JsonWriterOptions { Indented = (options ?? GetDefaultOptions()).WriteIndented }
+			)
+		)
+		{
+			JsonSerializer.Serialize(writer, source, options ?? GetDefaultOptions());
+			writer.Flush();
+		}
 
-		serializer.Formatting = formatting;
-
-		return DoSerialize(source, serializer);
+		if (!leaveOpen)
+		{
+			output.Flush();
+		}
 	}
 
-	public string Serialize(object source, Formatting formatting, TypeNameHandling typeNameHandling)
+	public void SerializeToStreamAsync(
+		object source,
+		Stream output,
+		JsonSerializerOptions options = null,
+		bool leaveOpen = false,
+		CancellationToken ct = default
+	)
 	{
-		var serializer = GetDefaultSerializer();
+		JsonSerializer.SerializeAsync(output, source, options ?? GetDefaultOptions(), ct).GetAwaiter().GetResult();
 
-		serializer.Formatting = formatting;
-		serializer.TypeNameHandling = typeNameHandling;
-
-		return DoSerialize(source, serializer);
+		if (!leaveOpen)
+		{
+			output.Flush();
+		}
 	}
 
-	public string Serialize(object source, Formatting formatting, bool includeNullProperties)
+	public bool TryDeserialize<T>(string json, out T value, JsonSerializerOptions options = null)
 	{
-		var serializer = GetDefaultSerializer();
-
-		serializer.Formatting = formatting;
-
-		serializer.NullValueHandling = includeNullProperties
-			? NullValueHandling.Include
-			: NullValueHandling.Ignore;
-
-		return DoSerialize(source, serializer);
-	}
-
-	private static T DoDeserialize<T>(string json, JsonSerializer serializer)
-	{
-		using var stringReader = new StringReader(json);
-		using var jsonReader = new JsonTextReader(stringReader);
-
-		return serializer.Deserialize<T>(jsonReader);
-	}
-
-	private static string DoSerialize(object source, JsonSerializer serializer)
-	{
-		using var stream = new MemoryStream();
-		using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
-		using var jsonWriter = new JsonTextWriter(writer);
-
-		serializer.Serialize(jsonWriter, source);
-		jsonWriter.Flush();
-		writer.Flush();
-
-		stream.Position = 0;
-		using var reader = new StreamReader(stream);
-		return reader.ReadToEnd();
+		try
+		{
+			value = Deserialize<T>(json, options);
+			return true;
+		}
+		catch
+		{
+			value = default;
+			return false;
+		}
 	}
 }

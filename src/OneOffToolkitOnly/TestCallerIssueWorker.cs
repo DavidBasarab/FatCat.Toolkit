@@ -1,7 +1,8 @@
+using System.Text.Json;
 using FatCat.Fakes;
 using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Web;
-using Newtonsoft.Json;
 
 namespace OneOffToolkitOnly;
 
@@ -21,7 +22,7 @@ public class TestCallerIssueWorker(IWebCallerFactory webCallerFactory)
 
 		var request = Faker.Create<TestRequest>();
 
-		var json = JsonConvert.SerializeObject(request, Formatting.Indented);
+		var json = new JsonOperations().Serialize(request, new JsonSerializerOptions { WriteIndented = true });
 
 		var response = await webCaller.Post("jesus", request);
 

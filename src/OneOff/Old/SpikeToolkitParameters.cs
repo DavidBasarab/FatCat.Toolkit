@@ -22,7 +22,7 @@ public class SpikeToolkitParameters : IToolkitTokenParameters
 			IssuerSigningKey = new X509SecurityKey(cert),
 			ValidAudience = "https://foghaze.com/Brume",
 			ValidIssuer = "FogHaze",
-			ClockSkew = 10.Seconds()
+			ClockSkew = 10.Seconds(),
 		};
 	}
 }

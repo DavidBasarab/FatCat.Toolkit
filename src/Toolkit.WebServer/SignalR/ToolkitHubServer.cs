@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using Humanizer;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
 
 namespace FatCat.Toolkit.WebServer.SignalR;
 
@@ -63,7 +63,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 		}
 
 		logger.Debug(
-			$"Got a client response for data buffer!!!!!!! | SessionId {sessionId} | {JsonConvert.SerializeObject(toolkitMessage)}"
+			$"Got a client response for data buffer!!!!!!! | SessionId {sessionId} | {new JsonOperations().Serialize(toolkitMessage)}"
 		);
 
 		responses.TryAdd(sessionId, toolkitMessage);
@@ -82,7 +82,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 		}
 
 		logger.Debug(
-			$"Got a client response!!!!!!! | SessionId {sessionId} | {JsonConvert.SerializeObject(toolkitMessage)}"
+			$"Got a client response!!!!!!! | SessionId {sessionId} | {new JsonOperations().Serialize(toolkitMessage)}"
 		);
 
 		responses.TryAdd(sessionId, toolkitMessage);
@@ -122,8 +122,8 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 
 		waitingForResponses.TryAdd(sessionId, message);
 
-		await hubContext.Clients
-			.Client(connectionId)
+		await hubContext
+			.Clients.Client(connectionId)
 			.SendAsync(
 				ToolkitHubMethodNames.ServerDataBufferMessage,
 				message.MessageType,
@@ -172,8 +172,8 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 
 	private async Task SendMessageToClient(string connectionId, ToolkitMessage message, string sessionId)
 	{
-		await hubContext.Clients
-			.Client(connectionId)
+		await hubContext
+			.Clients.Client(connectionId)
 			.SendAsync(
 				ToolkitHubMethodNames.ServerOriginatedMessage,
 				message.MessageType,

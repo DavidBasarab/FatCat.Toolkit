@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using FatCat.Toolkit.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -8,6 +9,6 @@ public abstract class MongoObject : DataObject
 {
 	[BsonId]
 	[BsonRepresentation(BsonType.ObjectId)]
-	[JsonConverter(typeof(ObjectIdConverter))]
+	[JsonConverter(typeof(ObjectIdJsonConverter))]
 	public ObjectId Id { get; set; }
 }

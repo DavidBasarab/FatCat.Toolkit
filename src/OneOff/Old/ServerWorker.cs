@@ -2,12 +2,12 @@
 using FatCat.Fakes;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Threading;
 using FatCat.Toolkit.Web;
 using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using FatCat.Toolkit.WebServer;
-using Newtonsoft.Json;
 
 namespace OneOff.Old;
 
@@ -19,44 +19,44 @@ public class ServerWorker(IThread thread)
 	public void DoWork(string[] args)
 	{
 		applicationSettings = new ToolkitWebApplicationSettings
-							{
-								Options = WebApplicationOptions.SignalR | WebApplicationOptions.Cors,
-								TlsCertificate = new CertificationSettings
-												{
-													Location = @"C:\DevelopmentCert\DevelopmentCert.pfx",
-													Password = "basarab_cert"
-												},
-								SignalRPath = "events",
-								ToolkitTokenParameters = new SpikeToolkitParameters(),
-								ContainerAssemblies = [Assembly.GetExecutingAssembly(), typeof(ToolkitWebServerModule).Assembly],
-								OnWebApplicationStarted = Started,
-								Args = args
-							};
+		{
+			Options = WebApplicationOptions.SignalR | WebApplicationOptions.Cors,
+			TlsCertificate = new CertificationSettings
+			{
+				Location = @"C:\DevelopmentCert\DevelopmentCert.pfx",
+				Password = "basarab_cert",
+			},
+			SignalRPath = "events",
+			ToolkitTokenParameters = new SpikeToolkitParameters(),
+			ContainerAssemblies = [Assembly.GetExecutingAssembly(), typeof(ToolkitWebServerModule).Assembly],
+			OnWebApplicationStarted = Started,
+			Args = args,
+		};
 
 		applicationSettings.ClientDataBufferMessage += async (message, buffer) =>
-														{
-															ConsoleLog.WriteMagenta($"Got data buffer message: {JsonConvert.SerializeObject(message)}");
-															ConsoleLog.WriteMagenta($"Data buffer length: {buffer.Length}");
+		{
+			ConsoleLog.WriteMagenta($"Got data buffer message: {new JsonOperations().Serialize(message)}");
+			ConsoleLog.WriteMagenta($"Data buffer length: {buffer.Length}");
 
-															await Task.CompletedTask;
+			await Task.CompletedTask;
 
-															var responseMessage = $"BufferResponse {Faker.RandomString()}";
+			var responseMessage = $"BufferResponse {Faker.RandomString()}";
 
-															ConsoleLog.WriteGreen($"Client Response for data buffer: <{responseMessage}>");
+			ConsoleLog.WriteGreen($"Client Response for data buffer: <{responseMessage}>");
 
-															return responseMessage;
-														};
+			return responseMessage;
+		};
 
 		applicationSettings.ClientMessage += async message =>
-											{
-												await Task.CompletedTask;
+		{
+			await Task.CompletedTask;
 
-												ConsoleLog.WriteDarkCyan(
-																		$"******** MessageId <{message.MessageType}> | Data <{message.Data}> | ConnectionId <{message.ConnectionId}>"
-																		);
+			ConsoleLog.WriteDarkCyan(
+				$"******** MessageId <{message.MessageType}> | Data <{message.Data}> | ConnectionId <{message.ConnectionId}>"
+			);
 
-												return "ACK";
-											};
+			return "ACK";
+		};
 
 		applicationSettings.ClientConnected += OnClientConnected;
 		applicationSettings.ClientDisconnected += OnClientDisconnected;
@@ -73,8 +73,14 @@ public class ServerWorker(IThread thread)
 		// var finalResult = new WebResult<TestModel>(response);
 		var finalResult = response;
 
-		if (finalResult.IsSuccessful) { ConsoleLog.WriteGreen(finalResult.Content); }
-		else { ConsoleLog.WriteRed($"Web Request status code: <{finalResult.StatusCode}> | <{finalResult.Content}>"); }
+		if (finalResult.IsSuccessful)
+		{
+			ConsoleLog.WriteGreen(finalResult.Content);
+		}
+		else
+		{
+			ConsoleLog.WriteRed($"Web Request status code: <{finalResult.StatusCode}> | <{finalResult.Content}>");
+		}
 	}
 
 	private Task OnClientConnected(ToolkitUser user, string connectionId)
@@ -94,22 +100,22 @@ public class ServerWorker(IThread thread)
 	private void Started()
 	{
 		thread.Run(() =>
-					{
-						ConsoleLog.WriteGreen("Hey the web application has started!!!!!");
+		{
+			ConsoleLog.WriteGreen("Hey the web application has started!!!!!");
 
-						var factory = SystemScope.Container.Resolve<IWebCallerFactory>();
+			var factory = SystemScope.Container.Resolve<IWebCallerFactory>();
 
-						var caller = factory.GetWebCaller(new Uri("http://localhost:14555"));
+			var caller = factory.GetWebCaller(new Uri("http://localhost:14555"));
 
-						MakeWebRequest(caller, "api/test");
+			MakeWebRequest(caller, "api/test");
 
-						var testModel = Faker.Create<TestModel>();
+			var testModel = Faker.Create<TestModel>();
 
-						caller.Post("api/test/post", testModel);
+			caller.Post("api/test/post", testModel);
 
-						// var response = caller.Get("api/test/Search/firstname=david&lastname=basarab&count=43").Result;
-						// MakeWebRequest(caller, "api/test/Search?firstname=david&lastname=basarab&count=43");
-						// MakeWebRequest(caller, "api/test/Search/Multi?statuses=Available&statuses=CheckedOut");
-					});
+			// var response = caller.Get("api/test/Search/firstname=david&lastname=basarab&count=43").Result;
+			// MakeWebRequest(caller, "api/test/Search?firstname=david&lastname=basarab&count=43");
+			// MakeWebRequest(caller, "api/test/Search/Multi?statuses=Available&statuses=CheckedOut");
+		});
 	}
 }

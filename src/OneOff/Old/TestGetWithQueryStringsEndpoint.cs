@@ -1,9 +1,9 @@
 ﻿using FatCat.Toolkit;
 using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.WebServer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace OneOff.Old;
 
@@ -23,7 +23,7 @@ public class TestGetWithQueryStringsEndpoint : Endpoint
 	public WebResult DoTestWithQueryStrings([FromQuery] QueryRequest request)
 	{
 		ConsoleLog.WriteMagenta("Got Query Request");
-		ConsoleLog.WriteMagenta(JsonConvert.SerializeObject(request, Formatting.Indented));
+		ConsoleLog.WriteMagenta(new JsonOperations().Serialize(request, true));
 
 		return Ok(
 			$"Got {request.Count} of {request.FirstName} {request.LastName} | <{DateTime.Now:h:mm:ss tt zz}>"

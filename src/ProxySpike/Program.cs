@@ -25,8 +25,8 @@ public static class Program
 
 			ConsoleLog.Write("Starting Proxy Spike Program");
 
-			Parser.Default
-				.ParseArguments<ServerOptions, ProxyOptions>(args)
+			Parser
+				.Default.ParseArguments<ServerOptions, ProxyOptions>(args)
 				.WithParsed<ProxyOptions>(options =>
 				{
 					thread.Run(async () =>

@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 using FatCat.Fakes;
 using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.WebServer;
-using Newtonsoft.Json;
 using ProxySpike.Helpers;
 using ProxySpike.Options;
 
@@ -21,7 +21,7 @@ public class WebServerWorker : ISpikeWorker<ServerOptions>
 			TlsCertificate = new CertificationSettings
 			{
 				Location = @"C:\DevelopmentCert\DevelopmentCert.pfx",
-				Password = "basarab_cert"
+				Password = "basarab_cert",
 			},
 			ToolkitTokenParameters = new SpikeToolkitParameters(),
 			ContainerAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() },
@@ -30,7 +30,7 @@ public class WebServerWorker : ISpikeWorker<ServerOptions>
 
 		applicationSettings.ClientDataBufferMessage += async (message, buffer) =>
 		{
-			ConsoleLog.WriteMagenta($"Got data buffer message: {JsonConvert.SerializeObject(message)}");
+			ConsoleLog.WriteMagenta($"Got data buffer message: {new JsonOperations().Serialize(message)}");
 			ConsoleLog.WriteMagenta($"Data buffer length: {buffer.Length}");
 
 			await Task.CompletedTask;

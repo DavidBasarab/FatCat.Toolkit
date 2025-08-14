@@ -31,7 +31,7 @@ public class ToolkitHub : Hub
 			Data = data,
 			ConnectionId = Context.ConnectionId,
 			User = GetUser(),
-			MessageType = messageType
+			MessageType = messageType,
 		};
 
 		var responseMessage = await ToolkitWebApplication.Settings.OnOnClientDataBufferMessage(
@@ -61,7 +61,7 @@ public class ToolkitHub : Hub
 			Data = data,
 			ConnectionId = Context.ConnectionId,
 			User = GetUser(),
-			MessageType = messageType
+			MessageType = messageType,
 		};
 
 		var responseMessage = await ToolkitWebApplication.Settings.OnClientHubMessage(toolkitMessage);
@@ -82,7 +82,7 @@ public class ToolkitHub : Hub
 			Data = data,
 			ConnectionId = Context.ConnectionId,
 			User = GetUser(),
-			MessageType = messageType
+			MessageType = messageType,
 		};
 
 		HubServer.ClientResponseMessage(sessionId, toolkitMessage);

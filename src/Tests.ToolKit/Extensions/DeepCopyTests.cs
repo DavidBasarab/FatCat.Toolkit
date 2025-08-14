@@ -49,6 +49,8 @@ public class DeepCopyTests
 
 		public string FirstName { get; set; }
 
+		public List<SubObject> List { get; set; }
+
 		public List<int> Numbers { get; set; }
 
 		public int SomeNumber { get; set; }

@@ -67,7 +67,7 @@ public class MongoSearchingWorker : SpikeWorker
 			Number = 1,
 			FirstName = Faker.RandomString(),
 			LastName = Faker.RandomString(),
-			SearchFlags = SearchFlags.FirstName | SearchFlags.LastName
+			SearchFlags = SearchFlags.FirstName | SearchFlags.LastName,
 		};
 
 		await mongo.Create(firstObject);
@@ -77,7 +77,7 @@ public class MongoSearchingWorker : SpikeWorker
 			Number = 2,
 			FirstName = Faker.RandomString(),
 			LastName = Faker.RandomString(),
-			SearchFlags = SearchFlags.WalkWithLove
+			SearchFlags = SearchFlags.WalkWithLove,
 		};
 
 		await mongo.Create(secondObject);

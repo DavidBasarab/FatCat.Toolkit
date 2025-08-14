@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Newtonsoft.Json;
+using FatCat.Toolkit.Json;
 
 namespace FatCat.Toolkit.Web;
 
@@ -85,7 +85,11 @@ public class FatWebResponse<T> : EqualObject
 
 	public FatWebResponse(HttpStatusCode statusCode, T data)
 	{
-		BaseResponse = new FatWebResponse { StatusCode = statusCode, Content = JsonConvert.SerializeObject(data) };
+		BaseResponse = new FatWebResponse
+		{
+			StatusCode = statusCode,
+			Content = new JsonOperations().Serialize(data),
+		};
 	}
 
 	public override string ToString()
@@ -118,7 +122,7 @@ public class FatWebResponse : EqualObject
 
 	public static FatWebResponse Ok(object data)
 	{
-		return new FatWebResponse(HttpStatusCode.OK, JsonConvert.SerializeObject(data));
+		return new FatWebResponse(HttpStatusCode.OK, new JsonOperations().Serialize(data));
 	}
 
 	public static FatWebResponse Ok()

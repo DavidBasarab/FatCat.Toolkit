@@ -10,6 +10,8 @@ namespace FatCat.Toolkit.Injection;
 
 public interface ISystemScope
 {
+	ILifetimeScope LifetimeScope { get; set; }
+
 	List<Assembly> SystemAssemblies { get; }
 
 	TItem Resolve<TItem>()
@@ -21,8 +23,6 @@ public interface ISystemScope
 
 	bool TryResolve<TItem>(out TItem instance)
 		where TItem : class;
-
-	ILifetimeScope LifetimeScope { get; set; }
 }
 
 public class SystemScope : ISystemScope

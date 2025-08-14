@@ -11,11 +11,11 @@ public interface IJsonOperations
 
 	T DeserializeFromStream<T>(Stream input, JsonSerializerOptions options = null, bool leaveOpen = false);
 
-	T DeserializeFromStreamAsync<T>(
+	Task<T> DeserializeFromStreamAsync<T>(
 		Stream input,
 		JsonSerializerOptions options = null,
 		bool leaveOpen = false,
-		CancellationToken ct = default
+		CancellationToken cancellationToken = default
 	);
 
 	JsonSerializerOptions GetDefaultOptions(bool indented = false);
@@ -33,12 +33,12 @@ public interface IJsonOperations
 		bool leaveOpen = false
 	);
 
-	void SerializeToStreamAsync(
+	Task SerializeToStreamAsync(
 		object source,
 		Stream output,
 		JsonSerializerOptions options = null,
 		bool leaveOpen = false,
-		CancellationToken ct = default
+		CancellationToken cancellationToken = default
 	);
 
 	bool TryDeserialize<T>(string json, out T value, JsonSerializerOptions options = null);
@@ -72,22 +72,22 @@ public sealed class JsonOperations : IJsonOperations
 		}
 	}
 
-	public T DeserializeFromStreamAsync<T>(
+	public async Task<T> DeserializeFromStreamAsync<T>(
 		Stream input,
 		JsonSerializerOptions options = null,
 		bool leaveOpen = false,
-		CancellationToken ct = default
+		CancellationToken cancellationToken = default
 	)
 	{
-		var result = JsonSerializer
-			.DeserializeAsync<T>(input, options ?? GetDefaultOptions(), ct)
-			.AsTask()
-			.GetAwaiter()
-			.GetResult();
+		var result = await JsonSerializer.DeserializeAsync<T>(
+			input,
+			options ?? GetDefaultOptions(),
+			cancellationToken
+		);
 
 		if (!leaveOpen)
 		{
-			input.Dispose();
+			await input.DisposeAsync();
 		}
 
 		return result;
@@ -148,19 +148,19 @@ public sealed class JsonOperations : IJsonOperations
 		}
 	}
 
-	public void SerializeToStreamAsync(
+	public async Task SerializeToStreamAsync(
 		object source,
 		Stream output,
 		JsonSerializerOptions options = null,
 		bool leaveOpen = false,
-		CancellationToken ct = default
+		CancellationToken cancellationToken = default
 	)
 	{
-		JsonSerializer.SerializeAsync(output, source, options ?? GetDefaultOptions(), ct).GetAwaiter().GetResult();
+		await JsonSerializer.SerializeAsync(output, source, options ?? GetDefaultOptions(), cancellationToken);
 
 		if (!leaveOpen)
 		{
-			output.Flush();
+			await output.FlushAsync(cancellationToken);
 		}
 	}
 

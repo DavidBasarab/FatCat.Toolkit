@@ -16,8 +16,14 @@ public abstract class WebCallerTests
 
 	protected HttpBinResponse response;
 
-	protected WebCaller webCaller =
-		new(new Uri("https://httpbin.org"), new JsonOperations(), A.Fake<IToolkitLogger>()) { Accept = null };
+	protected WebCaller webCaller = new(
+		new Uri("https://httpbin.org"),
+		new JsonOperations(),
+		A.Fake<IToolkitLogger>()
+	)
+	{
+		Accept = null,
+	};
 
 	protected abstract string BasicPath { get; }
 
@@ -141,8 +147,8 @@ public abstract class WebCallerTests
 
 	protected void VerifyBasicQueryStrings()
 	{
-		response.QueryParameters["first"].Should().Be("12");
-		response.QueryParameters["second"].Should().Be("13");
+		response.QueryParameters["first"].GetString().Should().Be("12");
+		response.QueryParameters["second"].GetString().Should().Be("13");
 	}
 
 	protected void VerifyBearerToken()

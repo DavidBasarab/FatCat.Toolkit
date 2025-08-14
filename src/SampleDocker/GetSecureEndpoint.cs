@@ -1,9 +1,10 @@
-﻿using FatCat.Toolkit.Console;
+﻿using System.Text.Json;
+using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Web.Api.SignalR;
 using FatCat.Toolkit.WebServer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Endpoint = FatCat.Toolkit.WebServer.Endpoint;
 
 namespace SampleDocker;
@@ -19,7 +20,11 @@ public class GetSecureEndpoint(IHttpContextAccessor httpContextAccessor) : Endpo
 
 		var toolkitUser = ToolkitUser.Create(httpContextAccessor.HttpContext.User);
 
-		ConsoleLog.WriteCyan($"{JsonConvert.SerializeObject(toolkitUser, Formatting.Indented)}");
+		ConsoleLog.WriteCyan(
+			$"{new JsonOperations().Serialize(toolkitUser, new JsonSerializerOptions
+																			{
+																				WriteIndented = true })}"
+		);
 
 		return Ok("Got sample secure endpoint");
 	}

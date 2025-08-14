@@ -31,6 +31,7 @@ internal class FatCatTokenHandler : TokenHandler
 						jwtSecurityToken.Claims,
 						JwtBearerDefaults.AuthenticationScheme
 					),
+
 					// If you do not add SecurityToken to the result, then our validator will fire, return a positive result,
 					// but the authentication, in general, will fail.
 					SecurityToken = jwtSecurityToken,
@@ -39,7 +40,7 @@ internal class FatCatTokenHandler : TokenHandler
 		}
 		catch (Exception e)
 		{
-			return Task.FromResult(new TokenValidationResult { IsValid = false, Exception = e, });
+			return Task.FromResult(new TokenValidationResult { IsValid = false, Exception = e });
 		}
 	}
 }

@@ -6,5 +6,5 @@ public enum MovieItemStatus
 	Available,
 	CheckedOut,
 	Overdue,
-	Lost
+	Lost,
 }

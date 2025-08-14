@@ -1,5 +1,5 @@
+using FatCat.Toolkit.Json;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace FatCat.Toolkit.WebServer;
 
@@ -39,19 +39,19 @@ public abstract class Endpoint : Controller
 
 	protected WebResult Ok(EqualObject model)
 	{
-		return Ok(JsonConvert.SerializeObject(model));
+		return Ok(new JsonOperations().Serialize(model));
 	}
 
 	protected WebResult Ok<T>(List<T> list)
 		where T : EqualObject
 	{
-		return Ok(JsonConvert.SerializeObject(list));
+		return Ok(new JsonOperations().Serialize(list));
 	}
 
 	protected WebResult Ok<T>(IEnumerable<T> list)
 		where T : EqualObject
 	{
-		return Ok(JsonConvert.SerializeObject(list));
+		return Ok(new JsonOperations().Serialize(list));
 	}
 
 	/// <summary>

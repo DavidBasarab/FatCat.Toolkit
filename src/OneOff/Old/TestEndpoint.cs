@@ -1,11 +1,10 @@
-﻿using FatCat.Fakes;
+﻿using System.Text.Json.Serialization;
+using FatCat.Fakes;
 using FatCat.Toolkit;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.WebServer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace OneOff.Old;
 
@@ -14,7 +13,7 @@ public enum SomeEnum
 	First,
 	Second,
 	Third,
-	Fourth
+	Fourth,
 }
 
 public class TestModel : EqualObject
@@ -25,7 +24,7 @@ public class TestModel : EqualObject
 
 	public string SomeData { get; set; }
 
-	[JsonConverter(typeof(StringEnumConverter))]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public SomeEnum SomeEnum { get; set; }
 }
 

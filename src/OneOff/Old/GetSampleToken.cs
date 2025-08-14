@@ -17,7 +17,7 @@ public class GetSampleToken : Endpoint
 	[HttpGet("api/Sample/Token")]
 	public WebResult GetToken()
 	{
-		var userClaims = new[] { new Claim(ClaimTypes.Name, "John Doe"), };
+		var userClaims = new[] { new Claim(ClaimTypes.Name, "John Doe") };
 
 		var identity = new ClaimsIdentity(userClaims);
 
@@ -46,7 +46,7 @@ public class GetSampleToken : Endpoint
 			Audience = "https://foghaze.com/Brume",
 			Issuer = "FogHaze",
 			NotBefore = DateTime.UtcNow.AddSeconds(-10),
-			SigningCredentials = new X509SigningCredentials(cert)
+			SigningCredentials = new X509SigningCredentials(cert),
 		};
 	}
 }

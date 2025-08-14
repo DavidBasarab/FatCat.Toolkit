@@ -64,7 +64,7 @@ internal static class OAuthExtensions
 				ConsoleLog.WriteRed("ErrorDescription: {ErrorDescription}", context.ErrorDescription);
 
 				return Task.CompletedTask;
-			}
+			},
 		};
 	}
 }

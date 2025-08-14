@@ -17,7 +17,7 @@ public class ProxyRouteConfig
 				RouteId = $"route_{Faker.RandomInt()}",
 				ClusterId = "cluster1",
 				Match = new RouteMatch { Path = "{**catch-all}" },
-			}
+			},
 		};
 	}
 }
@@ -39,8 +39,8 @@ public static class ProxyClusterConfig
 						"destination1",
 						new DestinationConfig { Address = "https://localhost:14555/" }
 					},
-				}
-			}
+				},
+			},
 		};
 	}
 }

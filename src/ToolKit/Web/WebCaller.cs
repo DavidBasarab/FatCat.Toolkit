@@ -1,13 +1,10 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using FatCat.Toolkit.Data.Mongo;
 using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Logging;
 using Humanizer;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace FatCat.Toolkit.Web;
 
@@ -70,10 +67,8 @@ public interface IWebCaller
 	void UserBearerToken(string token);
 }
 
-public class WebCaller : IWebCaller
+public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger logger) : IWebCaller
 {
-	private readonly IJsonOperations jsonOperations;
-	private readonly IToolkitLogger logger;
 	private string basicPassword;
 	private string basicUsername;
 	private string bearerToken;
@@ -82,27 +77,9 @@ public class WebCaller : IWebCaller
 
 	public string Accept { get; set; }
 
-	public Uri BaseUri { get; }
+	public Uri BaseUri { get; } = uri;
 
 	public TimeSpan Timeout { get; set; } = 30.Seconds();
-
-	public WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger logger)
-	{
-		this.jsonOperations = jsonOperations;
-		this.logger = logger;
-		BaseUri = uri;
-
-		this.jsonOperations.JsonSettings = new JsonSerializerSettings
-		{
-			TypeNameHandling = TypeNameHandling.Auto,
-			NullValueHandling = NullValueHandling.Ignore,
-			Converters = new List<Newtonsoft.Json.JsonConverter>
-			{
-				new StringEnumConverter(),
-				new ObjectIdConverter(),
-			},
-		};
-	}
 
 	public void ClearAuthorization()
 	{

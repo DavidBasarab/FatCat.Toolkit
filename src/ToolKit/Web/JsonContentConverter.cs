@@ -1,6 +1,6 @@
 using System.Collections;
 using FatCat.Toolkit.Extensions;
-using Newtonsoft.Json;
+using FatCat.Toolkit.Json;
 
 namespace FatCat.Toolkit.Web;
 
@@ -20,7 +20,7 @@ public static class JsonContentConverter
 			return (T)TypeSetters[typeof(T)](json);
 		}
 
-		return JsonConvert.DeserializeObject<T>(json);
+		return new JsonOperations().Deserialize<T>(json);
 	}
 
 	static JsonContentConverter()

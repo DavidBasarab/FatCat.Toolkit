@@ -1,6 +1,6 @@
 ﻿using FatCat.Toolkit;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Web;
-using Newtonsoft.Json;
 
 namespace Tests.FatCat.Toolkit.Web.Api.WebCallerSpecs;
 
@@ -60,7 +60,7 @@ public class PostTests : WebCallerTests
 	{
 		var data = Faker.Create<TestData>();
 
-		var json = JsonConvert.SerializeObject(data);
+		var json = new JsonOperations().Serialize(data);
 
 		var result = await webCaller.Post(BasicPath, json);
 
@@ -100,7 +100,7 @@ public class PostTests : WebCallerTests
 
 		public string ToJson()
 		{
-			return JsonConvert.SerializeObject(this);
+			return new JsonOperations().Serialize(this);
 		}
 	}
 }

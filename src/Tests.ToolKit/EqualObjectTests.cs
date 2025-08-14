@@ -61,7 +61,7 @@ public class EqualObjectTests
 			LastName = firstObject.LastName,
 			TheNumber = firstObject.TheNumber,
 			On = firstObject.On,
-			SomeId = firstObject.SomeId
+			SomeId = firstObject.SomeId,
 		};
 
 		return (firstObject, secondObject);

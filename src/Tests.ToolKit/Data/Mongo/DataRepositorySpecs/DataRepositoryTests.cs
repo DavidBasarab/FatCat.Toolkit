@@ -23,7 +23,7 @@ public abstract class DataRepositoryTests
 
 		repository = new MongoRepository<TestingMongoObject>(mongoDataConnection, mongoNames)
 		{
-			Collection = collection
+			Collection = collection,
 		};
 	}
 

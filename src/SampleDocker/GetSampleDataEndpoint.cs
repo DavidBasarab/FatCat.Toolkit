@@ -24,7 +24,7 @@ public class GetSampleDataEndpoint : Endpoint
 		var response = new SampleResponse
 		{
 			ConfigValue = configuration["PlayingSetting"],
-			SomeMetaData = "Some Meta Data"
+			SomeMetaData = "Some Meta Data",
 		};
 
 		var testItem = Faker.Create<TestDataObject>();

@@ -1,6 +1,6 @@
 using FatCat.Toolkit;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.WebServer;
-using Newtonsoft.Json;
 
 namespace Tests.FatCat.Toolkit;
 
@@ -53,7 +53,7 @@ public class WebResultAsTests
 	{
 		var item = Faker.Create<TestingModel>();
 
-		var json = JsonConvert.SerializeObject(item);
+		var json = new JsonOperations().Serialize(item);
 
 		var result = WebResult.Ok(json);
 

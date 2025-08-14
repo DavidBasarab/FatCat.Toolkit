@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 using FatCat.Fakes;
 using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using FatCat.Toolkit.WebServer;
 using Humanizer;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 
 namespace SampleDocker;
 
@@ -59,16 +59,16 @@ public static class Program
 			ContainerAssemblies = new List<Assembly>
 			{
 				Assembly.GetExecutingAssembly(),
-				typeof(ToolkitWebApplication).Assembly
+				typeof(ToolkitWebApplication).Assembly,
 			},
 			OnWebApplicationStarted = Started,
 			Args = args,
-			BasePath = "david"
+			BasePath = "david",
 		};
 
 		applicationSettings.ClientDataBufferMessage += async (message, buffer) =>
 		{
-			ConsoleLog.WriteMagenta($"Got data buffer message: {JsonConvert.SerializeObject(message)}");
+			ConsoleLog.WriteMagenta($"Got data buffer message: {new JsonOperations().Serialize(message)}");
 			ConsoleLog.WriteMagenta($"Data buffer length: {buffer.Length}");
 
 			await Task.CompletedTask;
@@ -109,7 +109,7 @@ public class SpikeToolkitParameters : IToolkitTokenParameters
 			IssuerSigningKey = new RsaSecurityKey(SecureData.Rsa),
 			ValidAudience = "https://foghaze.com/Brume",
 			ValidIssuer = "FogHaze",
-			ClockSkew = 10.Seconds()
+			ClockSkew = 10.Seconds(),
 		};
 	}
 }

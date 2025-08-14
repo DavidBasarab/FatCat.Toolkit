@@ -1,12 +1,13 @@
 using FatCat.Fakes;
 using FatCat.Toolkit.Injection;
+using FatCat.Toolkit.Json;
 using FatCat.Toolkit.WebServer;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace SampleDocker;
 
-public class GetWeatherEndpoint : Endpoint
+public class GetWeatherEndpoint(IExampleWorker exampleWorker, ISystemScope scope, IJsonOperations jsonOperations)
+	: Endpoint
 {
 	private static readonly string[] Summaries =
 	{
@@ -19,17 +20,8 @@ public class GetWeatherEndpoint : Endpoint
 		"Balmy",
 		"Hot",
 		"Sweltering",
-		"Scorching"
+		"Scorching",
 	};
-
-	private readonly IExampleWorker exampleWorker;
-	private readonly ISystemScope scope;
-
-	public GetWeatherEndpoint(IExampleWorker exampleWorker, ISystemScope scope)
-	{
-		this.exampleWorker = exampleWorker;
-		this.scope = scope;
-	}
 
 	[HttpGet("api/weather")]
 	public WebResult GetWeather()
@@ -38,20 +30,17 @@ public class GetWeatherEndpoint : Endpoint
 
 		var items = Enumerable
 			.Range(1, 5)
-			.Select(
-				index =>
-					new WeatherForecast
-					{
-						Date = DateTime.Now.AddDays(index),
-						TemperatureC = Random.Shared.Next(-20, 55),
-						Summary = Summaries[Random.Shared.Next(Summaries.Length)],
-						MetaData = $"This has been added by me David Basarab - <{Faker.RandomInt()}>",
-						SecondMetaData = $"Just more fake goodness - <{Faker.RandomInt()}>",
-						SomeMessage = $"{exampleWorker.GetMessage()} | <{secondInjectedThing.GetSomeNumber()}>"
-					}
-			)
+			.Select(index => new WeatherForecast
+			{
+				Date = DateTime.Now.AddDays(index),
+				TemperatureC = Random.Shared.Next(-20, 55),
+				Summary = Summaries[Random.Shared.Next(Summaries.Length)],
+				MetaData = $"This has been added by me David Basarab - <{Faker.RandomInt()}>",
+				SecondMetaData = $"Just more fake goodness - <{Faker.RandomInt()}>",
+				SomeMessage = $"{exampleWorker.GetMessage()} | <{secondInjectedThing.GetSomeNumber()}>",
+			})
 			.ToArray();
 
-		return WebResult.Ok(JsonConvert.SerializeObject(items));
+		return WebResult.Ok(jsonOperations.Serialize(items));
 	}
 }

@@ -36,7 +36,7 @@ public class HashTools : IHashTools
 		{
 			WriteBytesToMemoryStream(data);
 
-			var hash = await GetMd5Hash();
+			var hash = await GetSha256Hash();
 
 			return hash;
 		}
@@ -46,11 +46,11 @@ public class HashTools : IHashTools
 			memoryStream.Dispose();
 		}
 
-		private async Task<byte[]> GetMd5Hash()
+		private async Task<byte[]> GetSha256Hash()
 		{
-			using var md5 = MD5.Create();
+			using var sha256 = SHA256.Create();
 
-			return await md5.ComputeHashAsync(memoryStream);
+			return await sha256.ComputeHashAsync(memoryStream);
 		}
 
 		private void WriteBytesToMemoryStream(byte[] value)
@@ -75,16 +75,16 @@ public class HashTools : IHashTools
 		public async Task<string> CalculateHash(string value)
 		{
 			await WriteToMemoryStream(value);
-			var hash = await GetMd5Hash();
+			var hash = await GetSha256Hash();
 
 			return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
 		}
 
-		private async Task<byte[]> GetMd5Hash()
+		private async Task<byte[]> GetSha256Hash()
 		{
-			using var md5 = MD5.Create();
+			using var sha256 = SHA256.Create();
 
-			var hash = await md5.ComputeHashAsync(memoryStream);
+			var hash = await sha256.ComputeHashAsync(memoryStream);
 			return hash;
 		}
 
@@ -93,6 +93,7 @@ public class HashTools : IHashTools
 			var streamWriter = new StreamWriter(memoryStream);
 
 			await streamWriter.WriteAsync(value);
+			await streamWriter.FlushAsync();
 
 			memoryStream.Seek(0, SeekOrigin.Begin);
 		}

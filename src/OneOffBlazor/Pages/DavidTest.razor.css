@@ -1,0 +1,48 @@
+/* Scoped styles for DavidTest page */
+.david-page {
+    background-color: #1f1f1f;
+    color: #eaeaea;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    min-height: calc(100vh - 3.5rem);
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.david-page h3 {
+    color: #ffffff;
+    margin-top: 0;
+}
+
+.david-page p {
+    color: #d6d6d6;
+}
+
+.david-page a {
+    color: #9cdcfe;
+}
+
+.david-page button {
+    background-color: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #444;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.david-page button:hover {
+    background-color: #3a3a3a;
+    border-color: #555;
+}
+
+/* Stretch background to cover layout article padding on wider screens */
+@media (min-width: 641px) {
+    .david-page {
+        margin-left: -2rem;   /* matches article padding-left in layout */
+        margin-right: -1.5rem;/* matches article padding-right in layout */
+        padding-left: 2rem;
+        padding-right: 1.5rem;
+    }
+}
+

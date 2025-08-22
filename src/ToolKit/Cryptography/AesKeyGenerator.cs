@@ -11,7 +11,8 @@ public class AesKeyGenerator(IGenerator generator) : IAesKeyGenerator
 {
 	public byte[] CreateIv()
 	{
-		return generator.Bytes(16).ToArray();
+		// AES-GCM standard 96-bit nonce (12 bytes)
+		return generator.Bytes(12).ToArray();
 	}
 
 	public byte[] CreateKey(AesKeySize keySize)

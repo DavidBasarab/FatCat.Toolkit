@@ -29,7 +29,7 @@ public class AesKeyGeneratorTests
 	{
 		keyGenerator.CreateIv();
 
-		A.CallTo(() => generator.Bytes(16)).MustHaveHappened();
+		A.CallTo(() => generator.Bytes(12)).MustHaveHappened();
 	}
 
 	[Theory]

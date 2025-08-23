@@ -7,37 +7,33 @@ public class WebCryptoAesGcm(IJSRuntime javaScript) : IFatCatAesEncryption
 {
 	public async Task<byte[]> Decrypt(byte[] cypherData, byte[] key, byte[] iv)
 	{
-		ArgumentNullException.ThrowIfNull(cypherData);
-		ArgumentNullException.ThrowIfNull(key);
-		ArgumentNullException.ThrowIfNull(iv);
+		var cypherString = Convert.ToBase64String(cypherData);
+		var keyString = Convert.ToBase64String(key);
+		var ivString = Convert.ToBase64String(iv);
 
-		if (iv.Length != 12)
-		{
-			throw new ArgumentException("AES-GCM requires a 12-byte IV (nonce).", nameof(iv));
-		}
+		var openData = await javaScript.InvokeAsync<string>(
+			"cryptoInterop.decrypt",
+			cypherString,
+			keyString,
+			ivString
+		);
 
-		var ctB64 = Convert.ToBase64String(cypherData);
-		var keyB64 = Convert.ToBase64String(key);
-		var ivB64 = Convert.ToBase64String(iv);
-		var ptB64 = await javaScript.InvokeAsync<string>("cryptoInterop.decrypt", ctB64, keyB64, ivB64);
-		return Convert.FromBase64String(ptB64);
+		return Convert.FromBase64String(openData);
 	}
 
 	public async Task<byte[]> Encrypt(byte[] openData, byte[] key, byte[] iv)
 	{
-		ArgumentNullException.ThrowIfNull(openData);
-		ArgumentNullException.ThrowIfNull(key);
-		ArgumentNullException.ThrowIfNull(iv);
+		var openString = Convert.ToBase64String(openData);
+		var keyString = Convert.ToBase64String(key);
+		var ivString = Convert.ToBase64String(iv);
 
-		if (iv.Length != 12)
-		{
-			throw new ArgumentException("AES-GCM requires a 12-byte IV (nonce).", nameof(iv));
-		}
+		var encryptedData = await javaScript.InvokeAsync<string>(
+			"cryptoInterop.encrypt",
+			openString,
+			keyString,
+			ivString
+		);
 
-		var ptB64 = Convert.ToBase64String(openData);
-		var keyB64 = Convert.ToBase64String(key);
-		var ivB64 = Convert.ToBase64String(iv);
-		var ctB64 = await javaScript.InvokeAsync<string>("cryptoInterop.encrypt", ptB64, keyB64, ivB64);
-		return Convert.FromBase64String(ctB64);
+		return Convert.FromBase64String(encryptedData);
 	}
 }

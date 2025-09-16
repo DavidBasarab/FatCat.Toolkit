@@ -13,14 +13,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj"/>
-        <ProjectReference Include="..\ToolKit\ToolKit.csproj"/>
+        <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
+        <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommandLineParser" Version="2.9.1"/>
-        <PackageReference Include="FatCat.Fakes" Version="1.0.30"/>
-        <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0"/>
+        <PackageReference Include="CommandLineParser" Version="2.9.1" />
+        <PackageReference Include="FatCat.Fakes" Version="1.0.31" />
+        <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
     </ItemGroup>
 
     <ItemGroup>

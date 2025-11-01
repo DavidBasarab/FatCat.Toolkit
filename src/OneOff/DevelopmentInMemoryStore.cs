@@ -10,18 +10,18 @@ public class DevelopmentInMemoryStore
 
 	public void AddCredentialToUser(Fido2User user, StoredCredential credential)
 	{
-		credential.Id = user.Id;
+		credential.UserId = user.Id;
 		_storedCredentials.Add(credential);
 	}
 
-	public StoredCredential GetCredentialById(byte[] id)
+	public StoredCredential? GetCredentialById(byte[] id)
 	{
 		return _storedCredentials.FirstOrDefault(c => c.Descriptor.Id.AsSpan().SequenceEqual(id));
 	}
 
 	public List<StoredCredential> GetCredentialsByUser(Fido2User user)
 	{
-		return _storedCredentials.Where(c => c.UserName.AsSpan().SequenceEqual(user.Name)).ToList();
+		return _storedCredentials.Where(c => c.UserId.AsSpan().SequenceEqual(user.Id)).ToList();
 	}
 
 	public Task<List<StoredCredential>> GetCredentialsByUserHandleAsync(
@@ -29,7 +29,9 @@ public class DevelopmentInMemoryStore
 		CancellationToken cancellationToken = default
 	)
 	{
-		return Task.FromResult(_storedCredentials.Where(c => c.Id.SequenceEqual(userHandle)).ToList());
+		return Task.FromResult(
+			_storedCredentials.Where(c => c.UserHandle.AsSpan().SequenceEqual(userHandle)).ToList()
+		);
 	}
 
 	public Fido2User GetOrAddUser(string username, Func<Fido2User> addCallback)
@@ -57,13 +59,13 @@ public class DevelopmentInMemoryStore
 		}
 
 		return Task.FromResult(
-			_storedUsers.Where(u => u.Value.Id.SequenceEqual(cred.Id)).Select(u => u.Value).ToList()
+			_storedUsers.Where(u => u.Value.Id.SequenceEqual(cred.UserId)).Select(u => u.Value).ToList()
 		);
 	}
 
 	public void UpdateCounter(byte[] credentialId, uint counter)
 	{
 		var cred = _storedCredentials.First(c => c.Descriptor.Id.AsSpan().SequenceEqual(credentialId));
-		cred.SignatureCounter = counter;
+		cred.SignCount = counter;
 	}
 }

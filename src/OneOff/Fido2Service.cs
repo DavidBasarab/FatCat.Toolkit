@@ -6,7 +6,12 @@ namespace OneOff;
 
 public interface IFido2Service
 {
-	void MakeCredentialOptions(
+	Task<RegisteredPublicKeyCredential> MakeCredential(
+		CredentialCreateOptions options,
+		AuthenticatorAttestationRawResponse attestationResponse
+	);
+
+	CredentialCreateOptions MakeCredentialOptions(
 		string username,
 		string displayName,
 		string attType,
@@ -18,8 +23,6 @@ public interface IFido2Service
 
 public class Fido2Service : IFido2Service
 {
-	private DevelopmentInMemoryStore DemoStorage { get; } = new();
-
 	private readonly IFido2 _fido2 = new Fido2(
 		new Fido2Configuration
 		{
@@ -29,7 +32,60 @@ public class Fido2Service : IFido2Service
 		}
 	);
 
-	public void MakeCredentialOptions(
+	private DevelopmentInMemoryStore DemoStorage { get; } = new();
+
+	public async Task<RegisteredPublicKeyCredential> MakeCredential(
+		CredentialCreateOptions options,
+		AuthenticatorAttestationRawResponse attestationResponse
+	)
+	{
+		// 2. Create callback so that lib can verify credential id is unique to this user
+		IsCredentialIdUniqueToUserAsyncDelegate callback = async (args, cancellationToken) =>
+		{
+			var users = await DemoStorage.GetUsersByCredentialIdAsync(args.CredentialId, cancellationToken);
+
+			if (users.Count > 0)
+			{
+				return false;
+			}
+
+			return true;
+		};
+
+		// 2. Verify and make the credentials
+		var credential = await _fido2.MakeNewCredentialAsync(
+			new MakeNewCredentialParams
+			{
+				AttestationResponse = attestationResponse,
+				OriginalOptions = options,
+				IsCredentialIdUniqueToUserCallback = callback,
+			}
+		);
+
+		// 3. Store the credentials in db
+		DemoStorage.AddCredentialToUser(
+			options.User,
+			new StoredCredential
+			{
+				Id = credential.Id,
+				PublicKey = credential.PublicKey,
+				UserHandle = credential.User.Id,
+				SignCount = credential.SignCount,
+				AttestationFormat = credential.AttestationFormat,
+				RegDate = DateTimeOffset.UtcNow,
+				AaGuid = credential.AaGuid,
+				Transports = credential.Transports,
+				IsBackupEligible = credential.IsBackupEligible,
+				IsBackedUp = credential.IsBackedUp,
+				AttestationObject = credential.AttestationObject,
+				AttestationClientDataJson = credential.AttestationClientDataJson,
+			}
+		);
+
+		return credential;
+	}
+
+	public CredentialCreateOptions MakeCredentialOptions(
 		string username,
 		string displayName,
 		string attType,
@@ -87,5 +143,7 @@ public class Fido2Service : IFido2Service
 				Extensions = exts,
 			}
 		);
+
+		return options;
 	}
 }

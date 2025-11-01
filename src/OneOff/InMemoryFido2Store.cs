@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Fido2NetLib.Objects;
 
 namespace OneOff;
 
@@ -80,21 +79,4 @@ public class InMemoryFido2Store : IInMemoryFido2Store
 
 		return [];
 	}
-}
-
-public class StoredCredential
-{
-	public Guid AaGuid { get; set; } = Guid.Empty;
-
-	public string CredType { get; set; } = "public-key";
-
-	public PublicKeyCredentialDescriptor Descriptor { get; set; } = null!;
-
-	public byte[] Id { get; set; } = [];
-
-	public byte[] PublicKey { get; set; } = [];
-
-	public uint SignatureCounter { get; set; }
-
-	public string UserName { get; set; } = string.Empty;
 }

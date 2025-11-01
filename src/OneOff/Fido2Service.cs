@@ -8,6 +8,11 @@ public interface IFido2Service
 {
 	AssertionOptions AssertionOptionsPost(string username, string userVerification);
 
+	Task<VerifyAssertionResult> MakeAssertion(
+		AssertionOptions options,
+		AuthenticatorAssertionRawResponse clientResponse
+	);
+
 	Task<RegisteredPublicKeyCredential> MakeCredential(
 		CredentialCreateOptions options,
 		AuthenticatorAttestationRawResponse attestationResponse
@@ -79,6 +84,47 @@ public class Fido2Service : IFido2Service
 		{
 			return null;
 		}
+	}
+
+	public async Task<VerifyAssertionResult> MakeAssertion(
+		AssertionOptions options,
+		AuthenticatorAssertionRawResponse clientResponse
+	)
+	{
+		// 2. Get registered credential from database
+		var creds =
+			DemoStorage.GetCredentialById(clientResponse.RawId) ?? throw new Exception("Unknown credentials");
+
+		// 3. Get credential counter from database
+		var storedCounter = creds.SignCount;
+
+		// 4. Create callback to check if the user handle owns the credentialId
+		IsUserHandleOwnerOfCredentialIdAsync callback = async (args, cancellationToken) =>
+		{
+			var storedCreds = await DemoStorage.GetCredentialsByUserHandleAsync(
+				args.UserHandle,
+				cancellationToken
+			);
+
+			return storedCreds.Exists(c => c.Descriptor.Id.SequenceEqual(args.CredentialId));
+		};
+
+		// 5. Make the assertion
+		var res = await _fido2.MakeAssertionAsync(
+			new MakeAssertionParams
+			{
+				AssertionResponse = clientResponse,
+				OriginalOptions = options,
+				StoredPublicKey = creds.PublicKey,
+				StoredSignatureCounter = storedCounter,
+				IsUserHandleOwnerOfCredentialIdCallback = callback,
+			}
+		);
+
+		// 6. Store the updated counter
+		DemoStorage.UpdateCounter(res.CredentialId, res.SignCount);
+
+		return res;
 	}
 
 	public async Task<RegisteredPublicKeyCredential> MakeCredential(

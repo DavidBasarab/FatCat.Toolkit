@@ -27,16 +27,88 @@ public class UserController : ControllerBase
 
 	private readonly IFido2 fido = FidoFactory.GetFido2();
 
-	/// <summary>
-	///  Creates a new credential for a user.
-	/// </summary>
-	/// <param name="username">
-	///  Username of registering user. If usernameless, use base64 encoded options.User.Name from the
-	///  credential-options used to create the credential.
-	/// </param>
-	/// <param name="attestationResponse"></param>
-	/// <param name="cancellationToken"></param>
-	/// <returns>a string containing either "OK" or an error message.</returns>
+	// --------------------------------------------------------
+	//  REGISTER: Step 1 - Get credential options
+	// --------------------------------------------------------
+	[HttpGet("{username}/credential-options")]
+	[HttpGet("credential-options")]
+	public CredentialCreateOptions GetCredentialOptions(
+		[FromRoute] string? username,
+		[FromQuery] string? displayName,
+		[FromQuery] AttestationConveyancePreference? attestationType,
+		[FromQuery] AuthenticatorAttachment? authenticator,
+		[FromQuery] UserVerificationRequirement? userVerification,
+		[FromQuery] ResidentKeyRequirement? residentKey
+	)
+	{
+		var key = username ?? Guid.NewGuid().ToString("N");
+
+		if (string.IsNullOrEmpty(displayName))
+			displayName = username ?? "User";
+
+		// 1. Ensure a valid user object
+		var user = _demoStorage.GetOrAddUser(
+			username ?? displayName,
+			() =>
+				new Fido2User
+				{
+					DisplayName = displayName,
+					Name = username ?? displayName,
+					Id = Encoding.UTF8.GetBytes(username ?? displayName),
+				}
+		);
+
+		// 2. Existing credentials
+		var existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
+
+		// 3. Authenticator preferences
+		var authenticatorSelection = new AuthenticatorSelection
+		{
+			AuthenticatorAttachment = authenticator ?? AuthenticatorAttachment.CrossPlatform,
+			ResidentKey = residentKey ?? ResidentKeyRequirement.Discouraged,
+			UserVerification = userVerification ?? UserVerificationRequirement.Required,
+		};
+
+		// 4. Create options
+		var options = fido.RequestNewCredential(
+			new RequestNewCredentialParams
+			{
+				User = user,
+				ExcludeCredentials = existingKeys,
+				AuthenticatorSelection = authenticatorSelection,
+				AttestationPreference = attestationType ?? AttestationConveyancePreference.None,
+				Extensions = new AuthenticationExtensionsClientInputs
+				{
+					Extensions = true,
+					UserVerificationMethod = true,
+					CredProps = true,
+				},
+			}
+		);
+
+		// ✅ Ensure standard algorithms
+		if (options.PubKeyCredParams == null || options.PubKeyCredParams.Count == 0)
+		{
+			options.PubKeyCredParams = new List<PubKeyCredParam>
+			{
+				new PubKeyCredParam(COSE.Algorithm.ES256),
+				new PubKeyCredParam(COSE.Algorithm.RS256),
+			};
+		}
+
+		// ✅ Ensure RP ID matches API host (fixes browser rejection)
+		options.Rp.Id = HttpContext.Request.Host.Host;
+		options.Rp.Name = "OneOff FIDO2 Demo";
+
+		// 5. Cache options for verification
+		_pendingCredentials[key] = options;
+
+		return options;
+	}
+
+	// --------------------------------------------------------
+	//  REGISTER: Step 2 - Submit credential
+	// --------------------------------------------------------
 	[HttpPut("{username}/credential")]
 	public async Task<string> CreateCredentialAsync(
 		[FromRoute] string username,
@@ -46,12 +118,9 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			// 1. Get the options we sent the client
-			var options = _pendingCredentials[username];
+			if (!_pendingCredentials.TryGetValue(username, out var options))
+				return "Error: registration options not found (request /credential-options first)";
 
-			// 2. Create callback so that lib can verify credential id is unique to this user
-
-			// 3. Verify and make the credentials
 			var credential = await fido.MakeNewCredentialAsync(
 				new MakeNewCredentialParams
 				{
@@ -62,7 +131,6 @@ public class UserController : ControllerBase
 				cancellationToken
 			);
 
-			// 4. Store the credentials in db
 			_demoStorage.AddCredentialToUser(
 				options.User,
 				new StoredCredential
@@ -82,130 +150,54 @@ public class UserController : ControllerBase
 				}
 			);
 
-			// 5. Now we need to remove the options from the pending dictionary
-			_pendingCredentials.Remove(Request.Host.ToString());
+			_pendingCredentials.Remove(username);
 
-			// 5. return OK to client
 			return "OK";
 		}
 		catch (Exception e)
 		{
-			return FormatException(e);
+			return $"Error: {FormatException(e)}";
 		}
 	}
 
-	/// <summary>
-	///  Creates options to create a new credential for a user.
-	/// </summary>
-	/// <param name="username">(optional) The user's internal identifier. Omit for usernameless account.</param>
-	/// <param name="displayName">(optional as query) Name for display purposes.</param>
-	/// <param name="attestationType">(optional as query)</param>
-	/// <param name="authenticator">(optional as query)</param>
-	/// <param name="userVerification">(optional as query)</param>
-	/// <param name="residentKey">(optional as query)</param>
-	/// <returns>A new <see cref="CredentialCreateOptions" />. Contains an error message if .Status is "error".</returns>
-	[HttpGet("{username}/credential-options")]
-	[HttpGet("credential-options")]
-	public CredentialCreateOptions GetCredentialOptions(
+	// --------------------------------------------------------
+	//  LOGIN: Step 1 - Get assertion options
+	// --------------------------------------------------------
+	[HttpGet("{username}/assertion-options")]
+	[HttpGet("assertion-options")]
+	public AssertionOptions MakeAssertionOptions(
 		[FromRoute] string? username,
-		[FromQuery] string? displayName,
-		[FromQuery] AttestationConveyancePreference? attestationType,
-		[FromQuery] AuthenticatorAttachment? authenticator,
-		[FromQuery] UserVerificationRequirement? userVerification,
-		[FromQuery] ResidentKeyRequirement? residentKey
+		[FromQuery] UserVerificationRequirement? userVerification
 	)
 	{
-		var key = username;
+		var existingKeys = new List<PublicKeyCredentialDescriptor>();
 
-		if (string.IsNullOrEmpty(username))
+		if (!string.IsNullOrEmpty(username))
 		{
-			var created = DateTime.UtcNow;
+			var user = _demoStorage.GetUser(username);
+			if (user != null)
+				existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
+		}
 
-			if (string.IsNullOrEmpty(displayName))
+		var exts = new AuthenticationExtensionsClientInputs { UserVerificationMethod = true, Extensions = true };
+
+		var options = fido.GetAssertionOptions(
+			new GetAssertionOptionsParams
 			{
-				// More precise generated name for less collisions in _pendingCredentials
-				username = $"(Usernameless user created {created})";
-			}
-			else
-			{
-				// Less precise but nicer for user if there's a displayName set anyway
-				username = $"{displayName} (Usernameless user created {created.ToShortDateString()})";
-			}
-
-			key = Convert.ToBase64String(Encoding.UTF8.GetBytes(username));
-		}
-
-		Debug.Assert(key != null); // If it was null before, it was set to the base64 value. Analyzer doesn't understand this though.
-
-		// 1. Get user from DB by username (in our example, auto create missing users)
-		var user = _demoStorage.GetOrAddUser(
-			username,
-			() =>
-				new Fido2User
-				{
-					DisplayName = displayName,
-					Name = username,
-					Id = Encoding.UTF8.GetBytes(username), // byte representation of userID is required
-				}
-		);
-
-		// 2. Get user existing keys by username
-		var existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
-
-		// 3. Build authenticator selection
-		var authenticatorSelection = AuthenticatorSelection.Default;
-
-		if (authenticator != null)
-		{
-			authenticatorSelection.AuthenticatorAttachment = authenticator;
-		}
-
-		if (userVerification != null)
-		{
-			authenticatorSelection.UserVerification = userVerification.Value;
-		}
-
-		if (residentKey != null)
-		{
-			authenticatorSelection.ResidentKey = residentKey.Value;
-		}
-
-		// 4. Create options
-		var options = fido.RequestNewCredential(
-			new RequestNewCredentialParams
-			{
-				User = user,
-				ExcludeCredentials = existingKeys,
-				AuthenticatorSelection = authenticatorSelection,
-				AttestationPreference = attestationType ?? AttestationConveyancePreference.None,
-				Extensions = new AuthenticationExtensionsClientInputs
-				{
-					Extensions = true,
-					UserVerificationMethod = true,
-					CredProps = true,
-				},
+				AllowedCredentials = existingKeys,
+				UserVerification = userVerification ?? UserVerificationRequirement.Required,
+				Extensions = exts,
 			}
 		);
 
-		// 5. Temporarily store options, session/in-memory cache/redis/db
-		_pendingCredentials[key] = options;
-
-		// 6. return options to client
+		var key = Convert.ToBase64String(options.Challenge);
+		_pendingAssertions[key] = options;
 		return options;
 	}
 
-	/// <summary>
-	///  Verifies an assertion response from a client, generating a new JWT for the user.
-	/// </summary>
-	/// <param name="clientResponse">The client's authenticator's response to the challenge.</param>
-	/// <param name="cancellationToken"></param>
-	/// <returns>
-	///  Either a new JWT header or an error message.
-	///  Example successful response:
-	///  "Bearer eyyylmaooimtotallyatoken"
-	///  Example error response:
-	///  "Error: Invalid assertion"
-	/// </returns>
+	// --------------------------------------------------------
+	//  LOGIN: Step 2 - Verify assertion
+	// --------------------------------------------------------
 	[HttpPost("assertion")]
 	public async Task<string> MakeAssertionAsync(
 		[FromBody] AuthenticatorAssertionRawResponse clientResponse,
@@ -214,30 +206,23 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			// 1. Get the assertion options we sent the client remove them from memory so they can't be used again
 			var response = JsonSerializer.Deserialize<AuthenticatorResponse>(
 				clientResponse.Response.ClientDataJson
 			);
 
 			if (response is null)
-			{
 				return "Error: Could not deserialize client data";
-			}
 
-			var key = new string(response.Challenge.Select(b => (char)b).ToArray());
+			var key = Convert.ToBase64String(response.Challenge);
 
 			if (!_pendingAssertions.TryGetValue(key, out var options))
-			{
-				return "Error: Challenge not found, please get a new one via GET /{username?}/assertion-options";
-			}
+				return "Error: Challenge not found (request /assertion-options first)";
 
 			_pendingAssertions.Remove(key);
 
-			// 2. Get registered credential from database
 			var creds =
 				_demoStorage.GetCredentialById(clientResponse.RawId) ?? throw new Exception("Unknown credentials");
 
-			// 3. Make the assertion
 			var res = await fido.MakeAssertionAsync(
 				new MakeAssertionParams
 				{
@@ -250,31 +235,24 @@ public class UserController : ControllerBase
 				cancellationToken
 			);
 
-			// 4. Store the updated counter
 			_demoStorage.UpdateCounter(res.CredentialId, res.SignCount);
 
-			// 5. return result to client
 			var handler = new JwtSecurityTokenHandler();
 
 			var token = handler.CreateEncodedJwt(
 				HttpContext.Request.Host.Host,
 				HttpContext.Request.Headers.Referer,
 				new ClaimsIdentity(
-					new Claim[] { new(ClaimTypes.Actor, Encoding.UTF8.GetString(creds.UserHandle)) }
+					new[] { new Claim(ClaimTypes.Actor, Encoding.UTF8.GetString(creds.UserHandle)) }
 				),
-				DateTime.Now.Subtract(TimeSpan.FromMinutes(1)),
+				DateTime.Now.AddMinutes(-1),
 				DateTime.Now.AddDays(1),
 				DateTime.Now,
 				_signingCredentials,
 				null
 			);
 
-			if (token is null)
-			{
-				return "Error: Token couldn't be created";
-			}
-
-			return $"Bearer {token}";
+			return token is null ? "Error: Token couldn't be created" : $"Bearer {token}";
 		}
 		catch (Exception e)
 		{
@@ -282,45 +260,9 @@ public class UserController : ControllerBase
 		}
 	}
 
-	[HttpGet("{username}/assertion-options")]
-	[HttpGet("assertion-options")]
-	public AssertionOptions MakeAssertionOptions(
-		[FromRoute] string? username,
-		[FromQuery] UserVerificationRequirement? userVerification
-	)
-	{
-		var existingKeys = new List<PublicKeyCredentialDescriptor>();
-
-		if (!string.IsNullOrEmpty(username))
-		{
-			// 1. Get user and their credentials from DB
-			var user = _demoStorage.GetUser(username);
-
-			if (user != null)
-			{
-				existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
-			}
-		}
-
-		var exts = new AuthenticationExtensionsClientInputs { UserVerificationMethod = true, Extensions = true };
-
-		// 2. Create options (usernameless users will be prompted by their device to select a credential from their own list)
-		var options = fido.GetAssertionOptions(
-			new GetAssertionOptionsParams
-			{
-				AllowedCredentials = existingKeys,
-				UserVerification = userVerification ?? UserVerificationRequirement.Discouraged,
-				Extensions = exts,
-			}
-		);
-
-		// 4. Temporarily store options, session/in-memory cache/redis/db
-		_pendingAssertions[new string(options.Challenge.Select(b => (char)b).ToArray())] = options;
-
-		// 5. return options to client
-		return options;
-	}
-
+	// --------------------------------------------------------
+	//  Helper callbacks
+	// --------------------------------------------------------
 	private static async Task<bool> CredentialIdUniqueToUserAsync(
 		IsCredentialIdUniqueToUserParams args,
 		CancellationToken cancellationToken
@@ -328,11 +270,6 @@ public class UserController : ControllerBase
 	{
 		var users = await _demoStorage.GetUsersByCredentialIdAsync(args.CredentialId, cancellationToken);
 		return users.Count <= 0;
-	}
-
-	private static string FormatException(Exception e)
-	{
-		return $"{e.Message}{e.InnerException?.Message ?? string.Empty}";
 	}
 
 	private static async Task<bool> UserHandleOwnerOfCredentialIdAsync(
@@ -343,4 +280,7 @@ public class UserController : ControllerBase
 		var storedCreds = await _demoStorage.GetCredentialsByUserHandleAsync(args.UserHandle, cancellationToken);
 		return storedCreds.Exists(c => c.Descriptor.Id.SequenceEqual(args.CredentialId));
 	}
+
+	private static string FormatException(Exception e) =>
+		$"{e.Message} {e.InnerException?.Message ?? string.Empty}";
 }

@@ -7,9 +7,8 @@ using Fido2NetLib;
 using Fido2NetLib.Objects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using OneOff;
 
-namespace BlazorWasmDemo.Server.Controllers;
+namespace OneOff;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -26,14 +25,7 @@ public class UserController : ControllerBase
 		SecurityAlgorithms.HmacSha256
 	);
 
-	private readonly IFido2 fido = new Fido2(
-		new Fido2Configuration
-		{
-			ServerDomain = "localhost",
-			ServerName = "Fido2 Test",
-			Origins = new HashSet<string> { "https://localhost:14555", "http://localhost:5000" },
-		}
-	);
+	private readonly IFido2 fido = FidoFactory.GetFido2();
 
 	/// <summary>
 	///  Creates a new credential for a user.

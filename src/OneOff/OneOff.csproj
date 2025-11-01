@@ -19,4 +19,10 @@
         <ProjectReference Include="..\ToolKit\ToolKit.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Fido2" Version="4.0.0" />
+      <PackageReference Include="Fido2.Models" Version="4.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
+    </ItemGroup>
+
 </Project>

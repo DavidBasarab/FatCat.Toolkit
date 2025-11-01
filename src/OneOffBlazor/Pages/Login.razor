@@ -1,0 +1,36 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<h3>Login</h3>
+
+<input placeholder="Username" @bind="Username" />
+<button class="btn btn-primary" @onclick="LoginAsync">Login</button>
+
+<p>@Message</p>
+
+@code {
+    private string Username { get; set; } = "";
+    private string Message { get; set; } = "";
+
+    private async Task LoginAsync()
+    {
+        Message = "Fetching assertion options...";
+        // Get assertion options from API
+        var options = await Http.GetFromJsonAsync<object>(
+                                                          $"api/user/{Username}/assertion-options?userVerification=required");
+
+        var optionsJson = System.Text.Json.JsonSerializer.Serialize(options);
+
+        // perform WebAuthn get() via JS interop
+        var assertionJson = await JS.InvokeAsync<string>("webauthnInterop.getAssertion", optionsJson);
+
+        // send to API for verification
+        var result = await Http.PostAsJsonAsync(
+                                                "api/user/assertion",
+                                                System.Text.Json.JsonSerializer.Deserialize<object>(assertionJson)!);
+
+        var token = await result.Content.ReadAsStringAsync();
+        Message = token.Contains("Bearer") ? "✅ Login successful!" : $"❌ {token}";
+    }
+}

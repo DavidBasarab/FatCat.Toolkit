@@ -35,7 +35,7 @@ public static class Program
 				ScopeOptions.SetLifetimeScope
 			);
 
-			// RunServer(args);
+			RunServer(args);
 
 			// var worker = SystemScope.Container.Resolve<RetryWorker>();
 			//

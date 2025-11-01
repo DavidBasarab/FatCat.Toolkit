@@ -1,41 +1,25 @@
-﻿using FatCat.Fakes;
-using FatCat.Toolkit.Console;
-using FatCat.Toolkit.Cryptography;
-using FatCat.Toolkit.Extensions;
+﻿using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Web;
 using Microsoft.AspNetCore.Components;
 
 namespace OneOffBlazor.Pages;
 
-public partial class DavidTest(
-	ITestingService testingService,
-	IFatCatAesEncryption aesEncryption,
-	IAesKeyGenerator aesKeyGenerator
-) : ComponentBase
+public partial class DavidTest(IWebCallerFactory factory) : ComponentBase
 {
 	public async Task DoSomeWork()
 	{
 		try
 		{
 			// Use the testing service to verify DI and remove unused parameter warning
-			testingService.PrintAMessage();
+			var caller = factory.GetWebCaller(new Uri("http://localhost:14555"));
 
-			var key = aesKeyGenerator.CreateKey(AesKeySize.Aes256);
-			var iv = aesKeyGenerator.CreateIv();
+			var badResponse = await caller.Get("request/bad");
 
-			ConsoleLog.Write($"Key := <{key.ToReadableString()}> ");
-			ConsoleLog.Write($"IV := <{iv.ToReadableString()}> ");
+			ConsoleLog.Write($"Bad Response: {badResponse.Content}");
 
-			var openData = Faker.RandomBytes(4);
+			var goodResponse = await caller.Get("request/good");
 
-			ConsoleLog.Write($"OpenData := <{openData.ToReadableString()}> ");
-
-			var encryptedData = await aesEncryption.Encrypt(openData, key, iv);
-
-			ConsoleLog.Write($"EncryptedData := <{encryptedData.ToReadableString()}> ");
-
-			var decryptedData = await aesEncryption.Decrypt(encryptedData, key, iv);
-
-			ConsoleLog.Write($"DecryptedData := <{decryptedData.ToReadableString()}> ");
+			ConsoleLog.Write($"Good Response: {goodResponse.Content}");
 		}
 		catch (Exception ex)
 		{

@@ -6,6 +6,8 @@ namespace OneOff;
 
 public interface IFido2Service
 {
+	AssertionOptions AssertionOptionsPost(string username, string userVerification);
+
 	Task<RegisteredPublicKeyCredential> MakeCredential(
 		CredentialCreateOptions options,
 		AuthenticatorAttestationRawResponse attestationResponse
@@ -33,6 +35,51 @@ public class Fido2Service : IFido2Service
 	);
 
 	private DevelopmentInMemoryStore DemoStorage { get; } = new();
+
+	public AssertionOptions AssertionOptionsPost(string username, string userVerification)
+	{
+		try
+		{
+			List<PublicKeyCredentialDescriptor> existingCredentials = [];
+
+			if (!string.IsNullOrEmpty(username))
+			{
+				// 1. Get user from DB
+				var user =
+					DemoStorage.GetUser(username) ?? throw new ArgumentException("Username was not registered");
+
+				// 2. Get registered credentials from database
+				existingCredentials = DemoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
+			}
+
+			var exts = new AuthenticationExtensionsClientInputs
+			{
+				Extensions = true,
+				UserVerificationMethod = true,
+			};
+
+			// 3. Create options
+			var uv = string.IsNullOrEmpty(userVerification)
+				? UserVerificationRequirement.Discouraged
+				: userVerification.ToEnum<UserVerificationRequirement>();
+
+			var options = _fido2.GetAssertionOptions(
+				new GetAssertionOptionsParams
+				{
+					AllowedCredentials = existingCredentials,
+					UserVerification = uv,
+					Extensions = exts,
+				}
+			);
+
+			// 5. Return options to client
+			return options;
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
+	}
 
 	public async Task<RegisteredPublicKeyCredential> MakeCredential(
 		CredentialCreateOptions options,

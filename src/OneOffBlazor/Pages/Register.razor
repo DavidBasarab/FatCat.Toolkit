@@ -1,43 +1,37 @@
 ﻿@page "/register"
-@using System.Text.Json
 @inject HttpClient Http
-@inject IJSRuntime JS
+@inject WebAuthnInterop WebAuthn
 
-<h3>Register User</h3>
+<h3 class="text-2xl font-bold mb-4 text-white">Register Credential</h3>
 
-<input placeholder="Username" @bind="Username"/>
-<button class="btn btn-primary" @onclick="RegisterAsync">Register</button>
+<input @bind="Username" placeholder="Username" class="p-2 rounded text-black" />
+<button class="ml-2 bg-blue-500 text-white px-4 py-2 rounded" @onclick="RegisterAsync">Register</button>
 
-<p>@Message</p>
+<p class="mt-4 text-gray-300">@Status</p>
 
 @code {
-
-    private string Username { get; set; } = "";
-
-
-    private string Message { get; set; } = "";
+    private string Username = "david";
+    private string Status = "";
 
     private async Task RegisterAsync()
     {
-        Message = "Requesting credential options...";
+        try
+        {
+            Status = "Requesting credential options...";
+            var options = await Http.GetFromJsonAsync<object>($"http://localhost:14555/api/user/{Username}/credential-options");
 
-        // get credential options from API
-        var options = await Http.GetFromJsonAsync<object>(
-                                                          $"api/user/{Username}/credential-options?attestationType=None&userVerification=required");
+            var attestationJson = await WebAuthn.CreateCredentialAsync(options!);
+            Status = "Sending attestation to server...";
 
-        var optionsJson = JsonSerializer.Serialize(options);
+            var content = new StringContent(attestationJson, System.Text.Encoding.UTF8, "application/json");
+            var resp = await Http.PutAsync($"http://localhost:14555/api/user/{Username}/credential", content);
+            var result = await resp.Content.ReadAsStringAsync();
 
-        // create WebAuthn credential via interop
-        var credJson = await JS.InvokeAsync<string>("webauthnInterop.createCredential", optionsJson);
-
-        // send credential back to API to register
-        var response = await Http.PutAsJsonAsync(
-                                                 $"api/user/{Username}/credential",
-                                                 JsonSerializer.Deserialize<object>(credJson)!);
-
-        if (response.IsSuccessStatusCode) Message = "✅ Registration complete!";
-        else Message = $"❌ Error: {await response.Content.ReadAsStringAsync()}";
+            Status = $"Server response: {result}";
+        }
+        catch (Exception ex)
+        {
+            Status = $"Error: {ex.Message}";
+        }
     }
-
-
 }

@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Json;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
 using Microsoft.AspNetCore.Mvc;
@@ -28,85 +29,6 @@ public class UserController : ControllerBase
 	private readonly IFido2 fido = FidoFactory.GetFido2();
 
 	// --------------------------------------------------------
-	//  REGISTER: Step 1 - Get credential options
-	// --------------------------------------------------------
-	[HttpGet("{username}/credential-options")]
-	[HttpGet("credential-options")]
-	public CredentialCreateOptions GetCredentialOptions(
-		[FromRoute] string? username,
-		[FromQuery] string? displayName,
-		[FromQuery] AttestationConveyancePreference? attestationType,
-		[FromQuery] AuthenticatorAttachment? authenticator,
-		[FromQuery] UserVerificationRequirement? userVerification,
-		[FromQuery] ResidentKeyRequirement? residentKey
-	)
-	{
-		var key = username ?? Guid.NewGuid().ToString("N");
-
-		if (string.IsNullOrEmpty(displayName))
-			displayName = username ?? "User";
-
-		// 1. Ensure a valid user object
-		var user = _demoStorage.GetOrAddUser(
-			username ?? displayName,
-			() =>
-				new Fido2User
-				{
-					DisplayName = displayName,
-					Name = username ?? displayName,
-					Id = Encoding.UTF8.GetBytes(username ?? displayName),
-				}
-		);
-
-		// 2. Existing credentials
-		var existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
-
-		// 3. Authenticator preferences
-		var authenticatorSelection = new AuthenticatorSelection
-		{
-			AuthenticatorAttachment = authenticator ?? AuthenticatorAttachment.CrossPlatform,
-			ResidentKey = residentKey ?? ResidentKeyRequirement.Discouraged,
-			UserVerification = userVerification ?? UserVerificationRequirement.Required,
-		};
-
-		// 4. Create options
-		var options = fido.RequestNewCredential(
-			new RequestNewCredentialParams
-			{
-				User = user,
-				ExcludeCredentials = existingKeys,
-				AuthenticatorSelection = authenticatorSelection,
-				AttestationPreference = attestationType ?? AttestationConveyancePreference.None,
-				Extensions = new AuthenticationExtensionsClientInputs
-				{
-					Extensions = true,
-					UserVerificationMethod = true,
-					CredProps = true,
-				},
-			}
-		);
-
-		// ✅ Ensure standard algorithms
-		if (options.PubKeyCredParams == null || options.PubKeyCredParams.Count == 0)
-		{
-			options.PubKeyCredParams = new List<PubKeyCredParam>
-			{
-				new PubKeyCredParam(COSE.Algorithm.ES256),
-				new PubKeyCredParam(COSE.Algorithm.RS256),
-			};
-		}
-
-		// ✅ Ensure RP ID matches API host (fixes browser rejection)
-		options.Rp.Id = HttpContext.Request.Host.Host;
-		options.Rp.Name = "OneOff FIDO2 Demo";
-
-		// 5. Cache options for verification
-		_pendingCredentials[key] = options;
-
-		return options;
-	}
-
-	// --------------------------------------------------------
 	//  REGISTER: Step 2 - Submit credential
 	// --------------------------------------------------------
 	[HttpPut("{username}/credential")]
@@ -119,7 +41,9 @@ public class UserController : ControllerBase
 		try
 		{
 			if (!_pendingCredentials.TryGetValue(username, out var options))
+			{
 				return "Error: registration options not found (request /credential-options first)";
+			}
 
 			var credential = await fido.MakeNewCredentialAsync(
 				new MakeNewCredentialParams
@@ -161,38 +85,88 @@ public class UserController : ControllerBase
 	}
 
 	// --------------------------------------------------------
-	//  LOGIN: Step 1 - Get assertion options
+	//  REGISTER: Step 1 - Get credential options
 	// --------------------------------------------------------
-	[HttpGet("{username}/assertion-options")]
-	[HttpGet("assertion-options")]
-	public AssertionOptions MakeAssertionOptions(
+	[HttpGet("{username}/credential-options")]
+	[HttpGet("credential-options")]
+	public IActionResult GetCredentialOptions(
 		[FromRoute] string? username,
-		[FromQuery] UserVerificationRequirement? userVerification
+		[FromQuery] string? displayName,
+		[FromQuery] AttestationConveyancePreference? attestationType,
+		[FromQuery] AuthenticatorAttachment? authenticator,
+		[FromQuery] UserVerificationRequirement? userVerification,
+		[FromQuery] ResidentKeyRequirement? residentKey
 	)
 	{
-		var existingKeys = new List<PublicKeyCredentialDescriptor>();
+		var key = username ?? Guid.NewGuid().ToString("N");
+		displayName ??= username ?? "User";
 
-		if (!string.IsNullOrEmpty(username))
+		// 1️⃣ Create or fetch the user
+		var user = _demoStorage.GetOrAddUser(
+			username ?? displayName,
+			() =>
+				new Fido2User
+				{
+					DisplayName = displayName,
+					Name = username ?? displayName,
+					Id = Encoding.UTF8.GetBytes(username ?? displayName),
+				}
+		);
+
+		// 2️⃣ Get existing credentials
+		var existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
+
+		// 3️⃣ Authenticator preferences
+		var authenticatorSelection = new AuthenticatorSelection
 		{
-			var user = _demoStorage.GetUser(username);
-			if (user != null)
-				existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
-		}
+			AuthenticatorAttachment = authenticator ?? AuthenticatorAttachment.CrossPlatform,
+			ResidentKey = residentKey ?? ResidentKeyRequirement.Discouraged,
+			UserVerification = userVerification ?? UserVerificationRequirement.Required,
+		};
 
-		var exts = new AuthenticationExtensionsClientInputs { UserVerificationMethod = true, Extensions = true };
-
-		var options = fido.GetAssertionOptions(
-			new GetAssertionOptionsParams
+		// 4️⃣ Request options
+		var options = fido.RequestNewCredential(
+			new RequestNewCredentialParams
 			{
-				AllowedCredentials = existingKeys,
-				UserVerification = userVerification ?? UserVerificationRequirement.Required,
-				Extensions = exts,
+				User = user,
+				ExcludeCredentials = existingKeys,
+				AuthenticatorSelection = authenticatorSelection,
+				AttestationPreference = attestationType ?? AttestationConveyancePreference.None,
+				Extensions = new AuthenticationExtensionsClientInputs
+				{
+					Extensions = true,
+					UserVerificationMethod = true,
+					CredProps = true,
+				},
 			}
 		);
 
-		var key = Convert.ToBase64String(options.Challenge);
-		_pendingAssertions[key] = options;
-		return options;
+		// ✅ Normalize / fix WebAuthn required fields
+		options.Rp.Id = "localhost";
+		options.Rp.Name = "OneOff FIDO2 Demo";
+		options.Attestation = AttestationConveyancePreference.None;
+
+		// ✅ Replace invalid PubKeyCredParams
+		options.PubKeyCredParams = new List<PubKeyCredParam>
+		{
+			new(COSE.Algorithm.ES256),
+			new(COSE.Algorithm.RS256),
+		};
+
+		// ✅ Normalize enums to lowercase for browser validation
+		options.AuthenticatorSelection.AuthenticatorAttachment = AuthenticatorAttachment.CrossPlatform;
+		options.AuthenticatorSelection.ResidentKey = ResidentKeyRequirement.Discouraged;
+		options.AuthenticatorSelection.UserVerification = UserVerificationRequirement.Required;
+
+		// 5️⃣ Cache options
+		_pendingCredentials[key] = options;
+
+		ConsoleLog.WriteMagenta("Credential Options:");
+		ConsoleLog.WriteMagenta(new JsonOperations().Serialize(options));
+
+		// ✅ Wrap in `publicKey` for JS interop
+		var result = new { publicKey = options };
+		return new JsonResult(result);
 	}
 
 	// --------------------------------------------------------
@@ -211,12 +185,16 @@ public class UserController : ControllerBase
 			);
 
 			if (response is null)
+			{
 				return "Error: Could not deserialize client data";
+			}
 
 			var key = Convert.ToBase64String(response.Challenge);
 
 			if (!_pendingAssertions.TryGetValue(key, out var options))
+			{
 				return "Error: Challenge not found (request /assertion-options first)";
+			}
 
 			_pendingAssertions.Remove(key);
 
@@ -237,6 +215,7 @@ public class UserController : ControllerBase
 
 			_demoStorage.UpdateCounter(res.CredentialId, res.SignCount);
 
+			// ✅ Return JWT token after successful verification
 			var handler = new JwtSecurityTokenHandler();
 
 			var token = handler.CreateEncodedJwt(
@@ -261,6 +240,45 @@ public class UserController : ControllerBase
 	}
 
 	// --------------------------------------------------------
+	//  LOGIN: Step 1 - Get assertion options
+	// --------------------------------------------------------
+	[HttpGet("{username}/assertion-options")]
+	[HttpGet("assertion-options")]
+	public IActionResult MakeAssertionOptions(
+		[FromRoute] string? username,
+		[FromQuery] UserVerificationRequirement? userVerification
+	)
+	{
+		var existingKeys = new List<PublicKeyCredentialDescriptor>();
+
+		if (!string.IsNullOrEmpty(username))
+		{
+			var user = _demoStorage.GetUser(username);
+
+			if (user != null)
+			{
+				existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
+			}
+		}
+
+		var exts = new AuthenticationExtensionsClientInputs { UserVerificationMethod = true, Extensions = true };
+
+		var options = fido.GetAssertionOptions(
+			new GetAssertionOptionsParams
+			{
+				AllowedCredentials = existingKeys,
+				UserVerification = userVerification ?? UserVerificationRequirement.Required,
+				Extensions = exts,
+			}
+		);
+
+		var key = Convert.ToBase64String(options.Challenge);
+		_pendingAssertions[key] = options;
+
+		return new JsonResult(new { publicKey = options });
+	}
+
+	// --------------------------------------------------------
 	//  Helper callbacks
 	// --------------------------------------------------------
 	private static async Task<bool> CredentialIdUniqueToUserAsync(
@@ -272,6 +290,11 @@ public class UserController : ControllerBase
 		return users.Count <= 0;
 	}
 
+	private static string FormatException(Exception e)
+	{
+		return $"{e.Message} {e.InnerException?.Message ?? string.Empty}";
+	}
+
 	private static async Task<bool> UserHandleOwnerOfCredentialIdAsync(
 		IsUserHandleOwnerOfCredentialIdParams args,
 		CancellationToken cancellationToken
@@ -280,7 +303,4 @@ public class UserController : ControllerBase
 		var storedCreds = await _demoStorage.GetCredentialsByUserHandleAsync(args.UserHandle, cancellationToken);
 		return storedCreds.Exists(c => c.Descriptor.Id.SequenceEqual(args.CredentialId));
 	}
-
-	private static string FormatException(Exception e) =>
-		$"{e.Message} {e.InnerException?.Message ?? string.Empty}";
 }

@@ -22,6 +22,8 @@ public static class Program
 
 		builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:14555/") });
 
+		builder.Services.AddScoped<WebAuthnInterop>();
+
 		await builder.Build().RunAsync();
 	}
 

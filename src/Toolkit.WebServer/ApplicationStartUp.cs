@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Autofac;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Extensions;
@@ -73,7 +74,14 @@ internal sealed class ApplicationStartUp
 		try
 		{
 			// Add services to the container.
-			services.AddControllers();
+			services
+				.AddControllers()
+				.AddJsonOptions(o =>
+				{
+					o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+
+					o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+				});
 
 			services.AddEndpointsApiExplorer();
 
@@ -249,7 +257,7 @@ internal sealed class ApplicationStartUp
 	{
 		public override void OnActionExecuting(ActionExecutingContext actionContext)
 		{
-			if (actionContext.ModelState.IsValid == false)
+			if (!actionContext.ModelState.IsValid)
 			{
 				actionContext.Result = new BadRequestObjectResult(actionContext.ModelState);
 			}

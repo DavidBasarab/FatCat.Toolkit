@@ -5,8 +5,7 @@
 
 <h3 class="text-2xl font-bold mb-4 text-white">Login with FIDO2</h3>
 
-<div class="flex flex-col gap-4">
-    <input @bind="Username" placeholder="Enter username" class="rounded p-2 text-black"/>
+<div class="flex flex-col gap-4 bg-gray-800 ">
     <button @onclick="LoginAsync"
             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-40">
         Login
@@ -20,8 +19,6 @@
 
 @code {
 
-    private string Username { get; set; } = "david";
-
 
     private string Status { get; set; } = "";
 
@@ -33,7 +30,7 @@
 
             // Step 1: Get assertion options
             var optionsResponse =
-                await Http.GetFromJsonAsync<JsonElement>($"http://localhost:14555/api/user/{Username}/assertion-options");
+                await Http.GetFromJsonAsync<JsonElement>($"http://localhost:14555/api/user/assertion-options");
 
             // Step 2: Use WebAuthn to sign in
             Status = "Authenticating...";

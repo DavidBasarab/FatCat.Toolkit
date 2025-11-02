@@ -119,9 +119,9 @@ public class UserController : ControllerBase
 		// 3️⃣ Authenticator preferences
 		var authenticatorSelection = new AuthenticatorSelection
 		{
-			AuthenticatorAttachment = authenticator ?? AuthenticatorAttachment.CrossPlatform,
-			ResidentKey = residentKey ?? ResidentKeyRequirement.Discouraged,
-			UserVerification = userVerification ?? UserVerificationRequirement.Required,
+			AuthenticatorAttachment = AuthenticatorAttachment.Platform, // use built-in (Windows Hello / Touch ID)
+			ResidentKey = ResidentKeyRequirement.Required, // 🔥 enable discoverable credentials
+			UserVerification = UserVerificationRequirement.Required,
 		};
 
 		// 4️⃣ Request options

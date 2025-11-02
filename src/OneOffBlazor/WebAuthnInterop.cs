@@ -5,15 +5,17 @@ namespace OneOffBlazor;
 
 public class WebAuthnInterop(IJSRuntime js)
 {
-	public async Task<string> CreateCredentialAsync(object options)
+	public async Task<object> CreateCredentialAsync(object options)
 	{
 		var json = JsonSerializer.Serialize(options);
-		return await js.InvokeAsync<string>("createCredential", json);
+
+		return await js.InvokeAsync<JsonElement>("createCredential", json);
 	}
 
-	public async Task<string> GetAssertionAsync(object options)
+	public async Task<object> GetAssertionAsync(object options)
 	{
 		var json = JsonSerializer.Serialize(options);
-		return await js.InvokeAsync<string>("getAssertion", json);
+
+		return await js.InvokeAsync<JsonElement>("getAssertion", json);
 	}
 }

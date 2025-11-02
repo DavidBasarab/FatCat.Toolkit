@@ -1,37 +1,65 @@
 ﻿@page "/login"
+@using System.Text.Json
 @inject HttpClient Http
-@inject WebAuthnInterop WebAuthn
+@inject IJSRuntime Js
 
-<h3 class="text-2xl font-bold mb-4 text-white">Login with Passkey</h3>
+<h3 class="text-2xl font-bold mb-4 text-white">Login with FIDO2</h3>
 
-<input @bind="Username" placeholder="Username" class="p-2 rounded text-black" />
-<button class="ml-2 bg-green-600 text-white px-4 py-2 rounded" @onclick="LoginAsync">Login</button>
+<div class="flex flex-col gap-4">
+    <input @bind="Username" placeholder="Enter username" class="rounded p-2 text-black"/>
+    <button @onclick="LoginAsync"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-40">
+        Login
+    </button>
+</div>
 
-<p class="mt-4 text-gray-300">@Status</p>
+@if (!string.IsNullOrEmpty(Status))
+{
+    <p class="mt-4 text-gray-300">@Status</p>
+}
 
 @code {
-    private string Username = "david";
-    private string Status = "";
+
+    private string Username { get; set; } = "david";
+
+
+    private string Status { get; set; } = "";
 
     private async Task LoginAsync()
     {
         try
         {
             Status = "Requesting assertion options...";
-            var options = await Http.GetFromJsonAsync<object>($"http://localhost:14555/api/user/{Username}/assertion-options");
 
-            var assertionJson = await WebAuthn.GetAssertionAsync(options!);
-            Status = "Verifying with server...";
+            // Step 1: Get assertion options
+            var optionsResponse =
+                await Http.GetFromJsonAsync<JsonElement>($"http://localhost:14555/api/user/{Username}/assertion-options");
 
-            var content = new StringContent(assertionJson, System.Text.Encoding.UTF8, "application/json");
-            var resp = await Http.PostAsync("http://localhost:14555/api/user/assertion", content);
-            var token = await resp.Content.ReadAsStringAsync();
+            // Step 2: Use WebAuthn to sign in
+            Status = "Authenticating...";
 
-            Status = $"Server response: {token}";
+            var assertion = await Js.InvokeAsync<JsonElement>(
+                                                              "getAssertion",
+                                                              JsonSerializer.Serialize(optionsResponse)
+                                                             );
+
+            // Step 3: Send to server
+            var result = await Http.PostAsJsonAsync(
+                                                    "http://localhost:14555/api/user/assertion",
+                                                    assertion
+                                                   );
+
+            var token = await result.Content.ReadAsStringAsync();
+
+            if (token.StartsWith("Bearer")) Status = "✅ Login successful!";
+            else Status = $"❌ Login failed: {token}";
         }
         catch (Exception ex)
         {
-            Status = $"Error: {ex.Message}";
+            Status = $"⚠️ Error: {ex.Message}";
+            Console.WriteLine(ex);
         }
     }
+
+
 }

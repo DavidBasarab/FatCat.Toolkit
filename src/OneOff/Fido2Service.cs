@@ -30,7 +30,7 @@ public interface IFido2Service
 
 public class Fido2Service : IFido2Service
 {
-	private readonly IFido2 _fido2 = new Fido2(
+	private readonly IFido2 fido2 = new Fido2(
 		new Fido2Configuration
 		{
 			ServerDomain = "localhost",
@@ -68,7 +68,7 @@ public class Fido2Service : IFido2Service
 				? UserVerificationRequirement.Discouraged
 				: userVerification.ToEnum<UserVerificationRequirement>();
 
-			var options = _fido2.GetAssertionOptions(
+			var options = fido2.GetAssertionOptions(
 				new GetAssertionOptionsParams
 				{
 					AllowedCredentials = existingCredentials,
@@ -110,7 +110,7 @@ public class Fido2Service : IFido2Service
 		};
 
 		// 5. Make the assertion
-		var res = await _fido2.MakeAssertionAsync(
+		var res = await fido2.MakeAssertionAsync(
 			new MakeAssertionParams
 			{
 				AssertionResponse = clientResponse,
@@ -146,7 +146,7 @@ public class Fido2Service : IFido2Service
 		};
 
 		// 2. Verify and make the credentials
-		var credential = await _fido2.MakeNewCredentialAsync(
+		var credential = await fido2.MakeNewCredentialAsync(
 			new MakeNewCredentialParams
 			{
 				AttestationResponse = attestationResponse,
@@ -226,7 +226,7 @@ public class Fido2Service : IFido2Service
 			CredProps = true,
 		};
 
-		var options = _fido2.RequestNewCredential(
+		var options = fido2.RequestNewCredential(
 			new RequestNewCredentialParams
 			{
 				User = user,

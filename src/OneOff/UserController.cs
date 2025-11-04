@@ -15,11 +15,11 @@ namespace OneOff;
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-	private static readonly DevelopmentInMemoryStore _demoStorage = new();
-	private static readonly Dictionary<string, AssertionOptions> _pendingAssertions = new();
-	private static readonly Dictionary<string, CredentialCreateOptions> _pendingCredentials = new();
+	private static readonly DevelopmentInMemoryStore demoStorage = new();
+	private static readonly Dictionary<string, AssertionOptions> pendingAssertions = new();
+	private static readonly Dictionary<string, CredentialCreateOptions> pendingCredentials = new();
 
-	private static readonly SigningCredentials _signingCredentials = new(
+	private static readonly SigningCredentials signingCredentials = new(
 		new SymmetricSecurityKey(
 			"This is my very long and totally secret key for signing tokens, which clients may never learn or I'd have to replace it."u8.ToArray()
 		),
@@ -40,7 +40,7 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			if (!_pendingCredentials.TryGetValue(username, out var options))
+			if (!pendingCredentials.TryGetValue(username, out var options))
 			{
 				return "Error: registration options not found (request /credential-options first)";
 			}
@@ -55,7 +55,7 @@ public class UserController : ControllerBase
 				cancellationToken
 			);
 
-			_demoStorage.AddCredentialToUser(
+			demoStorage.AddCredentialToUser(
 				options.User,
 				new StoredCredential
 				{
@@ -74,7 +74,7 @@ public class UserController : ControllerBase
 				}
 			);
 
-			_pendingCredentials.Remove(username);
+			pendingCredentials.Remove(username);
 
 			return "OK";
 		}
@@ -102,7 +102,7 @@ public class UserController : ControllerBase
 		displayName ??= username ?? "User";
 
 		// 1️⃣ Create or fetch the user
-		var user = _demoStorage.GetOrAddUser(
+		var user = demoStorage.GetOrAddUser(
 			username ?? displayName,
 			() =>
 				new Fido2User
@@ -114,7 +114,7 @@ public class UserController : ControllerBase
 		);
 
 		// 2️⃣ Get existing credentials
-		var existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
+		var existingKeys = demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
 
 		// 3️⃣ Authenticator preferences
 		var authenticatorSelection = new AuthenticatorSelection
@@ -159,7 +159,7 @@ public class UserController : ControllerBase
 		options.AuthenticatorSelection.UserVerification = UserVerificationRequirement.Required;
 
 		// 5️⃣ Cache options
-		_pendingCredentials[key] = options;
+		pendingCredentials[key] = options;
 
 		ConsoleLog.WriteMagenta("Credential Options:");
 		ConsoleLog.WriteMagenta(new JsonOperations().Serialize(options));
@@ -191,15 +191,15 @@ public class UserController : ControllerBase
 
 			var key = Convert.ToBase64String(response.Challenge);
 
-			if (!_pendingAssertions.TryGetValue(key, out var options))
+			if (!pendingAssertions.TryGetValue(key, out var options))
 			{
 				return "Error: Challenge not found (request /assertion-options first)";
 			}
 
-			_pendingAssertions.Remove(key);
+			pendingAssertions.Remove(key);
 
 			var creds =
-				_demoStorage.GetCredentialById(clientResponse.RawId) ?? throw new Exception("Unknown credentials");
+				demoStorage.GetCredentialById(clientResponse.RawId) ?? throw new Exception("Unknown credentials");
 
 			var res = await fido.MakeAssertionAsync(
 				new MakeAssertionParams
@@ -213,7 +213,7 @@ public class UserController : ControllerBase
 				cancellationToken
 			);
 
-			_demoStorage.UpdateCounter(res.CredentialId, res.SignCount);
+			demoStorage.UpdateCounter(res.CredentialId, res.SignCount);
 
 			// ✅ Return JWT token after successful verification
 			var handler = new JwtSecurityTokenHandler();
@@ -227,7 +227,7 @@ public class UserController : ControllerBase
 				DateTime.Now.AddMinutes(-1),
 				DateTime.Now.AddDays(1),
 				DateTime.Now,
-				_signingCredentials,
+				signingCredentials,
 				null
 			);
 
@@ -253,11 +253,11 @@ public class UserController : ControllerBase
 
 		if (!string.IsNullOrEmpty(username))
 		{
-			var user = _demoStorage.GetUser(username);
+			var user = demoStorage.GetUser(username);
 
 			if (user != null)
 			{
-				existingKeys = _demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
+				existingKeys = demoStorage.GetCredentialsByUser(user).Select(c => c.Descriptor).ToList();
 			}
 		}
 
@@ -273,7 +273,7 @@ public class UserController : ControllerBase
 		);
 
 		var key = Convert.ToBase64String(options.Challenge);
-		_pendingAssertions[key] = options;
+		pendingAssertions[key] = options;
 
 		return new JsonResult(new { publicKey = options });
 	}
@@ -286,7 +286,7 @@ public class UserController : ControllerBase
 		CancellationToken cancellationToken
 	)
 	{
-		var users = await _demoStorage.GetUsersByCredentialIdAsync(args.CredentialId, cancellationToken);
+		var users = await demoStorage.GetUsersByCredentialIdAsync(args.CredentialId, cancellationToken);
 		return users.Count <= 0;
 	}
 
@@ -300,7 +300,7 @@ public class UserController : ControllerBase
 		CancellationToken cancellationToken
 	)
 	{
-		var storedCreds = await _demoStorage.GetCredentialsByUserHandleAsync(args.UserHandle, cancellationToken);
+		var storedCreds = await demoStorage.GetCredentialsByUserHandleAsync(args.UserHandle, cancellationToken);
 		return storedCreds.Exists(c => c.Descriptor.Id.SequenceEqual(args.CredentialId));
 	}
 }

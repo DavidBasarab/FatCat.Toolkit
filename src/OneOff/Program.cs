@@ -44,10 +44,6 @@ public static class Program
 			// var consoleUtilities = SystemScope.Container.Resolve<IConsoleUtilities>();
 			//
 			// consoleUtilities.WaitForExit();
-
-			var messenger = SystemScope.Container.Resolve<IMessenger>();
-
-			ConsoleLog.WriteCyan($"Type of messenger {messenger.GetType().FullName}");
 		}
 		catch (Exception ex)
 		{

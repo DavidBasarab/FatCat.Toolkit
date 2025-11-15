@@ -52,6 +52,9 @@
         <PackageReference Include="System.IO.Abstractions" Version="22.0.16" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
     </ItemGroup>
+    <PropertyGroup>
+        <DisableImplicitSystemNetHttpPackage>true</DisableImplicitSystemNetHttpPackage>
+    </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
     </ItemGroup>

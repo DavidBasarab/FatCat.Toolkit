@@ -8,6 +8,10 @@
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <DisableImplicitSystemNetHttpPackage>true</DisableImplicitSystemNetHttpPackage>
+    </PropertyGroup>
+
     <ItemGroup>
         <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true"/>
     </ItemGroup>

@@ -30,6 +30,9 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<NoWarn>CS8002,CS1700;IL2121;CS8618;IL2121;CS8603</NoWarn>
 	</PropertyGroup>
+	<PropertyGroup>
+		<DisableImplicitSystemNetHttpPackage>true</DisableImplicitSystemNetHttpPackage>
+	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="8.4.0" />
 		<PackageReference Include="CSharpier.MsBuild" Version="1.2.1">

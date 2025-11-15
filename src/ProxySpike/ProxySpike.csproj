@@ -12,6 +12,10 @@
         <NoWarn>$(NoWarn);NETSDK1206</NoWarn>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <DisableImplicitSystemNetHttpPackage>true</DisableImplicitSystemNetHttpPackage>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
         <ProjectReference Include="..\ToolKit\ToolKit.csproj" />

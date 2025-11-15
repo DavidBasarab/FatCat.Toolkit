@@ -22,6 +22,10 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <DisableImplicitSystemNetHttpPackage>true</DisableImplicitSystemNetHttpPackage>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
         <ProjectReference Include="..\ToolKit\ToolKit.csproj" />

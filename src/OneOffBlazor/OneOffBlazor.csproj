@@ -7,9 +7,17 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <DisableImplicitSystemNetHttpPackage>true</DisableImplicitSystemNetHttpPackage>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <NoWarn>CS8002,CS1700;IL2121;CS8618;IL2121;CS8603;NU1903</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" PrivateAssets="all" />
     </ItemGroup>
 

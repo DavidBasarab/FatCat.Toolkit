@@ -28,6 +28,10 @@
         <NoWarn>CS8002,CS1700;IL2121;CS8618;IL2121;CS8603</NoWarn>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <DisableImplicitSystemNetHttpPackage>true</DisableImplicitSystemNetHttpPackage>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
         <ProjectReference Include="..\ToolKit\ToolKit.csproj" />

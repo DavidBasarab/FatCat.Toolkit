@@ -12,6 +12,10 @@
         <NoWarn>$(NoWarn);NETSDK1206</NoWarn>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <DisableImplicitSystemNetHttpPackage>true</DisableImplicitSystemNetHttpPackage>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
         <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
@@ -21,6 +25,7 @@
         <PackageReference Include="CommandLineParser" Version="2.9.1" />
         <PackageReference Include="FatCat.Fakes" Version="1.0.31" />
         <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
+        
     </ItemGroup>
 
     <ItemGroup>

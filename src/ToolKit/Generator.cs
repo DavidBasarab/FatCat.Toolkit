@@ -1,4 +1,3 @@
-#nullable enable
 using FatCat.Fakes;
 using MongoDB.Bson;
 
@@ -20,7 +19,7 @@ public interface IGenerator
 
 	int RandomNumber(int? minNumber = null, int? maxNumber = null);
 
-	string RandomString(string? prefix = null, int? length = null);
+	string RandomString(string prefix = null, int? length = null);
 }
 
 public class Generator : IGenerator
@@ -60,7 +59,7 @@ public class Generator : IGenerator
 		return Faker.RandomInt(minNumber, maxNumber);
 	}
 
-	public string RandomString(string? prefix = null, int? length = null)
+	public string RandomString(string prefix = null, int? length = null)
 	{
 		return Faker.RandomString(prefix, length);
 	}

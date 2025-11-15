@@ -50,7 +50,7 @@
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
         <PackageReference Include="MongoDB.Driver" Version="3.5.0" />
         <PackageReference Include="System.IO.Abstractions" Version="22.0.16" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ToolKit\ToolKit.csproj" />

@@ -6,7 +6,7 @@
 		<AssemblyName>FatCat.Toolkit</AssemblyName>
 		<DebugType>full</DebugType>
 		<LangVersion>default</LangVersion>
-    <VersionPrefix>1.0.317</VersionPrefix>
+		<VersionPrefix>1.0.317</VersionPrefix>
 		<Authors>David Basarab</Authors>
 		<PackageTags>tools</PackageTags>
 		<PackageProjectUrl>https://github.com/DavidBasarab/FatCat.Toolkit</PackageProjectUrl>
@@ -47,8 +47,8 @@
 		<PackageReference Include="FluentAssertions" Version="7.0.0" />
 		<PackageReference Include="Humanizer.Core" Version="3.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
-		<PackageReference Include="MongoDB.Driver" Version="3.5.1" />
-		<PackageReference Include="System.IO.Abstractions" Version="22.0.16" />
+		<PackageReference Include="MongoDB.Driver" Version="3.5.2" />
+		<PackageReference Include="System.IO.Abstractions" Version="22.1.0" />
 		<PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
 	</ItemGroup>
 </Project>

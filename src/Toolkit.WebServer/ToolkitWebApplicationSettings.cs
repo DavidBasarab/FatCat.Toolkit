@@ -7,11 +7,15 @@ namespace FatCat.Toolkit.WebServer;
 
 public class ToolkitWebApplicationSettings : EqualObject
 {
+	public bool AllowAllOrigins { get; set; }
+
 	public string[] Args { get; set; } = [];
 
 	public string BasePath { get; set; }
 
 	public List<Assembly> ContainerAssemblies { get; set; } = new();
+
+	public List<string> CorsSevers { get; set; } = [];
 
 	public Func<JwtBearerEvents> JwtBearerEvents { get; set; } = OAuthExtensions.GetTokenBearerEvents;
 
@@ -36,11 +40,23 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public event ToolkitHubMessage ClientMessage;
 
-	public Task OnClientConnected(ToolkitUser user, string connectionId) { return ClientConnected?.Invoke(user, connectionId); }
+	public Task OnClientConnected(ToolkitUser user, string connectionId)
+	{
+		return ClientConnected?.Invoke(user, connectionId);
+	}
 
-	public Task OnClientDisconnected(ToolkitUser user, string connectionId) { return ClientDisconnected?.Invoke(user, connectionId); }
+	public Task OnClientDisconnected(ToolkitUser user, string connectionId)
+	{
+		return ClientDisconnected?.Invoke(user, connectionId);
+	}
 
-	public Task<string> OnClientHubMessage(ToolkitMessage message) { return ClientMessage.Invoke(message)!; }
+	public Task<string> OnClientHubMessage(ToolkitMessage message)
+	{
+		return ClientMessage.Invoke(message)!;
+	}
 
-	public Task<string> OnOnClientDataBufferMessage(ToolkitMessage message, byte[] dataBuffer) { return ClientDataBufferMessage?.Invoke(message, dataBuffer)!; }
+	public Task<string> OnOnClientDataBufferMessage(ToolkitMessage message, byte[] dataBuffer)
+	{
+		return ClientDataBufferMessage?.Invoke(message, dataBuffer)!;
+	}
 }

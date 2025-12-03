@@ -35,17 +35,7 @@ public static class ToolkitWebApplication
 
 		builder.Services.AddHttpContextAccessor();
 
-		builder.Services.AddCors(options =>
-		{
-			options.AddPolicy(
-				CorsPolicyName,
-				policy =>
-					policy
-						.AllowAnyOrigin() // Allows all domains
-						.AllowAnyMethod() // Allows all HTTP methods
-						.AllowAnyHeader()
-			);
-		});
+		AddCors(builder);
 
 		var applicationStartUp = new ApplicationStartUp();
 
@@ -76,5 +66,48 @@ public static class ToolkitWebApplication
 		});
 
 		app.Run();
+	}
+
+	private static void AddCors(WebApplicationBuilder builder)
+	{
+		if (Settings.AllowAllOrigins)
+		{
+			AddDefaultCors(builder);
+		}
+		else
+		{
+			AddCorsSettings(builder);
+		}
+	}
+
+	private static void AddCorsSettings(WebApplicationBuilder builder)
+	{
+		builder.Services.AddCors(options =>
+		{
+			options.AddPolicy(
+				CorsPolicyName,
+				policy =>
+					policy
+						.WithOrigins(Settings.CorsSevers.ToArray())
+						.AllowAnyHeader()
+						.AllowAnyMethod()
+						.AllowCredentials()
+			);
+		});
+	}
+
+	private static void AddDefaultCors(WebApplicationBuilder builder)
+	{
+		builder.Services.AddCors(options =>
+		{
+			options.AddPolicy(
+				CorsPolicyName,
+				policy =>
+					policy
+						.AllowAnyOrigin() // Allows all domains
+						.AllowAnyMethod() // Allows all HTTP methods
+						.AllowAnyHeader()
+			);
+		});
 	}
 }

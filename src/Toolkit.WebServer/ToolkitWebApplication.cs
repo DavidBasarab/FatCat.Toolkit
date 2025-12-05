@@ -83,13 +83,18 @@ public static class ToolkitWebApplication
 		}
 	}
 
+	private static void WriteMessage(string message)
+	{
+		Settings.OnLogEvent?.Invoke(message);
+	}
+
 	private static void AddCorsSettings(WebApplicationBuilder builder)
 	{
-		ConsoleLog.Write("Configuring CORS for the following origins:");
+		WriteMessage("Configuring CORS for the following origins:");
 
 		foreach (var server in Settings.CorsSevers)
 		{
-			ConsoleLog.WriteGray($" - {server}");
+			WriteMessage($" - {server}");
 		}
 
 		builder.Services.AddCors(options =>

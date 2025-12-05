@@ -19,6 +19,8 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public Func<JwtBearerEvents> JwtBearerEvents { get; set; } = OAuthExtensions.GetTokenBearerEvents;
 
+	public Action<string> OnLogEvent { get; set; }
+
 	public Action OnWebApplicationStarted { get; set; }
 
 	public WebApplicationOptions Options { get; set; } =

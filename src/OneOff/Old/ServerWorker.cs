@@ -32,6 +32,10 @@ public class ServerWorker(IThread thread)
 			Args = args,
 			AllowAllOrigins = false,
 			CorsSevers = ["http://localhost:14555", "https://localhost:5003"],
+			OnLogEvent = m =>
+			{
+				ConsoleLog.WriteMagenta(m);
+			},
 		};
 
 		applicationSettings.ClientDataBufferMessage += async (message, buffer) =>

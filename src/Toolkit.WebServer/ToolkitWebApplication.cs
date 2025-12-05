@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Threading;
@@ -84,6 +85,13 @@ public static class ToolkitWebApplication
 
 	private static void AddCorsSettings(WebApplicationBuilder builder)
 	{
+		ConsoleLog.Write("Configuring CORS for the following origins:");
+
+		foreach (var server in Settings.CorsSevers)
+		{
+			ConsoleLog.WriteGray($" - {server}");
+		}
+
 		builder.Services.AddCors(options =>
 		{
 			options.AddPolicy(

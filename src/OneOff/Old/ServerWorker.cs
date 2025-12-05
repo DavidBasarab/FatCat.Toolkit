@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using FatCat.Fakes;
 using FatCat.Toolkit.Console;
-using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Threading;
 using FatCat.Toolkit.Web;
@@ -31,6 +30,12 @@ public class ServerWorker(IThread thread)
 			ContainerAssemblies = [Assembly.GetExecutingAssembly(), typeof(ToolkitWebServerModule).Assembly],
 			OnWebApplicationStarted = Started,
 			Args = args,
+			AllowAllOrigins = false,
+			CorsSevers = ["http://localhost:14555", "https://localhost:5003"],
+			OnLogEvent = m =>
+			{
+				ConsoleLog.WriteMagenta(m);
+			},
 		};
 
 		applicationSettings.ClientDataBufferMessage += async (message, buffer) =>

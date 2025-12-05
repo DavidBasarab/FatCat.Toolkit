@@ -7,7 +7,7 @@
         <AssemblyName>FatCat.Toolkit.WebServer</AssemblyName>
         <DebugType>full</DebugType>
         <LangVersion>default</LangVersion>
-    <VersionPrefix>1.0.319</VersionPrefix>
+    <VersionPrefix>1.0.320</VersionPrefix>
         <Authors>David Basarab</Authors>
         <PackageTags>tools</PackageTags>
         <PackageProjectUrl>https://github.com/DavidBasarab/FatCat.Toolkit</PackageProjectUrl>

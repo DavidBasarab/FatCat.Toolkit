@@ -49,6 +49,8 @@ public static class ToolkitWebApplication
 
 		applicationStartUp.Configure(app, app.Environment, app.Services.GetRequiredService<ILoggerFactory>());
 
+		app.UseCors(CorsPolicyName);
+
 		if (Settings.BasePath.IsNotNullOrEmpty())
 		{
 			app.UsePathBase(Settings.BasePath);

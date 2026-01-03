@@ -1,4 +1,6 @@
 using System.Security.Cryptography;
+using System.Text;
+using Konscious.Security.Cryptography;
 
 namespace FatCat.Toolkit;
 
@@ -9,6 +11,8 @@ public interface IHashTools
 	Task<string> CalculateHash(string data);
 
 	bool HashEquals(byte[] hash1, byte[] hash2);
+
+	byte[] HashPassword(string password, byte[] salt);
 }
 
 public class HashTools : IHashTools
@@ -26,6 +30,19 @@ public class HashTools : IHashTools
 	public bool HashEquals(byte[] hash1, byte[] hash2)
 	{
 		return hash1.SequenceEqual(hash2);
+	}
+
+	public byte[] HashPassword(string password, byte[] salt)
+	{
+		var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
+		{
+			Salt = salt,
+			DegreeOfParallelism = Environment.ProcessorCount,
+			Iterations = 4,
+			MemorySize = 1024 * 64,
+		};
+
+		return argon2.GetBytes(32);
 	}
 
 	private class ByteHashProcessor : IDisposable
@@ -65,12 +82,7 @@ public class HashTools : IHashTools
 
 	private class StringHashProcessor
 	{
-		private readonly MemoryStream memoryStream;
-
-		public StringHashProcessor()
-		{
-			memoryStream = new MemoryStream();
-		}
+		private readonly MemoryStream memoryStream = new();
 
 		public async Task<string> CalculateHash(string value)
 		{

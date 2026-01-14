@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FakeItEasy" Version="8.3.0" />
+        <PackageReference Include="FakeItEasy" Version="9.0.0" />
         <PackageReference Include="FatCat.Fakes" Version="1.0.31" />
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />

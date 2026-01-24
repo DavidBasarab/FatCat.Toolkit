@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -29,20 +28,7 @@ internal sealed class ApplicationStartUp
 {
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
 	{
-		// Forwarded headers should be VERY early
-		var forwardedHeadersOptions = new ForwardedHeadersOptions
-		{
-			ForwardedHeaders =
-				ForwardedHeaders.XForwardedFor
-				| ForwardedHeaders.XForwardedProto
-				| ForwardedHeaders.XForwardedHost,
-		};
-
-		// Optional: if you're behind a proxy and want to avoid needing KnownNetworks/Proxies configuration
-		// forwardedHeadersOptions.KnownNetworks.Clear();
-		// forwardedHeadersOptions.KnownProxies.Clear();
-
-		app.UseForwardedHeaders(forwardedHeadersOptions);
+		app.UseForwardedHeaders();
 
 		// If you want https redirects, do it early (and AFTER forwarded headers)
 		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.HttpsRedirection))

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -28,6 +29,27 @@ internal sealed class ApplicationStartUp
 {
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
 	{
+		// Forwarded headers should be VERY early
+		var forwardedHeadersOptions = new ForwardedHeadersOptions
+		{
+			ForwardedHeaders =
+				ForwardedHeaders.XForwardedFor
+				| ForwardedHeaders.XForwardedProto
+				| ForwardedHeaders.XForwardedHost,
+		};
+
+		// Optional: if you're behind a proxy and want to avoid needing KnownNetworks/Proxies configuration
+		// forwardedHeadersOptions.KnownNetworks.Clear();
+		// forwardedHeadersOptions.KnownProxies.Clear();
+
+		app.UseForwardedHeaders(forwardedHeadersOptions);
+
+		// If you want https redirects, do it early (and AFTER forwarded headers)
+		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.HttpsRedirection))
+		{
+			app.UseHttpsRedirection();
+		}
+
 		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.Cors))
 		{
 			app.UseCors(ToolkitWebApplication.CorsPolicyName);
@@ -35,8 +57,8 @@ internal sealed class ApplicationStartUp
 
 		app.Use(CaptureMiddlewareExceptions);
 
+		// Static files/file server typically early
 		app.UseFileServer();
-
 		SetUpStaticFiles(app);
 
 		app.UseRouting();
@@ -49,18 +71,9 @@ internal sealed class ApplicationStartUp
 
 		app.UseEndpoints(endpoints => endpoints.MapControllers());
 
-		app.Use(async (_, next) => await next.Invoke());
-
 		SystemScope.Container.LifetimeScope = app.ApplicationServices.GetAutofacRoot();
 
 		SetUpSignalR(app);
-
-		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.HttpsRedirection))
-		{
-			app.UseHttpsRedirection();
-		}
-
-		app.UseAuthorization();
 	}
 
 	public void ConfigureContainer(ContainerBuilder builder)
@@ -249,7 +262,7 @@ internal sealed class ApplicationStartUp
 	{
 		public override void OnActionExecuting(ActionExecutingContext actionContext)
 		{
-			if (actionContext.ModelState.IsValid == false)
+			if (!actionContext.ModelState.IsValid)
 			{
 				actionContext.Result = new BadRequestObjectResult(actionContext.ModelState);
 			}

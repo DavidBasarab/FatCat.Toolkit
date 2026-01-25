@@ -1,10 +1,10 @@
 ﻿using Autofac;
-using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Threading;
 using Humanizer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
@@ -35,6 +35,23 @@ public static class ToolkitWebApplication
 		builder.Host.UseServiceProviderFactory(new ToolkitServiceProviderFactory(new AutofacOptions()));
 
 		builder.Services.AddHttpContextAccessor();
+
+		builder.Services.Configure<ForwardedHeadersOptions>(options =>
+		{
+			options.ForwardedHeaders =
+				ForwardedHeaders.XForwardedFor
+				| ForwardedHeaders.XForwardedProto
+				| ForwardedHeaders.XForwardedHost;
+
+			// Azure front-ends/proxies often have dynamic IPs; this tells ASP.NET Core
+			// to accept forwarded headers from any proxy. Only do this if your app is
+			// NOT directly exposed to the internet except through Azure's proxy/ingress.
+			options.KnownIPNetworks.Clear();
+			options.KnownProxies.Clear();
+
+			// Helps prevent header chain abuse; usually 1 is correct for App Service/ACA.
+			options.ForwardLimit = 1;
+		});
 
 		AddCors(builder);
 
@@ -83,11 +100,6 @@ public static class ToolkitWebApplication
 		}
 	}
 
-	private static void WriteMessage(string message)
-	{
-		Settings.OnLogEvent?.Invoke(message);
-	}
-
 	private static void AddCorsSettings(WebApplicationBuilder builder)
 	{
 		WriteMessage("Configuring CORS for the following origins:");
@@ -124,5 +136,10 @@ public static class ToolkitWebApplication
 						.AllowAnyHeader()
 			);
 		});
+	}
+
+	private static void WriteMessage(string message)
+	{
+		Settings.OnLogEvent?.Invoke(message);
 	}
 }

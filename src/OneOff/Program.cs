@@ -2,7 +2,6 @@
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Logging;
-using FatCat.Toolkit.Messaging;
 using FatCat.Toolkit.WebServer;
 using OneOff.Old;
 using OneOffLib;
@@ -35,7 +34,14 @@ public static class Program
 				ScopeOptions.SetLifetimeScope
 			);
 
-			RunServer(args);
+			if (args.Contains("client"))
+			{
+				await RunClient();
+			}
+			else
+			{
+				RunServer(args);
+			}
 
 			// var worker = SystemScope.Container.Resolve<RetryWorker>();
 			//
@@ -53,6 +59,13 @@ public static class Program
 		{
 			ConsoleLog.WriteException(ex);
 		}
+	}
+
+	private static async Task RunClient()
+	{
+		var clientWorker = SystemScope.Container.Resolve<ClientWorker>();
+
+		await clientWorker.DoWork();
 	}
 
 	private static void RunServer(string[] args)

@@ -1,5 +1,3 @@
-using FatCat.Toolkit.Console;
-
 namespace FatCat.Toolkit.Web;
 
 public static class HttpClientFactory
@@ -11,7 +9,7 @@ public static class HttpClientFactory
 
 	public static HttpClient Get()
 	{
-		client ??= new HttpClient() { Timeout = DefaultTimeout };
+		client ??= new HttpClient { Timeout = DefaultTimeout };
 
 		return client;
 	}

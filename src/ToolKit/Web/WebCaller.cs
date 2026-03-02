@@ -291,6 +291,8 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 		var httpClient = localClient ?? HttpClientFactory.Get();
 
+		httpClient.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
+
 		var requestUri = GetFullUrl(url);
 
 		logger.Debug($"Creating request message to Uri := <{requestUri}>");

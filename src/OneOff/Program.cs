@@ -1,11 +1,9 @@
 using Autofac;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;
-using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.WebServer;
-using OneOff.Old;
+using OneOff.MongoProof;
 using OneOffLib;
-using Thread = FatCat.Toolkit.Threading.Thread;
 
 namespace OneOff;
 
@@ -15,8 +13,6 @@ public static class Program
 
 	public static async Task Main(params string[] args)
 	{
-		await Task.CompletedTask;
-
 		Args = args;
 
 		ConsoleLog.LogCallerInformation = true;
@@ -34,28 +30,13 @@ public static class Program
 				ScopeOptions.SetLifetimeScope
 			);
 
-			RunServer(args);
+			var worker = SystemScope.Container.Resolve<MongoProofWorker>();
 
-			// var worker = SystemScope.Container.Resolve<RetryWorker>();
-			//
-			// await worker.DoWork();
-
-			// var consoleUtilities = SystemScope.Container.Resolve<IConsoleUtilities>();
-			//
-			// consoleUtilities.WaitForExit();
-
-			// var messenger = SystemScope.Container.Resolve<IMessenger>();
-			//
-			// ConsoleLog.WriteCyan($"Type of messenger {messenger.GetType().FullName}");
+			await worker.DoWork();
 		}
 		catch (Exception ex)
 		{
 			ConsoleLog.WriteException(ex);
 		}
-	}
-
-	private static void RunServer(string[] args)
-	{
-		new ServerWorker(new Thread(new ToolkitLogger())).DoWork(args);
 	}
 }

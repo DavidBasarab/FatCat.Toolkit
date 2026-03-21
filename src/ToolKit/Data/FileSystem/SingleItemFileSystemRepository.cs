@@ -25,34 +25,22 @@ public class SingleItemFileSystemRepository<T>(
 
 	private string DataDirectory
 	{
-		get
-		{
-			return Path.Join(applicationTools.ExecutingDirectory, "Data");
-		}
+		get { return Path.Join(applicationTools.ExecutingDirectory, "Data"); }
 	}
 
 	private bool DataDirectoryDoesNotExist
 	{
-		get
-		{
-			return !fileSystem.Directory.Exists(DataDirectory);
-		}
+		get { return !fileSystem.Directory.Exists(DataDirectory); }
 	}
 
 	private bool DataFileNotFound
 	{
-		get
-		{
-			return !fileSystem.File.Exists(DataPath);
-		}
+		get { return !fileSystem.File.Exists(DataPath); }
 	}
 
 	private string DataPath
 	{
-		get
-		{
-			return Path.Join(DataDirectory, $"{typeof(T).Name}.data");
-		}
+		get { return Path.Join(DataDirectory, $"{typeof(T).Name}.data"); }
 	}
 
 	public bool Exists()

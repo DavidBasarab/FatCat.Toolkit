@@ -26,12 +26,7 @@ public interface IJsonOperations
 
 	public string Serialize(object source, bool indented);
 
-	public void SerializeToStream(
-		object source,
-		Stream output,
-		JsonSerializerOptions options = null,
-		bool leaveOpen = false
-	);
+	public void SerializeToStream(object source, Stream output, JsonSerializerOptions options = null, bool leaveOpen = false);
 
 	public Task SerializeToStreamAsync(
 		object source,
@@ -79,11 +74,7 @@ public sealed class JsonOperations : IJsonOperations
 		CancellationToken cancellationToken = default
 	)
 	{
-		var result = await JsonSerializer.DeserializeAsync<T>(
-			input,
-			options ?? GetDefaultOptions(),
-			cancellationToken
-		);
+		var result = await JsonSerializer.DeserializeAsync<T>(input, options ?? GetDefaultOptions(), cancellationToken);
 
 		if (!leaveOpen)
 		{
@@ -124,12 +115,7 @@ public sealed class JsonOperations : IJsonOperations
 		return Serialize(source, GetDefaultOptions(indented));
 	}
 
-	public void SerializeToStream(
-		object source,
-		Stream output,
-		JsonSerializerOptions options = null,
-		bool leaveOpen = false
-	)
+	public void SerializeToStream(object source, Stream output, JsonSerializerOptions options = null, bool leaveOpen = false)
 	{
 		using (
 			var writer = new Utf8JsonWriter(

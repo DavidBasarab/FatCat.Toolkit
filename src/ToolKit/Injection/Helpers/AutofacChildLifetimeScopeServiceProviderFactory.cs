@@ -76,9 +76,7 @@ public class AutofacChildLifetimeScopeServiceProviderFactory
 	///  creating the <see cref="IServiceProvider" />.
 	/// </param>
 	/// <returns>An <see cref="IServiceProvider" />.</returns>
-	public IServiceProvider CreateServiceProvider(
-		AutofacChildLifetimeScopeConfigurationAdapter configurationAdapter
-	)
+	public IServiceProvider CreateServiceProvider(AutofacChildLifetimeScopeConfigurationAdapter configurationAdapter)
 	{
 		if (configurationAdapter == null)
 		{

@@ -41,10 +41,7 @@ public class ApplicationTools : IApplicationTools
 {
 	public static bool IsInContainer
 	{
-		get
-		{
-			return Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER").ToBool();
-		}
+		get { return Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER").ToBool(); }
 	}
 
 	private string? executableName;
@@ -55,10 +52,7 @@ public class ApplicationTools : IApplicationTools
 
 	public string ExecutableFullPath
 	{
-		get
-		{
-			return GetProcessFileName();
-		}
+		get { return GetProcessFileName(); }
 	}
 
 	public string ExecutableName
@@ -99,10 +93,7 @@ public class ApplicationTools : IApplicationTools
 
 	public bool InContainer
 	{
-		get
-		{
-			return IsInContainer;
-		}
+		get { return IsInContainer; }
 	}
 
 	public string MacAddress
@@ -120,10 +111,7 @@ public class ApplicationTools : IApplicationTools
 
 	public string MachineName
 	{
-		get
-		{
-			return Environment.MachineName;
-		}
+		get { return Environment.MachineName; }
 	}
 
 	public ushort FindNextOpenPort(ushort startingPort)
@@ -212,9 +200,7 @@ public class ApplicationTools : IApplicationTools
 		var host = Dns.GetHostEntry(Dns.GetHostName());
 
 		return host
-			.AddressList.Where(ip =>
-				ip.AddressFamily is AddressFamily.InterNetwork or AddressFamily.InterNetworkV6
-			)
+			.AddressList.Where(ip => ip.AddressFamily is AddressFamily.InterNetwork or AddressFamily.InterNetworkV6)
 			.Select(ip => ip.ToString())
 			.ToList();
 	}

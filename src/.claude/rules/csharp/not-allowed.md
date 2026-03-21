@@ -3,7 +3,7 @@
 These are hard stops. Do not do any of the following under any circumstances.
 
 ## Type System
-- Do NOT use nullable annotations (`?`) anywhere — `string?`, `ILogger?`, `int?` are all banned
+- Do NOT use nullable annotations (`?`) defensively — only use `?` where a value is genuinely nullable (generic return types, reflection code, extension methods designed to accept null). Never annotate injected dependencies or always-populated values.
 - Do NOT use records — use classes only
 
 ## Async

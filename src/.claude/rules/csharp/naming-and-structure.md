@@ -20,6 +20,9 @@
 - String interpolation required — never string concatenation with `+`
 - Do NOT suffix method names with `Async` just because they return a `Task`. Name the method after what it does: `Save`, not `SaveAsync`. Only use the `Async` suffix when a non-async overload with the same name already exists and both must coexist.
 
+## Discards
+- Use `_` to discard outputs you intentionally do not need — `out _` for ignored out parameters, `using var _ = ...` for disposables acquired only for their side effect.
+
 ## Method Size
 - Methods should be as short as possible.
 - ~10 lines is a signal to evaluate refactoring — not an automatic rule.

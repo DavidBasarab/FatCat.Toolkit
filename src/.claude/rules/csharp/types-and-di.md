@@ -5,9 +5,18 @@
 - Small methods and good naming make the type obvious from context.
 - Use explicit types only when the type is not clear from the right-hand side.
 
-## Nullable Reference Types — BANNED
-- Nullable reference types (`?`) are banned. Do not use nullable annotations on any type.
-- Do not write `string?`, `ILogger?`, `OutputContext?`, or any other nullable annotation.
+## Nullable Reference Types
+- Use nullable annotations (`?`) only where a value is genuinely optional or nullable — for example, generic return types (`T?`), reflection-heavy code, or extension methods that accept null input by design.
+- Do not annotate defensively. If a value cannot be null in normal usage, do not mark it nullable.
+- Do not write `string?`, `ILogger?`, or other nullable annotations on injected dependencies or values that are always populated.
+
+## Thread-Safe Collections
+- Use `ConcurrentDictionary<TKey, TValue>` for shared mutable state that is accessed across threads.
+- Never use a plain `Dictionary` with manual locking for this purpose.
+
+## Lazy Initialization
+- Use `Lazy<T>` for thread-safe singleton initialization when a value is expensive to compute or must be deferred.
+- Always use the factory constructor overload: `new Lazy<T>(() => ...)`.
 
 ## Records — BANNED
 - Records are banned. Use classes only.
@@ -66,6 +75,7 @@ Do NOT add to the module when:
 - Mark the module class `[ExcludeFromCodeCoverage]` — it contains no testable logic
 - Do not register the concrete type without `.As<IInterface>()` unless there is an explicit reason
 - For classes that require a factory method for construction, use a static `.Factory` method on the class and register it via `builder.Register(MyClass.Factory)`:
+- Use `.OnActivated(handler)` when a type needs initialization that cannot happen in its constructor — for example, calling a method on an open generic after resolution. The handler receives `IActivatedEventArgs<object>` and can use `args.Instance`, `args.Context`, and reflection to invoke the initialization. Use this sparingly; prefer constructor injection for all normal dependencies.
 
 ```csharp
 // Common project — default implementation, resolved automatically (no module entry needed)

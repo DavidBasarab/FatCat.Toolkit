@@ -39,3 +39,27 @@ Use target-typed `new()` expressions for object and collection initialization wh
 ## `var` Usage
 
 Use `var` for local variables when the type is evident from the right-hand side. Use explicit types when the type is not immediately obvious from context.
+
+## Interface Naming
+
+All interfaces are prefixed with `I` (e.g., `IFatTcpClient`, `ICacheItem`).
+
+## Constants
+
+Constant fields (`const`) use PascalCase (e.g., `private const int TagSizeBytes = 16;`).
+
+## Regions
+
+Do not use `#region` directives. Organize code by method ordering, not regions.
+
+## String Formatting
+
+Prefer string interpolation (`$"..."`) over concatenation or `string.Format()`.
+
+## Null Checks
+
+Use pattern matching (`x is null`, `x is not null`) for null checks and null-coalescing operators (`??`, `??=`) for null fallbacks, rather than `== null` / `!= null`.
+
+## Swallowed Exceptions
+
+When intentionally catching and ignoring an exception, add an `// ignored` comment in the catch body to make the intent explicit.

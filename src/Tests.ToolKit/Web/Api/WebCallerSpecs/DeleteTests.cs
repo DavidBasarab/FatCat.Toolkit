@@ -6,7 +6,10 @@ public class DeleteTests : WebCallerTests
 {
 	protected override string BasicPath
 	{
-		get => "/delete";
+		get
+		{
+			return "/delete";
+		}
 	}
 
 	protected override async Task<FatWebResponse> MakeCallToWeb(string path)

@@ -2,20 +2,16 @@ using MongoDB.Driver;
 
 namespace Tests.FatCat.Toolkit.Data.Mongo;
 
-public class TestingAsyncCursor<T> : IAsyncCursor<T>
+public class TestingAsyncCursor<T>(List<T> items) : IAsyncCursor<T>
 {
-	private readonly List<T> items;
-
 	private bool movedCalled;
 
 	public IEnumerable<T> Current
 	{
-		get => items;
-	}
-
-	public TestingAsyncCursor(List<T> items)
-	{
-		this.items = items;
+		get
+		{
+			return items;
+		}
 	}
 
 	public void Dispose() { }

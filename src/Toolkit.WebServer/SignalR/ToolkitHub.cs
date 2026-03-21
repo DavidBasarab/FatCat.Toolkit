@@ -10,12 +10,18 @@ public class ToolkitHub : Hub
 {
 	private IToolkitHubServer HubServer
 	{
-		get => SystemScope.Container.Resolve<IToolkitHubServer>();
+		get
+		{
+			return SystemScope.Container.Resolve<IToolkitHubServer>();
+		}
 	}
 
 	private IToolkitLogger Logger
 	{
-		get => SystemScope.Container.Resolve<IToolkitLogger>();
+		get
+		{
+			return SystemScope.Container.Resolve<IToolkitLogger>();
+		}
 	}
 
 	public async Task ClientDataBufferMessage(int messageType, string sessionId, string data, byte[] dataBuffer)

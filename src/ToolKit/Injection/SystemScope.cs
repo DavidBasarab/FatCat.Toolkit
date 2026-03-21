@@ -33,7 +33,10 @@ public class SystemScope : ISystemScope
 
 	public static SystemScope Container
 	{
-		get => instance.Value;
+		get
+		{
+			return instance.Value;
+		}
 	}
 
 	public static List<Assembly> ContainerAssemblies { get; set; } = defaultAssemblies;
@@ -71,7 +74,10 @@ public class SystemScope : ISystemScope
 
 	public List<Assembly> SystemAssemblies
 	{
-		get => ContainerAssemblies;
+		get
+		{
+			return ContainerAssemblies;
+		}
 	}
 
 	private SystemScope() { }

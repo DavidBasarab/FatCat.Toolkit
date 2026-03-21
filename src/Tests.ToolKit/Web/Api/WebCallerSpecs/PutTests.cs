@@ -8,7 +8,10 @@ public class PutTests : WebCallerTests
 {
 	protected override string BasicPath
 	{
-		get => "/put";
+		get
+		{
+			return "/put";
+		}
 	}
 
 	[Fact]

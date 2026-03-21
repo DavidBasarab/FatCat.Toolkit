@@ -62,19 +62,11 @@ public interface ISimpleLogger
 	);
 }
 
-public class SimpleLogger : ISimpleLogger
+public class SimpleLogger(IApplicationTools applicationTools, string? logName = null) : ISimpleLogger
 {
-	private readonly IApplicationTools applicationTools;
-	private readonly string? logName;
+	private readonly string? logName = logName ?? applicationTools.ExecutableName;
 
 	private LogLevel logLevel = LogLevel.Information;
-
-	public SimpleLogger(IApplicationTools applicationTools, string? logName = null)
-	{
-		this.applicationTools = applicationTools;
-
-		this.logName = logName ?? this.applicationTools.ExecutableName;
-	}
 
 	public void SetLogLevel(LogLevel logLevel)
 	{

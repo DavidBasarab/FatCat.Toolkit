@@ -7,7 +7,10 @@ public class TestCacheItem : EqualObject, ICacheItem
 {
 	public string CacheId
 	{
-		get => SomeId;
+		get
+		{
+			return SomeId;
+		}
 	}
 
 	public string SomeId { get; set; }

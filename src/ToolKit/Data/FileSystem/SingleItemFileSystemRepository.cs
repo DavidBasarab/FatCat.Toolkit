@@ -14,44 +14,45 @@ public interface ISingleItemFileSystemRepository<T>
 	public Task Save(T item);
 }
 
-public class SingleItemFileSystemRepository<T> : ISingleItemFileSystemRepository<T>
+public class SingleItemFileSystemRepository<T>(
+	IFileSystem fileSystem,
+	IApplicationTools applicationTools,
+	IJsonOperations jsonOperations
+) : ISingleItemFileSystemRepository<T>
 	where T : FileSystemDataObject, new()
 {
-	private readonly IApplicationTools applicationTools;
-	private readonly IFileSystem fileSystem;
-	private readonly IJsonOperations jsonOperations;
-
 	public T? Data { get; set; }
 
 	private string DataDirectory
 	{
-		get => Path.Join(applicationTools.ExecutingDirectory, "Data");
+		get
+		{
+			return Path.Join(applicationTools.ExecutingDirectory, "Data");
+		}
 	}
 
 	private bool DataDirectoryDoesNotExist
 	{
-		get => !fileSystem.Directory.Exists(DataDirectory);
+		get
+		{
+			return !fileSystem.Directory.Exists(DataDirectory);
+		}
 	}
 
 	private bool DataFileNotFound
 	{
-		get => !fileSystem.File.Exists(DataPath);
+		get
+		{
+			return !fileSystem.File.Exists(DataPath);
+		}
 	}
 
 	private string DataPath
 	{
-		get => Path.Join(DataDirectory, $"{typeof(T).Name}.data");
-	}
-
-	public SingleItemFileSystemRepository(
-		IFileSystem fileSystem,
-		IApplicationTools applicationTools,
-		IJsonOperations jsonOperations
-	)
-	{
-		this.fileSystem = fileSystem;
-		this.applicationTools = applicationTools;
-		this.jsonOperations = jsonOperations;
+		get
+		{
+			return Path.Join(DataDirectory, $"{typeof(T).Name}.data");
+		}
 	}
 
 	public bool Exists()

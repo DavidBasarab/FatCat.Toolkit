@@ -29,7 +29,10 @@ public class ManualWaitEvent : IManualWaitEvent
 
 	public bool HasBeenTriggered
 	{
-		get => manualResetEvent.WaitOne(1);
+		get
+		{
+			return manualResetEvent.WaitOne(1);
+		}
 	}
 
 	public void Dispose()

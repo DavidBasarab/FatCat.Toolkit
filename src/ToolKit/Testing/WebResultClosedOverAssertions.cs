@@ -29,7 +29,10 @@ public class FatWebResponseClosedOverAssertions<T>(FatWebResponse<T> result)
 {
 	protected override string Identifier
 	{
-		get => "Web Results assertions";
+		get
+		{
+			return "Web Results assertions";
+		}
 	}
 
 	public FatWebResponseClosedOverAssertions<T> Be(FatWebResponse<T> expectedResult)

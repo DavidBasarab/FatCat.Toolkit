@@ -8,17 +8,26 @@ public class HttpBinResponse : EqualObject
 {
 	public string AcceptHeader
 	{
-		get => Headers.GetValueOrDefault("Accept");
+		get
+		{
+			return Headers.GetValueOrDefault("Accept");
+		}
 	}
 
 	public string AuthorizationHeader
 	{
-		get => Headers.GetValueOrDefault("Authorization");
+		get
+		{
+			return Headers.GetValueOrDefault("Authorization");
+		}
 	}
 
 	public string ContentTypeHeader
 	{
-		get => Headers.GetValueOrDefault("Content-Type");
+		get
+		{
+			return Headers.GetValueOrDefault("Content-Type");
+		}
 	}
 
 	[JsonPropertyName("headers")]

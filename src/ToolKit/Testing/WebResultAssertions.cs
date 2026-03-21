@@ -27,7 +27,10 @@ public class FatWebResponseAssertions(FatWebResponse result)
 {
 	protected override string Identifier
 	{
-		get => "Web Results assertions";
+		get
+		{
+			return "Web Results assertions";
+		}
 	}
 
 	public FatWebResponseAssertions Be(FatWebResponse expectedResult)

@@ -16,7 +16,10 @@ public class TaskTestAssertions<T>(Task<T> subject)
 {
 	protected override string Identifier
 	{
-		get => "Task Test Assertions";
+		get
+		{
+			return "Task Test Assertions";
+		}
 	}
 
 	public TaskTestAssertions<T> Be(T expectedValue)

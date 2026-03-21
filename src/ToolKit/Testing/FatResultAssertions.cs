@@ -25,7 +25,10 @@ public class FatResultAssertions<T>(FatResult<T> subject)
 {
 	protected override string Identifier
 	{
-		get => "FatResultAssertions";
+		get
+		{
+			return "FatResultAssertions";
+		}
 	}
 
 	public FatResultAssertions<T> Be(FatResult<T> expectedResult)

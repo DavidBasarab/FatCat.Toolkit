@@ -23,7 +23,10 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 
 	public string DatabaseName
 	{
-		get => repository.DatabaseName;
+		get
+		{
+			return repository.DatabaseName;
+		}
 	}
 
 	public T DeletedItem { get; set; } = null!;

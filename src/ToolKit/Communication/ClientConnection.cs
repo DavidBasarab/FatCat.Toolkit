@@ -19,7 +19,10 @@ public abstract class ClientConnection(
 
 	private bool IsNotCanceled
 	{
-		get => !cancellationToken.IsCancellationRequested;
+		get
+		{
+			return !cancellationToken.IsCancellationRequested;
+		}
 	}
 
 	public void Start()

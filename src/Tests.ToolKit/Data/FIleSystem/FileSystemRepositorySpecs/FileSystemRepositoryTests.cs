@@ -11,12 +11,18 @@ public abstract class FileSystemRepositoryTests
 
 	protected static string DataDirectory
 	{
-		get => Path.Join(ExecutingDirectory, "Data");
+		get
+		{
+			return Path.Join(ExecutingDirectory, "Data");
+		}
 	}
 
 	protected static string TestFileDataObjectPath
 	{
-		get => Path.Join(DataDirectory, "TestFileDataObject.data");
+		get
+		{
+			return Path.Join(DataDirectory, "TestFileDataObject.data");
+		}
 	}
 
 	protected readonly SingleItemFileSystemRepository<TestFileDataObject> repository;

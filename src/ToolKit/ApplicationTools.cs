@@ -41,7 +41,10 @@ public class ApplicationTools : IApplicationTools
 {
 	public static bool IsInContainer
 	{
-		get => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER").ToBool();
+		get
+		{
+			return Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER").ToBool();
+		}
 	}
 
 	private string? executableName;
@@ -52,7 +55,10 @@ public class ApplicationTools : IApplicationTools
 
 	public string ExecutableFullPath
 	{
-		get => GetProcessFileName();
+		get
+		{
+			return GetProcessFileName();
+		}
 	}
 
 	public string ExecutableName
@@ -93,7 +99,10 @@ public class ApplicationTools : IApplicationTools
 
 	public bool InContainer
 	{
-		get => IsInContainer;
+		get
+		{
+			return IsInContainer;
+		}
 	}
 
 	public string MacAddress
@@ -111,7 +120,10 @@ public class ApplicationTools : IApplicationTools
 
 	public string MachineName
 	{
-		get => Environment.MachineName;
+		get
+		{
+			return Environment.MachineName;
+		}
 	}
 
 	public ushort FindNextOpenPort(ushort startingPort)
@@ -123,21 +135,17 @@ public class ApplicationTools : IApplicationTools
 		// Ignore active connections
 		var connections = properties.GetActiveTcpConnections();
 
-		usedPorts.AddRange(
-			from n in connections
-			where n.LocalEndPoint.Port >= startingPort
-			select n.LocalEndPoint.Port
-		);
+		usedPorts.AddRange(connections.Where(n => n.LocalEndPoint.Port >= startingPort).Select(n => n.LocalEndPoint.Port));
 
 		// Ignore active tcp listeners
 		var endPoints = properties.GetActiveTcpListeners();
 
-		usedPorts.AddRange(from n in endPoints where n.Port >= startingPort select n.Port);
+		usedPorts.AddRange(endPoints.Where(n => n.Port >= startingPort).Select(n => n.Port));
 
 		// Ignore active udp listeners
 		endPoints = properties.GetActiveUdpListeners();
 
-		usedPorts.AddRange(from n in endPoints where n.Port >= startingPort select n.Port);
+		usedPorts.AddRange(endPoints.Where(n => n.Port >= startingPort).Select(n => n.Port));
 
 		usedPorts.Sort();
 

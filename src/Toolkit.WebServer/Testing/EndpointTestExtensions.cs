@@ -22,7 +22,10 @@ public class EndpointAssertions(Endpoint endpoint)
 
 	protected override string Identifier
 	{
-		get => "Fog Endpoint";
+		get
+		{
+			return "Fog Endpoint";
+		}
 	}
 
 	public AndConstraint<EndpointAssertions> BeDelete(string methodName, string template = null!)

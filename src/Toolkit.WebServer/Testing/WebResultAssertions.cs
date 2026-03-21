@@ -26,7 +26,10 @@ public class WebResultAssertions(WebResult result)
 {
 	protected override string Identifier
 	{
-		get => "Web Results assertions";
+		get
+		{
+			return "Web Results assertions";
+		}
 	}
 
 	public WebResultAssertions Be(WebResult expectedResult)

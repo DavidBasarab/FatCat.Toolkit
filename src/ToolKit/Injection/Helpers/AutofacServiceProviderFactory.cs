@@ -6,21 +6,10 @@ namespace FatCat.Toolkit.Injection.Helpers;
 /// <summary>
 ///  A factory for creating a <see cref="ContainerBuilder" /> and an <see cref="IServiceProvider" />.
 /// </summary>
-public class AutofacServiceProviderFactory : IServiceProviderFactory<ContainerBuilder>
+public class AutofacServiceProviderFactory(Action<ContainerBuilder> configurationAction = null)
+	: IServiceProviderFactory<ContainerBuilder>
 {
-	private readonly Action<ContainerBuilder> configurationAction;
-
-	/// <summary>
-	///  Initializes a new instance of the <see cref="AutofacServiceProviderFactory" /> class.
-	/// </summary>
-	/// <param name="configurationAction">
-	///  Action on a <see cref="ContainerBuilder" /> that adds component registrations to the
-	///  conatiner.
-	/// </param>
-	public AutofacServiceProviderFactory(Action<ContainerBuilder> configurationAction = null)
-	{
-		this.configurationAction = configurationAction ?? (_ => { });
-	}
+	private readonly Action<ContainerBuilder> configurationAction = configurationAction ?? (_ => { });
 
 	/// <summary>
 	///  Creates a container builder from an <see cref="IServiceCollection" />.

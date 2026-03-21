@@ -8,7 +8,10 @@ public class PostTests : WebCallerTests
 {
 	protected override string BasicPath
 	{
-		get => "/post";
+		get
+		{
+			return "/post";
+		}
 	}
 
 	[Fact]

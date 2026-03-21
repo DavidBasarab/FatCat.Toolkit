@@ -149,7 +149,7 @@ internal sealed class ApplicationStartUp
 	{
 		try
 		{
-			await next().ConfigureAwait(false);
+			await next();
 		}
 		catch (TaskCanceledException)
 		{

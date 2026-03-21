@@ -34,7 +34,10 @@ public class TestModelBindingContext(TestValueProvider testValueProvider) : Mode
 
 	public override IValueProvider ValueProvider
 	{
-		get => TestValueProvider;
+		get
+		{
+			return TestValueProvider;
+		}
 		set { }
 	}
 

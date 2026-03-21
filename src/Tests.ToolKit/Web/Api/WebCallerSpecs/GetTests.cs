@@ -6,7 +6,10 @@ public class GetTests : WebCallerTests
 {
 	protected override string BasicPath
 	{
-		get => "/get";
+		get
+		{
+			return "/get";
+		}
 	}
 
 	protected override async Task<FatWebResponse> MakeCallToWeb(string path)

@@ -29,7 +29,10 @@ public class WebResultClosedOverAssertions<T>(WebResult<T> result)
 {
 	protected override string Identifier
 	{
-		get => "Web Results assertions";
+		get
+		{
+			return "Web Results assertions";
+		}
 	}
 
 	public WebResultClosedOverAssertions<T> Be(WebResult<T> expectedResult)

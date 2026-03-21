@@ -44,32 +44,50 @@ public class WebResult<T> : IActionResult
 
 	public string Content
 	{
-		get => BaseResult.Content;
+		get
+		{
+			return BaseResult.Content;
+		}
 	}
 
 	public string ContentType
 	{
-		get => BaseResult.ContentType;
+		get
+		{
+			return BaseResult.ContentType;
+		}
 	}
 
 	public T Data
 	{
-		get => BaseResult.IsSuccessful ? BaseResult.To<T>() : null;
+		get
+		{
+			return BaseResult.IsSuccessful ? BaseResult.To<T>() : null;
+		}
 	}
 
 	public bool IsSuccessful
 	{
-		get => BaseResult.IsSuccessful;
+		get
+		{
+			return BaseResult.IsSuccessful;
+		}
 	}
 
 	public bool IsUnsuccessful
 	{
-		get => BaseResult.IsUnsuccessful;
+		get
+		{
+			return BaseResult.IsUnsuccessful;
+		}
 	}
 
 	public HttpStatusCode StatusCode
 	{
-		get => BaseResult.StatusCode;
+		get
+		{
+			return BaseResult.StatusCode;
+		}
 	}
 
 	public WebResult(WebResult result)
@@ -188,19 +206,28 @@ public class WebResult : IActionResult
 
 			return content;
 		}
-		set => content = value;
+		set
+		{
+			content = value;
+		}
 	}
 
 	public string ContentType { get; set; } = "application/json; charset=UTF-8";
 
 	public bool IsSuccessful
 	{
-		get => (int)StatusCode >= 200 && (int)StatusCode <= 299;
+		get
+		{
+			return (int)StatusCode >= 200 && (int)StatusCode <= 299;
+		}
 	}
 
 	public bool IsUnsuccessful
 	{
-		get => !IsSuccessful;
+		get
+		{
+			return !IsSuccessful;
+		}
 	}
 
 	public HttpStatusCode StatusCode { get; set; }

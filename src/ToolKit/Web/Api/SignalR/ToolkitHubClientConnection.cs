@@ -28,23 +28,12 @@ public interface IToolkitHubClientConnection : IAsyncDisposable
 	public Task<bool> TryToConnect(string hubUrl, Action onConnectionLost = null);
 }
 
-public class ToolkitHubClientConnection : IToolkitHubClientConnection
+public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger logger) : IToolkitHubClientConnection
 {
-	private readonly IGenerator generator;
-	private readonly IToolkitLogger logger;
-
 	private readonly ConcurrentDictionary<string, ToolkitMessage> responses = new();
 	private readonly ConcurrentDictionary<string, int> timedOutResponses = new();
 	private readonly ConcurrentDictionary<string, ToolkitMessage> waitingForResponses = new();
 	private HubConnection connection;
-
-	public ToolkitHubClientConnection(IGenerator generator, IToolkitLogger logger)
-	{
-		this.generator = generator;
-		this.logger = logger;
-
-		this.logger.Debug("CTOR of ToolkitHubClientConnection");
-	}
 
 	public event ToolkitHubDataBufferMessage ServerDataBufferMessage;
 

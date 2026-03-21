@@ -32,7 +32,10 @@ public static class Messenger
 
 			return thread;
 		}
-		set => thread = value;
+		set
+		{
+			thread = value;
+		}
 	}
 
 	public static void Send<TMessage>(TMessage payload)

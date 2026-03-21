@@ -1,65 +1,41 @@
-# FatCat.Toolkit C# Coding Standards
+# Haivision Coding Standards
 
-## Field Naming
+This file defines the coding standards for this codebase (Command 360).
+All code you generate — in any context — must follow the rules for the relevant language below.
+The goal is that AI-generated code is indistinguishable from code written by a senior member of this team.
 
-Private and protected fields use camelCase with no underscore prefix (e.g., `logger`, `bufferSize`, not `_logger`, `_bufferSize`).
+---
 
-## Nullable Reference Types
+## C# Rules
 
-Nullable reference types are disabled project-wide. Use `#nullable enable` at the top of individual files only where nullable analysis is explicitly needed.
+Apply these rules to all C# code. Do not apply them to React, TypeScript, PowerShell, or any other language.
 
-## Constructors
+@.claude/rules/csharp/naming-and-structure.md
+@.claude/rules/csharp/types-and-di.md
+@.claude/rules/csharp/toolchain.md
+@.claude/rules/csharp/async.md
+@.claude/rules/csharp/errors-and-logging.md
+@.claude/rules/csharp/testing.md
+@.claude/rules/csharp/not-allowed.md
 
-Prefer primary constructor syntax (C# 12+) for classes that take constructor parameters. Assign parameters to `protected readonly` or `private readonly` fields inline in the class body.
+## PowerShell Rules
 
-## Async Methods
+Apply these rules to all PowerShell scripts. Do not apply them to C#, React, TypeScript, or any other language.
 
-Do not use the `Async` suffix on method names. The only exception is when two methods share the same name and one returns a `Task` while the other does not — in that case, append `Async` to the `Task`-returning overload to disambiguate.
+@.claude/rules/powershell/powershell.md
 
-## Testing Stack
+## TypeScript & React Rules
 
-Tests use xUnit + FakeItEasy + FluentAssertions + FatCat.Fakes. Never use Moq or NSubstitute. Fake objects are created via `Faker.Create<T>()`. Common test usings are registered globally in `GlobalUsings.cs`.
+Apply these rules to all TypeScript and TSX files — both the React frontend (Sites/main) and the Node.js CLI tools (Installer/DataMigration). Do not apply them to C#, PowerShell, or any other language.
 
-## Namespaces
-
-Always use file-scoped namespace declarations (`namespace X.Y;`), never block-scoped namespaces.
-
-## Result and Response Types
-
-Prefer static factory methods on result and response types over direct constructor calls (e.g., `WebResult.Ok(...)`, `WebResult.BadRequest(...)`).
-
-## Extension Methods
-
-Extension methods live in the `Extensions` sub-namespace of their module. Each static class is named after the type being extended (e.g., `StringExtensions`, `ListExtensions`).
-
-## Object Initialization
-
-Use target-typed `new()` expressions for object and collection initialization where the type is already declared (e.g., `List<string> items = new();`, `Headers = new()`).
-
-## `var` Usage
-
-Use `var` for local variables when the type is evident from the right-hand side. Use explicit types when the type is not immediately obvious from context.
-
-## Interface Naming
-
-All interfaces are prefixed with `I` (e.g., `IFatTcpClient`, `ICacheItem`).
-
-## Constants
-
-Constant fields (`const`) use PascalCase (e.g., `private const int TagSizeBytes = 16;`).
-
-## Regions
-
-Do not use `#region` directives. Organize code by method ordering, not regions.
-
-## String Formatting
-
-Prefer string interpolation (`$"..."`) over concatenation or `string.Format()`.
-
-## Null Checks
-
-Use pattern matching (`x is null`, `x is not null`) for null checks and null-coalescing operators (`??`, `??=`) for null fallbacks, rather than `== null` / `!= null`.
-
-## Swallowed Exceptions
-
-When intentionally catching and ignoring an exception, add an `// ignored` comment in the catch body to make the intent explicit.
+@.claude/rules/typescript/naming-and-structure.md
+@.claude/rules/typescript/toolchain.md
+@.claude/rules/typescript/async.md
+@.claude/rules/typescript/react.md
+@.claude/rules/typescript/i18n.md
+@.claude/rules/typescript/errors.md
+@.claude/rules/typescript/performance.md
+@.claude/rules/typescript/forms.md
+@.claude/rules/typescript/datamigration.md
+@.claude/rules/typescript/testing.md
+@.claude/rules/typescript/not-allowed.md

@@ -6,29 +6,29 @@ namespace FatCat.Toolkit.Data.FileSystem;
 public interface IFileSystemRepository<T>
 	where T : FileSystemDataObject
 {
-	Task<T> Create(T item);
+	public Task<T> Create(T item);
 
-	Task<List<T>> Create(List<T> items);
+	public Task<List<T>> Create(List<T> items);
 
-	Task<T> Delete(T item);
+	public Task<T> Delete(T item);
 
-	Task<List<T>> Delete(List<T> items);
+	public Task<List<T>> Delete(List<T> items);
 
-	Task<List<T>> GetAll();
+	public Task<List<T>> GetAll();
 
-	Task<List<T>> GetAllByFilter(Expression<Func<T, bool>> filter);
+	public Task<List<T>> GetAllByFilter(Expression<Func<T, bool>> filter);
 
-	Task<T?> GetByFilter(Expression<Func<T, bool>> filter);
+	public Task<T?> GetByFilter(Expression<Func<T, bool>> filter);
 
-	Task<T?> GetById(string id);
+	public Task<T?> GetById(string id);
 
-	Task<T?> GetFirst();
+	public Task<T?> GetFirst();
 
-	Task<T> GetFirstOrCreate();
+	public Task<T> GetFirstOrCreate();
 
-	Task<T> Update(T item);
+	public Task<T> Update(T item);
 
-	Task<List<T>> Update(List<T> items);
+	public Task<List<T>> Update(List<T> items);
 }
 
 /// <summary>

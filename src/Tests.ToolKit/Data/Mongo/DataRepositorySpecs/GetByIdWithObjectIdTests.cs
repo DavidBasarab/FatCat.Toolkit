@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Testing;
+using FatCat.Toolkit.Testing;
 using MongoDB.Bson;
 using MongoDB.Driver;
 

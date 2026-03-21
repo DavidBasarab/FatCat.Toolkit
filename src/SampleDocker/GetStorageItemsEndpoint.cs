@@ -1,4 +1,4 @@
-﻿using Azure.Identity;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Extensions;

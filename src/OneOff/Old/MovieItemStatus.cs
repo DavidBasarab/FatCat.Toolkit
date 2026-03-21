@@ -1,4 +1,4 @@
-﻿namespace OneOff.Old;
+namespace OneOff.Old;
 
 public enum MovieItemStatus
 {

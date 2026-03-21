@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.Concurrent;
 using FatCat.Toolkit.Injection;
 
@@ -6,11 +6,11 @@ namespace FatCat.Toolkit.Web.Api.SignalR;
 
 public interface IToolkitHubClientFactory : IAsyncDisposable
 {
-	Task<IToolkitHubClientConnection> ConnectToClient(string hubUrl);
+	public Task<IToolkitHubClientConnection> ConnectToClient(string hubUrl);
 
-	void RemoveHubFromConnections(string hubUrl);
+	public void RemoveHubFromConnections(string hubUrl);
 
-	Task<ConnectionResult> TryToConnectToClient(string hubUrl, Action? onConnectionLost = null);
+	public Task<ConnectionResult> TryToConnectToClient(string hubUrl, Action? onConnectionLost = null);
 }
 
 public class ToolkitHubClientFactory(ISystemScope scope) : IToolkitHubClientFactory

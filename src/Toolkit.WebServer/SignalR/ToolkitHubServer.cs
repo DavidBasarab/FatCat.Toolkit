@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.Web.Api;
@@ -10,32 +10,32 @@ namespace FatCat.Toolkit.WebServer.SignalR;
 
 public interface IToolkitHubServer
 {
-	event ToolkitHubClientConnected ClientConnected;
+	public event ToolkitHubClientConnected ClientConnected;
 
-	event ToolkitHubClientDisconnected ClientDisconnected;
+	public event ToolkitHubClientDisconnected ClientDisconnected;
 
-	void ClientResponseDataBufferMessage(string sessionId, ToolkitMessage toolkitMessage, byte[] dataBuffer);
+	public void ClientResponseDataBufferMessage(string sessionId, ToolkitMessage toolkitMessage, byte[] dataBuffer);
 
-	void ClientResponseMessage(string sessionId, ToolkitMessage toolkitMessage);
+	public void ClientResponseMessage(string sessionId, ToolkitMessage toolkitMessage);
 
-	List<string> GetConnections();
+	public List<string> GetConnections();
 
-	void OnClientConnected(ToolkitUser toolkitUser, string connectionId);
+	public void OnClientConnected(ToolkitUser toolkitUser, string connectionId);
 
-	void OnClientDisconnected(ToolkitUser toolkitUser, string connectionId);
+	public void OnClientDisconnected(ToolkitUser toolkitUser, string connectionId);
 
-	Task<ToolkitMessage> SendDataBufferToClient(
+	public Task<ToolkitMessage> SendDataBufferToClient(
 		string connectionId,
 		ToolkitMessage message,
 		byte[] dataBuffer,
 		TimeSpan? timeout = null
 	);
 
-	Task SendToAllClients(ToolkitMessage message);
+	public Task SendToAllClients(ToolkitMessage message);
 
-	Task<ToolkitMessage> SendToClient(string connectionId, ToolkitMessage message, TimeSpan? timeout = null);
+	public Task<ToolkitMessage> SendToClient(string connectionId, ToolkitMessage message, TimeSpan? timeout = null);
 
-	Task SendToClientNoResponse(string connectionId, ToolkitMessage message);
+	public Task SendToClientNoResponse(string connectionId, ToolkitMessage message);
 }
 
 public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator generator, IToolkitLogger logger)

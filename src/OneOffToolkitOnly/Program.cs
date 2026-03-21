@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Autofac;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;

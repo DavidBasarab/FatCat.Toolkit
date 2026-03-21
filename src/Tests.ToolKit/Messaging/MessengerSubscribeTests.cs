@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Messaging;
+using FatCat.Toolkit.Messaging;
 using FatCat.Toolkit.Testing;
 
 namespace Tests.FatCat.Toolkit.Messaging;

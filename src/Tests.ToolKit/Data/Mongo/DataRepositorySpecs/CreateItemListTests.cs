@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Testing;
+using FatCat.Toolkit.Testing;
 
 namespace Tests.FatCat.Toolkit.Data.Mongo.DataRepositorySpecs;
 

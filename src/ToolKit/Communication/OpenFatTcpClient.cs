@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Threading;
+using FatCat.Toolkit.Threading;
 
 namespace FatCat.Toolkit.Communication;
 

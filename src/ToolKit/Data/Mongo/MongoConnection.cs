@@ -12,7 +12,7 @@ namespace FatCat.Toolkit.Data.Mongo;
 
 public interface IMongoConnection
 {
-	IMongoDatabase GetDatabase(string databaseName, string? connectionString);
+	public IMongoDatabase GetDatabase(string databaseName, string? connectionString);
 }
 
 public class MongoConnection : IMongoConnection

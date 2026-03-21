@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using FatCat.Toolkit.Json;
 
 namespace FatCat.Toolkit.Web;

@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Tests.FatCat.Toolkit.Web.Api.WebCallerSpecs;
 

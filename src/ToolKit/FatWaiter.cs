@@ -5,21 +5,21 @@ namespace FatCat.Toolkit;
 
 public interface IFatWaiter
 {
-	Task Wait(Func<bool> condition, TimeSpan interval);
+	public Task Wait(Func<bool> condition, TimeSpan interval);
 
-	Task Wait(Func<bool> condition, TimeSpan interval, TimeSpan maxWaitTime);
+	public Task Wait(Func<bool> condition, TimeSpan interval, TimeSpan maxWaitTime);
 
-	Task Wait(Func<bool> condition, TimeSpan interval, CancellationToken cancellationToken);
+	public Task Wait(Func<bool> condition, TimeSpan interval, CancellationToken cancellationToken);
 
-	Task Wait(Func<bool> condition, TimeSpan interval, TimeSpan maxWaitTime, CancellationToken cancellationToken);
+	public Task Wait(Func<bool> condition, TimeSpan interval, TimeSpan maxWaitTime, CancellationToken cancellationToken);
 
-	Task Wait(Func<Task<bool>> condition, TimeSpan interval);
+	public Task Wait(Func<Task<bool>> condition, TimeSpan interval);
 
-	Task Wait(Func<Task<bool>> condition, TimeSpan interval, TimeSpan maxWaitTime);
+	public Task Wait(Func<Task<bool>> condition, TimeSpan interval, TimeSpan maxWaitTime);
 
-	Task Wait(Func<Task<bool>> condition, TimeSpan interval, CancellationToken cancellationToken);
+	public Task Wait(Func<Task<bool>> condition, TimeSpan interval, CancellationToken cancellationToken);
 
-	Task Wait(
+	public Task Wait(
 		Func<Task<bool>> condition,
 		TimeSpan interval,
 		TimeSpan maxWaitTime,

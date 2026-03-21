@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Logging;

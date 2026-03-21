@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using CommandLine;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;

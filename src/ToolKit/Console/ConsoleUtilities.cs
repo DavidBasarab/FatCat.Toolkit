@@ -5,14 +5,14 @@ namespace FatCat.Toolkit.Console;
 
 public interface IConsoleUtilities
 {
-	void Exit();
+	public void Exit();
 
 	/// <summary>
 	///  Will hook up to Console events to wait for the user to hit Ctrl-C
 	///  to exit
 	/// </summary>
 	/// <param name="onExit">Callback function to be triggered when Ctrl-C is hit</param>
-	void WaitForExit(Action? onExit = null);
+	public void WaitForExit(Action? onExit = null);
 }
 
 public class ConsoleUtilities(IManualWaitEvent stopEvent) : IConsoleUtilities

@@ -4,51 +4,51 @@ namespace FatCat.Toolkit;
 
 public interface IFileSystemTools
 {
-	Task AppendToFile(string path, string text);
+	public Task AppendToFile(string path, string text);
 
-	void AppendToFileSync(string path, string text);
+	public void AppendToFileSync(string path, string text);
 
-	void DeleteDirectory(string path, bool recursive = true);
+	public void DeleteDirectory(string path, bool recursive = true);
 
-	bool DeleteFile(string path);
+	public bool DeleteFile(string path);
 
-	bool DirectoryExists(string path);
+	public bool DirectoryExists(string path);
 
-	void EnsureDirectory(string path);
+	public void EnsureDirectory(string path);
 
-	void EnsureFile(string path);
+	public void EnsureFile(string path);
 
-	bool FileExists(string path);
+	public bool FileExists(string path);
 
-	List<string> GetDirectories(string path);
+	public List<string> GetDirectories(string path);
 
-	IFileInfo GetFileMetaData(string fullPath);
+	public IFileInfo GetFileMetaData(string fullPath);
 
-	List<string> GetFiles(string directoryPath);
+	public List<string> GetFiles(string directoryPath);
 
-	List<IFileInfo> GetFilesWithMetaData(string directoryPath);
+	public List<IFileInfo> GetFilesWithMetaData(string directoryPath);
 
-	bool MoveDirectory(string sourceDirectory, string destinationDirectory);
+	public bool MoveDirectory(string sourceDirectory, string destinationDirectory);
 
-	bool MoveFile(string sourcePath, string sourceDestination);
+	public bool MoveFile(string sourcePath, string sourceDestination);
 
-	Task<byte[]> ReadAllBytes(string path);
+	public Task<byte[]> ReadAllBytes(string path);
 
-	byte[] ReadAllBytesSync(string path);
+	public byte[] ReadAllBytesSync(string path);
 
-	Task<List<string>> ReadAllLines(string path);
+	public Task<List<string>> ReadAllLines(string path);
 
-	List<string> ReadAllLinesSync(string path);
+	public List<string> ReadAllLinesSync(string path);
 
-	Task<string> ReadAllText(string path);
+	public Task<string> ReadAllText(string path);
 
-	string ReadAllTextSync(string path);
+	public string ReadAllTextSync(string path);
 
-	Task WriteAllBytes(string path, byte[] bytes);
+	public Task WriteAllBytes(string path, byte[] bytes);
 
-	Task WriteAllText(string path, string text);
+	public Task WriteAllText(string path, string text);
 
-	void WriteAllTextSync(string path, string text);
+	public void WriteAllTextSync(string path, string text);
 }
 
 public class FileSystemTools(IFileSystem fileSystem) : IFileSystemTools

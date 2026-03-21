@@ -7,11 +7,11 @@ namespace FatCat.Toolkit.Data.FileSystem;
 public interface ISingleItemFileSystemRepository<T>
 	where T : FileSystemDataObject, new()
 {
-	bool Exists();
+	public bool Exists();
 
-	Task<T> Get();
+	public Task<T> Get();
 
-	Task Save(T item);
+	public Task Save(T item);
 }
 
 public class SingleItemFileSystemRepository<T> : ISingleItemFileSystemRepository<T>

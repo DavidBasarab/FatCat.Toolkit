@@ -1,6 +1,6 @@
-﻿namespace FatCat.Toolkit.WebServer.Binders;
+namespace FatCat.Toolkit.WebServer.Binders;
 
 public interface IToolkitBinder
 {
-	WebResult Result { get; set; }
+	public WebResult Result { get; set; }
 }

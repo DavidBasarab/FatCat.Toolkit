@@ -4,19 +4,19 @@ namespace FatCat.Toolkit.Communication;
 
 public interface IFatTcpClient
 {
-	bool Connected { get; }
+	public bool Connected { get; }
 
-	bool Reconnect { get; set; }
+	public bool Reconnect { get; set; }
 
-	TimeSpan ReconnectDelay { get; set; }
+	public TimeSpan ReconnectDelay { get; set; }
 
-	event TcpMessageReceived TcpMessageReceivedEvent;
+	public event TcpMessageReceived TcpMessageReceivedEvent;
 
-	Task Connect(string host, ushort port, int bufferSize = 1024, CancellationToken cancellationToken = default);
+	public Task Connect(string host, ushort port, int bufferSize = 1024, CancellationToken cancellationToken = default);
 
-	void Disconnect();
+	public void Disconnect();
 
-	void Send(byte[] bytes);
+	public void Send(byte[] bytes);
 
-	void Send(string message, Encoding encoding = null);
+	public void Send(string message, Encoding encoding = null);
 }

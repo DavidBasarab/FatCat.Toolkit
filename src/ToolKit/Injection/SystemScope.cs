@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using System.Reflection;
 using Autofac;
 using FatCat.Toolkit.Console;
@@ -10,18 +10,18 @@ namespace FatCat.Toolkit.Injection;
 
 public interface ISystemScope
 {
-	ILifetimeScope LifetimeScope { get; set; }
+	public ILifetimeScope LifetimeScope { get; set; }
 
-	List<Assembly> SystemAssemblies { get; }
+	public List<Assembly> SystemAssemblies { get; }
 
-	TItem Resolve<TItem>()
+	public TItem Resolve<TItem>()
 		where TItem : class;
 
-	object Resolve(Type type);
+	public object Resolve(Type type);
 
-	bool TryResolve(Type type, out object instance);
+	public bool TryResolve(Type type, out object instance);
 
-	bool TryResolve<TItem>(out TItem instance)
+	public bool TryResolve<TItem>(out TItem instance)
 		where TItem : class;
 }
 

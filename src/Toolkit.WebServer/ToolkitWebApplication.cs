@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Threading;

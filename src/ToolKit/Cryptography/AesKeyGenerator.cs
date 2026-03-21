@@ -2,9 +2,9 @@ namespace FatCat.Toolkit.Cryptography;
 
 public interface IAesKeyGenerator
 {
-	byte[] CreateIv();
+	public byte[] CreateIv();
 
-	byte[] CreateKey(AesKeySize keySize);
+	public byte[] CreateKey(AesKeySize keySize);
 }
 
 public class AesKeyGenerator(IGenerator generator) : IAesKeyGenerator

@@ -7,7 +7,7 @@ namespace FatCat.Toolkit.Communication;
 
 public interface ISimpleTcpSender
 {
-	Task Send(IPEndPoint endPoint, string message, Encoding? encoding = null);
+	public Task Send(IPEndPoint endPoint, string message, Encoding? encoding = null);
 }
 
 public class SimpleTcpSender : ISimpleTcpSender

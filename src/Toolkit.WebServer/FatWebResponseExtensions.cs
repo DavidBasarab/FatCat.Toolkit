@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Web;
+using FatCat.Toolkit.Web;
 
 namespace FatCat.Toolkit.WebServer;
 

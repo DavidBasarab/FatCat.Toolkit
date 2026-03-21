@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Web.Api.SignalR;
@@ -22,8 +22,9 @@ public class GetSecureEndpoint(IHttpContextAccessor httpContextAccessor) : Endpo
 
 		ConsoleLog.WriteCyan(
 			$"{new JsonOperations().Serialize(toolkitUser, new JsonSerializerOptions
-																			{
-																				WriteIndented = true })}"
+			{
+				WriteIndented = true
+			})}"
 		);
 
 		return Ok("Got sample secure endpoint");

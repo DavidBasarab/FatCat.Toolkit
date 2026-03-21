@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 
 namespace FatCat.Toolkit.WebServer;
 

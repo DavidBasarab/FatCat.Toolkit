@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using FatCat.Toolkit.Web.Api.SignalR;
 using Microsoft.AspNetCore.SignalR;
 
@@ -6,7 +6,7 @@ namespace FatCat.Toolkit.WebServer.SignalR;
 
 public interface IToolkitHubConnectedClients
 {
-	Task SendMessage(string clientId, int messageType, string data, string? sessionId = null);
+	public Task SendMessage(string clientId, int messageType, string data, string? sessionId = null);
 }
 
 public class ToolkitHubConnectedClients(IHubContext<ToolkitHub> hubContext, IGenerator generator)

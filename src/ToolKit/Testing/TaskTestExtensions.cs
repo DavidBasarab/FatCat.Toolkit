@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using FluentAssertions.Primitives;
 
 namespace FatCat.Toolkit.Testing;

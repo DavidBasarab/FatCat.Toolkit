@@ -1,14 +1,14 @@
-﻿using DebounceThrottle;
+using DebounceThrottle;
 
 namespace FatCat.Toolkit.Debouncing;
 
 public interface ICatBounce
 {
-	void Debounce(Action action);
+	public void Debounce(Action action);
 
-	void Throttle(Action action);
+	public void Throttle(Action action);
 
-	void ThrottleAsync(Func<Task> action);
+	public void ThrottleAsync(Func<Task> action);
 }
 
 public class CatBounce(TimeSpan interval) : ICatBounce

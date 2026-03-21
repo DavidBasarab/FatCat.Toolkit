@@ -1,3 +1,3 @@
-﻿namespace FatCat.Toolkit.Messaging;
+namespace FatCat.Toolkit.Messaging;
 
 public abstract class Message : EqualObject { }

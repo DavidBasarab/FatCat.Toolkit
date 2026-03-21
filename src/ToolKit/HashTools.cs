@@ -6,13 +6,13 @@ namespace FatCat.Toolkit;
 
 public interface IHashTools
 {
-	Task<byte[]> CalculateHash(byte[] data);
+	public Task<byte[]> CalculateHash(byte[] data);
 
-	Task<string> CalculateHash(string data);
+	public Task<string> CalculateHash(string data);
 
-	bool HashEquals(byte[] hash1, byte[] hash2);
+	public bool HashEquals(byte[] hash1, byte[] hash2);
 
-	byte[] HashPassword(string password, byte[] salt);
+	public byte[] HashPassword(string password, byte[] salt);
 }
 
 public class HashTools : IHashTools

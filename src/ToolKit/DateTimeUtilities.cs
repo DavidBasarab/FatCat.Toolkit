@@ -4,11 +4,11 @@ namespace FatCat.Toolkit;
 
 public interface IDateTimeUtilities
 {
-	DateTime ConvertToUtc(DateTime localDateTime);
+	public DateTime ConvertToUtc(DateTime localDateTime);
 
-	DateTime LocalNow();
+	public DateTime LocalNow();
 
-	DateTime UtcNow();
+	public DateTime UtcNow();
 }
 
 [ExcludeFromCodeCoverage(Justification = "A time wrapper")]

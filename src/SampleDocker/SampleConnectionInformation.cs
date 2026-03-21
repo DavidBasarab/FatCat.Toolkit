@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Data.Mongo;
 using Microsoft.Extensions.Configuration;
 

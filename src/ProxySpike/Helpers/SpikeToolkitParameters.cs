@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography.X509Certificates;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.WebServer;
 using Humanizer;

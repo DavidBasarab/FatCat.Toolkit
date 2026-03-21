@@ -8,7 +8,7 @@ public interface IGetUserClaim
 	/// <param name="user">ToolkitUser</param>
 	/// <param name="claimType">name of the claim</param>
 	/// <returns>Claim, null if claim is not found</returns>
-	ToolkitClaim GetClaim(ToolkitUser user, string claimType);
+	public ToolkitClaim GetClaim(ToolkitUser user, string claimType);
 }
 
 public class GetUserClaim : IGetUserClaim

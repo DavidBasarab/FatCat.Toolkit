@@ -1,8 +1,8 @@
-﻿namespace FatCat.Toolkit.Console;
+namespace FatCat.Toolkit.Console;
 
 public interface IConsoleAccess
 {
-	void WriteLineWithColor(ConsoleColor color, string message);
+	public void WriteLineWithColor(ConsoleColor color, string message);
 }
 
 public class SystemConsoleAccess : IConsoleAccess

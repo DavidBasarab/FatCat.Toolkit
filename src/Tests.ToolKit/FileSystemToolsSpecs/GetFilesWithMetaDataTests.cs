@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using FatCat.Toolkit.Testing;
 
 namespace Tests.FatCat.Toolkit.FileSystemToolsSpecs;

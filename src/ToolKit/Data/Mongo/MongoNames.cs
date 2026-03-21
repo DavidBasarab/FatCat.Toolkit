@@ -2,10 +2,10 @@ namespace FatCat.Toolkit.Data.Mongo;
 
 public interface IMongoNames : IDataNames
 {
-	string GetDatabaseName<T>()
+	public string GetDatabaseName<T>()
 		where T : MongoObject;
 
-	string GetDatabaseNameFromType(Type type);
+	public string GetDatabaseNameFromType(Type type);
 }
 
 public class MongoNames(IDataNames dataNames) : IMongoNames

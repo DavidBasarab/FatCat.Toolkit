@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Logging;
@@ -9,23 +9,23 @@ namespace FatCat.Toolkit.Web.Api.SignalR;
 
 public interface IToolkitHubClientConnection : IAsyncDisposable
 {
-	event ToolkitHubDataBufferMessage ServerDataBufferMessage;
+	public event ToolkitHubDataBufferMessage ServerDataBufferMessage;
 
-	event ToolkitHubMessage ServerMessage;
+	public event ToolkitHubMessage ServerMessage;
 
-	Task Connect(string hubUrl, Action onConnectionLost = null);
+	public Task Connect(string hubUrl, Action onConnectionLost = null);
 
-	Task Disconnect();
+	public Task Disconnect();
 
-	Task<ToolkitMessage> Send(ToolkitMessage message, TimeSpan? timeout = null);
+	public Task<ToolkitMessage> Send(ToolkitMessage message, TimeSpan? timeout = null);
 
-	Task<ToolkitMessage> SendDataBuffer(ToolkitMessage message, byte[] dataBuffer, TimeSpan? timeout = null);
+	public Task<ToolkitMessage> SendDataBuffer(ToolkitMessage message, byte[] dataBuffer, TimeSpan? timeout = null);
 
-	Task SendDataBufferNoResponse(ToolkitMessage message, byte[] dataBuffer);
+	public Task SendDataBufferNoResponse(ToolkitMessage message, byte[] dataBuffer);
 
-	Task SendNoResponse(ToolkitMessage message);
+	public Task SendNoResponse(ToolkitMessage message);
 
-	Task<bool> TryToConnect(string hubUrl, Action onConnectionLost = null);
+	public Task<bool> TryToConnect(string hubUrl, Action onConnectionLost = null);
 }
 
 public class ToolkitHubClientConnection : IToolkitHubClientConnection

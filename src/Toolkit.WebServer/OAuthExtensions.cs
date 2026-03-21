@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

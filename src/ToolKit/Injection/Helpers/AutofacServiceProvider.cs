@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Web.Api.SignalR;
+using FatCat.Toolkit.Web.Api.SignalR;
 
 namespace Tests.FatCat.Toolkit.Web.Api.SignalR;
 

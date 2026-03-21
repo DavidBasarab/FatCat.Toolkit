@@ -1,17 +1,17 @@
-﻿using System.Text;
+using System.Text;
 using FatCat.Toolkit.Extensions;
 
 namespace FatCat.Toolkit;
 
 public interface IByteTools
 {
-	byte[] FromBase64Encoded(string text);
+	public byte[] FromBase64Encoded(string text);
 
-	byte[] FromBase64String(string text);
+	public byte[] FromBase64String(string text);
 
-	string ToBase64Encoded(byte[] bytes);
+	public string ToBase64Encoded(byte[] bytes);
 
-	string ToBase64String(byte[] bytes);
+	public string ToBase64String(byte[] bytes);
 }
 
 public class ByteTools : IByteTools

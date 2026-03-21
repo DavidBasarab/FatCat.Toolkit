@@ -11,29 +11,29 @@ namespace FatCat.Toolkit;
 
 public interface IApplicationTools
 {
-	string ExecutableFullPath { get; }
+	public string ExecutableFullPath { get; }
 
-	string ExecutableName { get; }
+	public string ExecutableName { get; }
 
-	string ExecutingDirectory { get; }
+	public string ExecutingDirectory { get; }
 
-	bool InContainer { get; }
+	public bool InContainer { get; }
 
-	string MacAddress { get; }
+	public string MacAddress { get; }
 
-	string MachineName { get; }
+	public string MachineName { get; }
 
-	ushort FindNextOpenPort(ushort startingPort);
+	public ushort FindNextOpenPort(ushort startingPort);
 
-	string GetHost();
+	public string GetHost();
 
-	string GetIPAddress();
+	public string GetIPAddress();
 
-	IPAddress GetIPAddressObject();
+	public IPAddress GetIPAddressObject();
 
-	List<string> GetIPList();
+	public List<string> GetIPList();
 
-	string GetVersionFromAssembly(Assembly assembly);
+	public string GetVersionFromAssembly(Assembly assembly);
 }
 
 [ExcludeFromCodeCoverage(Justification = "Going directly to dotnet dlls")]

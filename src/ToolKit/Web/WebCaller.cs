@@ -10,61 +10,61 @@ namespace FatCat.Toolkit.Web;
 
 public interface IWebCaller
 {
-	string Accept { get; set; }
+	public string Accept { get; set; }
 
-	Uri BaseUri { get; }
+	public Uri BaseUri { get; }
 
-	TimeSpan Timeout { get; set; }
+	public TimeSpan Timeout { get; set; }
 
-	Task<FatWebResponse> Delete(string url);
+	public Task<FatWebResponse> Delete(string url);
 
-	Task<FatWebResponse> Delete(string url, TimeSpan timeout);
+	public Task<FatWebResponse> Delete(string url, TimeSpan timeout);
 
-	Task<FatWebResponse> Get(string url);
+	public Task<FatWebResponse> Get(string url);
 
-	Task<FatWebResponse> Get(string url, TimeSpan timeout);
+	public Task<FatWebResponse> Get(string url, TimeSpan timeout);
 
-	Task<FatWebResponse> Post<T>(string url, T data);
+	public Task<FatWebResponse> Post<T>(string url, T data);
 
-	Task<FatWebResponse> Post<T>(string url, List<T> data);
+	public Task<FatWebResponse> Post<T>(string url, List<T> data);
 
-	Task<FatWebResponse> Post(string url);
+	public Task<FatWebResponse> Post(string url);
 
-	Task<FatWebResponse> Post(string url, string data);
+	public Task<FatWebResponse> Post(string url, string data);
 
-	Task<FatWebResponse> Post(string url, string data, string contentType);
+	public Task<FatWebResponse> Post(string url, string data, string contentType);
 
-	Task<FatWebResponse> Post<T>(string url, T data, TimeSpan timeout);
+	public Task<FatWebResponse> Post<T>(string url, T data, TimeSpan timeout);
 
-	Task<FatWebResponse> Post<T>(string url, List<T> data, TimeSpan timeout);
+	public Task<FatWebResponse> Post<T>(string url, List<T> data, TimeSpan timeout);
 
-	Task<FatWebResponse> Post(string url, TimeSpan timeout);
+	public Task<FatWebResponse> Post(string url, TimeSpan timeout);
 
-	Task<FatWebResponse> Post(string url, string data, TimeSpan timeout, string contentType);
+	public Task<FatWebResponse> Post(string url, string data, TimeSpan timeout, string contentType);
 
-	Task<FatWebResponse> Put<T>(string url, T data);
+	public Task<FatWebResponse> Put<T>(string url, T data);
 
-	Task<FatWebResponse> Put<T>(string url, List<T> data);
+	public Task<FatWebResponse> Put<T>(string url, List<T> data);
 
-	Task<FatWebResponse> Put(string url);
+	public Task<FatWebResponse> Put(string url);
 
-	Task<FatWebResponse> Put(string url, string data);
+	public Task<FatWebResponse> Put(string url, string data);
 
-	Task<FatWebResponse> Put(string url, string data, string contentType);
+	public Task<FatWebResponse> Put(string url, string data, string contentType);
 
-	Task<FatWebResponse> Put<T>(string url, T data, TimeSpan timeout);
+	public Task<FatWebResponse> Put<T>(string url, T data, TimeSpan timeout);
 
-	Task<FatWebResponse> Put<T>(string url, List<T> data, TimeSpan timeout);
+	public Task<FatWebResponse> Put<T>(string url, List<T> data, TimeSpan timeout);
 
-	Task<FatWebResponse> Put(string url, TimeSpan timeout);
+	public Task<FatWebResponse> Put(string url, TimeSpan timeout);
 
-	Task<FatWebResponse> Put(string url, string data, TimeSpan timeout, string contentType);
+	public Task<FatWebResponse> Put(string url, string data, TimeSpan timeout, string contentType);
 
-	void SetClient(HttpClient client);
+	public void SetClient(HttpClient client);
 
-	void UseBasicAuthorization(string username, string password);
+	public void UseBasicAuthorization(string username, string password);
 
-	void UserBearerToken(string token);
+	public void UserBearerToken(string token);
 }
 
 public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger logger) : IWebCaller

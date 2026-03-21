@@ -1,4 +1,4 @@
-﻿using FakeItEasy;
+using FakeItEasy;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Json;
 using FatCat.Toolkit.Logging;

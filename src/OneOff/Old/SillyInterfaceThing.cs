@@ -1,10 +1,10 @@
-﻿using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Console;
 
 namespace OneOff.Old;
 
 public interface ISillyInterfaceThing
 {
-	void DoSomethingSilly();
+	public void DoSomethingSilly();
 }
 
 public class SillyInterfaceThing : ISillyInterfaceThing

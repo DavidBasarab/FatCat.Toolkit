@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FatCat.Toolkit.WebServer;
 
@@ -7,5 +7,5 @@ namespace FatCat.Toolkit.WebServer;
 /// </summary>
 public interface IToolkitTokenParameters
 {
-	TokenValidationParameters Get();
+	public TokenValidationParameters Get();
 }

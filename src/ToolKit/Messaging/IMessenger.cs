@@ -1,14 +1,14 @@
-﻿namespace FatCat.Toolkit.Messaging;
+namespace FatCat.Toolkit.Messaging;
 
 public interface IMessenger
 {
-	void Send<TMessage>(TMessage payload)
+	public void Send<TMessage>(TMessage payload)
 		where TMessage : Message;
 
-	void Subscribe<TMessage>(Func<TMessage, Task> callback)
+	public void Subscribe<TMessage>(Func<TMessage, Task> callback)
 		where TMessage : Message;
 
-	void Unsubscribe<TMessage>(Func<TMessage, Task> callback)
+	public void Unsubscribe<TMessage>(Func<TMessage, Task> callback)
 		where TMessage : Message;
 }
 

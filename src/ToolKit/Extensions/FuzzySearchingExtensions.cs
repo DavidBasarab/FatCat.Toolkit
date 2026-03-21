@@ -1,4 +1,4 @@
-﻿namespace FatCat.Toolkit.Extensions;
+namespace FatCat.Toolkit.Extensions;
 
 public static class FuzzySearchingExtensions
 {

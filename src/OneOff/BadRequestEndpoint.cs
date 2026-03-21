@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.WebServer;
+using FatCat.Toolkit.WebServer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace OneOff;

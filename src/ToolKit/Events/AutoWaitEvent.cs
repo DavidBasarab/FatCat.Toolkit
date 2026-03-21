@@ -8,7 +8,7 @@ public interface IAutoWaitEvent : IDisposable
 	/// <summary>
 	///  Trigger the event.  If in wait will make it return true to keep with the execution
 	/// </summary>
-	void Trigger();
+	public void Trigger();
 
 	/// <summary>
 	///  Will wait until time out is reached.
@@ -18,7 +18,7 @@ public interface IAutoWaitEvent : IDisposable
 	///  True => if wait event is triggered
 	///  False => if not triggered
 	/// </returns>
-	bool Wait(TimeSpan? timeout = null);
+	public bool Wait(TimeSpan? timeout = null);
 }
 
 public class AutoWaitEvent : IAutoWaitEvent

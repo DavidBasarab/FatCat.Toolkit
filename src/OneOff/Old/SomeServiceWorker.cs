@@ -1,10 +1,10 @@
-﻿using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Console;
 
 namespace OneOff.Old;
 
 public interface ISomeServiceWorker
 {
-	void DoSomeWork();
+	public void DoSomeWork();
 }
 
 public class SomeServiceWorker : ISomeServiceWorker

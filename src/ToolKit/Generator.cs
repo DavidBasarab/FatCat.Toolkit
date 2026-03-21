@@ -5,21 +5,21 @@ namespace FatCat.Toolkit;
 
 public interface IGenerator
 {
-	IEnumerable<byte> Bytes(int length);
+	public IEnumerable<byte> Bytes(int length);
 
-	bool IsValidObjectId(string idToTest);
+	public bool IsValidObjectId(string idToTest);
 
-	Guid NewGuid();
+	public Guid NewGuid();
 
-	string NewId();
+	public string NewId();
 
-	ObjectId NewObjectId();
+	public ObjectId NewObjectId();
 
-	int NextRandom(int? minNumber = null, int? maxNumber = null);
+	public int NextRandom(int? minNumber = null, int? maxNumber = null);
 
-	int RandomNumber(int? minNumber = null, int? maxNumber = null);
+	public int RandomNumber(int? minNumber = null, int? maxNumber = null);
 
-	string RandomString(string prefix = null, int? length = null);
+	public string RandomString(string prefix = null, int? length = null);
 }
 
 public class Generator : IGenerator

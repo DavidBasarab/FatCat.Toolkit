@@ -9,9 +9,9 @@ namespace FatCat.Toolkit.Logging;
 /// </summary>
 public interface ISimpleLogger
 {
-	void SetLogLevel(LogLevel logLevel);
+	public void SetLogLevel(LogLevel logLevel);
 
-	void Write(
+	public void Write(
 		LogLevel logLevel,
 		string message,
 		[CallerMemberName] string memberName = "",
@@ -19,42 +19,42 @@ public interface ISimpleLogger
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteDebug(
+	public void WriteDebug(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteError(
+	public void WriteError(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteFatal(
+	public void WriteFatal(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteInformation(
+	public void WriteInformation(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteVerbose(
+	public void WriteVerbose(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteWarning(
+	public void WriteWarning(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",

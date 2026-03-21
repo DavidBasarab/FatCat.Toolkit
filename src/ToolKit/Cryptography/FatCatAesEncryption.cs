@@ -4,9 +4,9 @@ namespace FatCat.Toolkit.Cryptography;
 
 public interface IFatCatAesEncryption
 {
-	Task<byte[]> Decrypt(byte[] cypherData, byte[] key, byte[] iv);
+	public Task<byte[]> Decrypt(byte[] cypherData, byte[] key, byte[] iv);
 
-	Task<byte[]> Encrypt(byte[] openData, byte[] key, byte[] iv);
+	public Task<byte[]> Encrypt(byte[] openData, byte[] key, byte[] iv);
 }
 
 public class FatCatAesEncryption : IFatCatAesEncryption

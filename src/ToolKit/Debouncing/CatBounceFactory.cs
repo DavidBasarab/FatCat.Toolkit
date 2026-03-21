@@ -1,8 +1,8 @@
-﻿namespace FatCat.Toolkit.Debouncing;
+namespace FatCat.Toolkit.Debouncing;
 
 public interface ICatBounceFactory
 {
-	ICatBounce Create(TimeSpan interval);
+	public ICatBounce Create(TimeSpan interval);
 }
 
 public class CatBounceFactory : ICatBounceFactory

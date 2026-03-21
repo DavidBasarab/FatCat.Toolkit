@@ -1,10 +1,10 @@
-﻿using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Console;
 
 namespace OneOffBlazor;
 
 public interface ITestingService
 {
-	void PrintAMessage();
+	public void PrintAMessage();
 }
 
 public class TestingService : ITestingService

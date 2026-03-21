@@ -1,4 +1,4 @@
-﻿using FakeItEasy;
+using FakeItEasy;
 using FatCat.Toolkit.Threading;
 
 namespace FatCat.Toolkit.Testing;

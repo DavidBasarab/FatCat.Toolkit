@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography.X509Certificates;
 using FatCat.Toolkit.Logging;
 using Thread = FatCat.Toolkit.Threading.Thread;
 
@@ -6,13 +6,13 @@ namespace FatCat.Toolkit.Communication;
 
 public interface ITcpFactory
 {
-	IFatTcpClient CreateOpenTcpClient();
+	public IFatTcpClient CreateOpenTcpClient();
 
-	IFatTcpServer CreateOpenTcpServer();
+	public IFatTcpServer CreateOpenTcpServer();
 
-	IFatTcpClient CreateSecureTcpClient(X509Certificate certificate);
+	public IFatTcpClient CreateSecureTcpClient(X509Certificate certificate);
 
-	IFatTcpServer CreateSecureTcpServer(X509Certificate certificate);
+	public IFatTcpServer CreateSecureTcpServer(X509Certificate certificate);
 }
 
 public class TcpFactory : ITcpFactory

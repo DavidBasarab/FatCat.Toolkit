@@ -1,4 +1,4 @@
-﻿namespace FatCat.Toolkit.Web;
+namespace FatCat.Toolkit.Web;
 
 public interface IFatHttpCaller { }
 

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using FatCat.Fakes;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Json;

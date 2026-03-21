@@ -5,19 +5,19 @@ namespace FatCat.Toolkit.Threading;
 
 public interface IFifoThreadQueue : IDisposable
 {
-	CancellationToken CancelToken { get; }
+	public CancellationToken CancelToken { get; }
 
-	int QueueCount { get; }
+	public int QueueCount { get; }
 
-	void Enqueue(Action actionToQueue);
+	public void Enqueue(Action actionToQueue);
 
-	void Enqueue(Func<Task> actionToQueue);
+	public void Enqueue(Func<Task> actionToQueue);
 
-	void Next();
+	public void Next();
 
-	void Start();
+	public void Start();
 
-	void Stop();
+	public void Stop();
 }
 
 public class FifoThreadQueue : IFifoThreadQueue

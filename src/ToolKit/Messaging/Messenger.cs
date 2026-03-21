@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.Threading;

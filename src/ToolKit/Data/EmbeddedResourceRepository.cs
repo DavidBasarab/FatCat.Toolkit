@@ -1,14 +1,14 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace FatCat.Toolkit.Data;
 
 public interface IEmbeddedResourceRepository
 {
-	List<string> GetAllResourceNames(Assembly assembly);
+	public List<string> GetAllResourceNames(Assembly assembly);
 
-	Stream GetStream(Assembly assembly, string resourceName);
+	public Stream GetStream(Assembly assembly, string resourceName);
 
-	string GetText(Assembly assembly, string resourceName);
+	public string GetText(Assembly assembly, string resourceName);
 }
 
 public class EmbeddedResourceRepository : IEmbeddedResourceRepository

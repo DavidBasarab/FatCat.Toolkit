@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using FatCat.Toolkit.Caching;
 
 namespace FatCat.Toolkit.Web.Api.SignalR;

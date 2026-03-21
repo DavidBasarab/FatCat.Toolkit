@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.Web.Api.SignalR;

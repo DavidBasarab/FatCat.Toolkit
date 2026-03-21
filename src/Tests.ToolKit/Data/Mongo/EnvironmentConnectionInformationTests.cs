@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Data;
+using FatCat.Toolkit.Data;
 using FatCat.Toolkit.Data.Mongo;
 
 namespace Tests.FatCat.Toolkit.Data.Mongo;

@@ -4,13 +4,13 @@ namespace FatCat.Toolkit.Communication;
 
 public interface IFatTcpServer : IDisposable
 {
-	event TcpMessageReceived TcpMessageReceivedEvent;
+	public event TcpMessageReceived TcpMessageReceivedEvent;
 
-	void OnMessageReceived(byte[] bytesReceived);
+	public void OnMessageReceived(byte[] bytesReceived);
 
-	void Start(ushort port, int receiveBufferSize = 1024);
+	public void Start(ushort port, int receiveBufferSize = 1024);
 
-	void Start(ushort port, Encoding encoding, int receiveBufferSize = 1024);
+	public void Start(ushort port, Encoding encoding, int receiveBufferSize = 1024);
 
-	void Stop();
+	public void Stop();
 }

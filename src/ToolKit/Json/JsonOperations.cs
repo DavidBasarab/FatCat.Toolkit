@@ -5,35 +5,35 @@ namespace FatCat.Toolkit.Json;
 
 public interface IJsonOperations
 {
-	T Deserialize<T>(string json, JsonSerializerOptions options);
+	public T Deserialize<T>(string json, JsonSerializerOptions options);
 
-	T Deserialize<T>(string json);
+	public T Deserialize<T>(string json);
 
-	T DeserializeFromStream<T>(Stream input, JsonSerializerOptions options = null, bool leaveOpen = false);
+	public T DeserializeFromStream<T>(Stream input, JsonSerializerOptions options = null, bool leaveOpen = false);
 
-	Task<T> DeserializeFromStreamAsync<T>(
+	public Task<T> DeserializeFromStreamAsync<T>(
 		Stream input,
 		JsonSerializerOptions options = null,
 		bool leaveOpen = false,
 		CancellationToken cancellationToken = default
 	);
 
-	JsonSerializerOptions GetDefaultOptions(bool indented = false);
+	public JsonSerializerOptions GetDefaultOptions(bool indented = false);
 
-	string Serialize(object source);
+	public string Serialize(object source);
 
-	string Serialize(object source, JsonSerializerOptions options);
+	public string Serialize(object source, JsonSerializerOptions options);
 
-	string Serialize(object source, bool indented);
+	public string Serialize(object source, bool indented);
 
-	void SerializeToStream(
+	public void SerializeToStream(
 		object source,
 		Stream output,
 		JsonSerializerOptions options = null,
 		bool leaveOpen = false
 	);
 
-	Task SerializeToStreamAsync(
+	public Task SerializeToStreamAsync(
 		object source,
 		Stream output,
 		JsonSerializerOptions options = null,
@@ -41,7 +41,7 @@ public interface IJsonOperations
 		CancellationToken cancellationToken = default
 	);
 
-	bool TryDeserialize<T>(string json, out T value, JsonSerializerOptions options = null);
+	public bool TryDeserialize<T>(string json, out T value, JsonSerializerOptions options = null);
 }
 
 public sealed class JsonOperations : IJsonOperations

@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Console;
+using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Threading;
 using Humanizer;
 

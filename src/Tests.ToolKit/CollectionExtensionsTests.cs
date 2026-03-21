@@ -1,4 +1,4 @@
-﻿using Fasterflect;
+using Fasterflect;
 using FatCat.Toolkit;
 using FatCat.Toolkit.Extensions;
 

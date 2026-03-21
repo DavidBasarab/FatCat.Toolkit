@@ -1,4 +1,4 @@
-﻿using FatCat.Fakes;
+using FatCat.Fakes;
 using FatCat.Toolkit.Console;
 using Yarp.ReverseProxy.Configuration;
 

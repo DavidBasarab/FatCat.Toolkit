@@ -6,24 +6,24 @@ namespace FatCat.Toolkit.Caching;
 public interface IFatCatCache<T>
 	where T : class, ICacheItem
 {
-	void Add(T cacheItem, TimeSpan? timeout = null);
+	public void Add(T cacheItem, TimeSpan? timeout = null);
 
-	void Add(List<T> cacheItems, TimeSpan? timeout = null);
+	public void Add(List<T> cacheItems, TimeSpan? timeout = null);
 
-	void Clear();
+	public void Clear();
 
-	T? Get(string cacheId);
+	public T? Get(string cacheId);
 
-	IList<T> GetAll();
+	public IList<T> GetAll();
 
-	bool InCache(string cacheId);
+	public bool InCache(string cacheId);
 
 	public bool InCache(T cacheItem)
 	{
 		return InCache(cacheItem.CacheId);
 	}
 
-	void Remove(string cacheId);
+	public void Remove(string cacheId);
 
 	public void Remove(T cacheItem)
 	{

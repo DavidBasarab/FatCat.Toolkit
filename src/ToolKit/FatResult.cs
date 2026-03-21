@@ -1,4 +1,4 @@
-﻿namespace FatCat.Toolkit;
+namespace FatCat.Toolkit;
 
 public class FatResult<T> : EqualObject
 {

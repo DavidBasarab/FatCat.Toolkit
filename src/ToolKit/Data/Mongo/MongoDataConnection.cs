@@ -5,7 +5,7 @@ namespace FatCat.Toolkit.Data.Mongo;
 
 public interface IMongoDataConnection
 {
-	IMongoCollection<T> GetCollection<T>(string? connectionString = null, string? databaseName = null)
+	public IMongoCollection<T> GetCollection<T>(string? connectionString = null, string? databaseName = null)
 		where T : MongoObject;
 }
 

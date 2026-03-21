@@ -1,34 +1,34 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using FatCat.Toolkit.Console;
 
 namespace FatCat.Toolkit.Communication;
 
 public interface IFatTcpLogger
 {
-	void WriteDebug(
+	public void WriteDebug(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteError(
+	public void WriteError(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteException(Exception ex);
+	public void WriteException(Exception ex);
 
-	void WriteInformation(
+	public void WriteInformation(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",
 		[CallerLineNumber] int sourceLineNumber = 0
 	);
 
-	void WriteWarning(
+	public void WriteWarning(
 		string message,
 		[CallerMemberName] string memberName = "",
 		[CallerFilePath] string sourceFilePath = "",

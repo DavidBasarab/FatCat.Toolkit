@@ -1,10 +1,10 @@
-﻿using FatCat.Fakes;
+using FatCat.Fakes;
 
 namespace SampleDocker;
 
 public interface ISecondInjectedThing
 {
-	int GetSomeNumber();
+	public int GetSomeNumber();
 }
 
 public class SecondInjectedThing : ISecondInjectedThing

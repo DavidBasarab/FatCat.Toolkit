@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit;
+using FatCat.Toolkit;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Json;
 using FatCat.Toolkit.WebServer;

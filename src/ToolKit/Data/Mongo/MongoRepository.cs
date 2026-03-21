@@ -8,15 +8,15 @@ namespace FatCat.Toolkit.Data.Mongo;
 public interface IMongoRepository<T> : IDataRepository<T>
 	where T : MongoObject
 {
-	IMongoCollection<T> Collection { get; }
+	public IMongoCollection<T> Collection { get; }
 
-	string DatabaseName { get; }
+	public string DatabaseName { get; }
 
-	void Connect(string? connectionString = null, string? databaseName = null);
+	public void Connect(string? connectionString = null, string? databaseName = null);
 
-	Task<T?> GetById(string id);
+	public Task<T?> GetById(string id);
 
-	Task<T?> GetById(ObjectId id);
+	public Task<T?> GetById(ObjectId id);
 }
 
 public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongoNames mongoNames)

@@ -7,9 +7,9 @@ namespace FatCat.Toolkit;
 
 public interface IRegistryRepository
 {
-	object? Get(string applicationName, string keyName);
+	public object? Get(string applicationName, string keyName);
 
-	void Set(string applicationName, string keyName, object value);
+	public void Set(string applicationName, string keyName, object value);
 }
 
 public class RegistryRepository : IRegistryRepository

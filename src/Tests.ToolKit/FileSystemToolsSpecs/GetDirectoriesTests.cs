@@ -1,4 +1,4 @@
-﻿namespace Tests.FatCat.Toolkit.FileSystemToolsSpecs;
+namespace Tests.FatCat.Toolkit.FileSystemToolsSpecs;
 
 public class GetDirectoriesTests : FileToolsTests
 {

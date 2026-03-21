@@ -1,4 +1,4 @@
-﻿namespace FatCat.Toolkit.Data.Mongo;
+namespace FatCat.Toolkit.Data.Mongo;
 
 public class EnvironmentConnectionInformation(IEnvironmentRepository environmentRepository)
 	: IMongoConnectionInformation

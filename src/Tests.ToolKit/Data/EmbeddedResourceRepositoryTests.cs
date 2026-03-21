@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Data;
+using FatCat.Toolkit.Data;
 
 namespace Tests.FatCat.Toolkit.Data;
 

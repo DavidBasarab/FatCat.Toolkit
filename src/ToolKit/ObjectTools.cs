@@ -1,14 +1,14 @@
-﻿#nullable enable
+#nullable enable
 using FatCat.Toolkit.Extensions;
 
 namespace FatCat.Toolkit;
 
 public interface IObjectTools
 {
-	T? DeepClone<T>(T? obj)
+	public T? DeepClone<T>(T? obj)
 		where T : class;
 
-	bool IsEquals(EqualObject? obj1, EqualObject? obj2);
+	public bool IsEquals(EqualObject? obj1, EqualObject? obj2);
 }
 
 public class ObjectTools : IObjectTools

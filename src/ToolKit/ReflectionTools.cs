@@ -6,12 +6,12 @@ namespace FatCat.Toolkit;
 
 public interface IReflectionTools
 {
-	TAttribute? FindAttributeOnType<TAttribute>(Type type)
+	public TAttribute? FindAttributeOnType<TAttribute>(Type type)
 		where TAttribute : Attribute;
 
-	List<Type> FindTypesImplementing<TTypeImplementing>(List<Assembly> assemblies);
+	public List<Type> FindTypesImplementing<TTypeImplementing>(List<Assembly> assemblies);
 
-	List<Assembly> GetDomainAssemblies();
+	public List<Assembly> GetDomainAssemblies();
 }
 
 public class ReflectionTools : IReflectionTools

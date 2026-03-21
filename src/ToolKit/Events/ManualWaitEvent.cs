@@ -5,12 +5,12 @@ namespace FatCat.Toolkit.Events;
 /// </summary>
 public interface IManualWaitEvent : IDisposable
 {
-	bool HasBeenTriggered { get; }
+	public bool HasBeenTriggered { get; }
 
 	/// <summary>
 	///  Trigger the event.  If in wait will make it return true to keep with the execution
 	/// </summary>
-	void Trigger();
+	public void Trigger();
 
 	/// <summary>
 	///  Will wait until time out is reached.
@@ -20,7 +20,7 @@ public interface IManualWaitEvent : IDisposable
 	///  True => if wait event is triggered
 	///  False => if not triggered
 	/// </returns>
-	bool Wait(TimeSpan? timeout = null);
+	public bool Wait(TimeSpan? timeout = null);
 }
 
 public class ManualWaitEvent : IManualWaitEvent

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace FatCat.Toolkit.Web.Api.SignalR;
 
 public class ConnectionResult(bool connected, IToolkitHubClientConnection? connection = null)

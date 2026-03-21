@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Caching;
+using FatCat.Toolkit.Caching;
 
 namespace OneOff.Old;
 

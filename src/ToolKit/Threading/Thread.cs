@@ -4,13 +4,13 @@ namespace FatCat.Toolkit.Threading;
 
 public interface IThread
 {
-	void Run(Action action);
+	public void Run(Action action);
 
-	void Run(Func<Task> action);
+	public void Run(Func<Task> action);
 
-	Task Sleep(TimeSpan sleepTime);
+	public Task Sleep(TimeSpan sleepTime);
 
-	Task Sleep(TimeSpan sleepTime, CancellationToken token);
+	public Task Sleep(TimeSpan sleepTime, CancellationToken token);
 }
 
 public class Thread(IToolkitLogger logger) : IThread

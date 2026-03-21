@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FatCat.Toolkit.Injection.Helpers;

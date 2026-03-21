@@ -1,8 +1,8 @@
-﻿namespace FatCat.Toolkit.Data.Mongo;
+namespace FatCat.Toolkit.Data.Mongo;
 
 public interface IMongoConnectionInformation
 {
-	string GetConnectionString();
+	public string GetConnectionString();
 
-	string GetDatabaseName();
+	public string GetDatabaseName();
 }

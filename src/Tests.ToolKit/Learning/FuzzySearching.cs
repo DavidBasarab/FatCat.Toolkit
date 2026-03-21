@@ -85,31 +85,31 @@ public class FuzzySearching
 
 		result.Should()
 			.ContainEquivalentOf(new SearchObject
-								{
-									FirstName = "Zack",
-									LastName = "Taylor"
-								});
+			{
+				FirstName = "Zack",
+				LastName = "Taylor"
+			});
 
 		result.Should()
 			.ContainEquivalentOf(new SearchObject
-								{
-									FirstName = "Jason",
-									LastName = "Taylor"
-								});
+			{
+				FirstName = "Jason",
+				LastName = "Taylor"
+			});
 
 		result.Should()
 			.ContainEquivalentOf(new SearchObject
-								{
-									FirstName = "Taylor",
-									LastName = "Zack"
-								});
+			{
+				FirstName = "Taylor",
+				LastName = "Zack"
+			});
 
 		result.Should()
 			.ContainEquivalentOf(new SearchObject
-								{
-									FirstName = "Taylor",
-									LastName = "Jason"
-								});
+			{
+				FirstName = "Taylor",
+				LastName = "Jason"
+			});
 	}
 
 	private class SearchObject : EqualObject

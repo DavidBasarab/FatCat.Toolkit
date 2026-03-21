@@ -6,63 +6,63 @@ namespace FatCat.Toolkit.Utilities;
 
 public interface IStringUtilities
 {
-	bool Contains(string text, string toCheck, StringComparison comp);
+	public bool Contains(string text, string toCheck, StringComparison comp);
 
-	string FirstLetterToUpper(string text, char delimiter = ' ');
+	public string FirstLetterToUpper(string text, char delimiter = ' ');
 
-	string FixedLength(string text, int length);
+	public string FixedLength(string text, int length);
 
-	string FormatWith(string text, params object[] formatArgs);
+	public string FormatWith(string text, params object[] formatArgs);
 
-	string FromBase64Encoded(string text);
+	public string FromBase64Encoded(string text);
 
-	string InsertSafeFileDate(string text, DateTime dateTime);
+	public string InsertSafeFileDate(string text, DateTime dateTime);
 
-	string InsertSafeFileDate(string text);
+	public string InsertSafeFileDate(string text);
 
-	bool IsNotNullOrEmpty(string? text);
+	public bool IsNotNullOrEmpty(string? text);
 
-	bool IsNullOrEmpty(string? text);
+	public bool IsNullOrEmpty(string? text);
 
-	string MakeSafeFileName(string fileName);
+	public string MakeSafeFileName(string fileName);
 
-	string RemoveAllWhitespace(string text);
+	public string RemoveAllWhitespace(string text);
 
-	string RemoveSuffix(string text, string? suffix);
+	public string RemoveSuffix(string text, string? suffix);
 
-	string ReplaceAllWhitespace(string text, string replacement);
+	public string ReplaceAllWhitespace(string text, string replacement);
 
-	List<string> SplitByLine(string? text);
+	public List<string> SplitByLine(string? text);
 
-	string[] SplitByString(string? text, string separator);
+	public string[] SplitByString(string? text, string separator);
 
-	byte[] ToAsciiByteArray(string text);
+	public byte[] ToAsciiByteArray(string text);
 
-	string ToBase64Encoded(string text);
+	public string ToBase64Encoded(string text);
 
-	bool ToBool(string? text);
+	public bool ToBool(string? text);
 
-	byte ToByte(string text, byte? defaultValue = null);
+	public byte ToByte(string text, byte? defaultValue = null);
 
-	byte[] ToByteArray(string text, Encoding? encoding = null);
+	public byte[] ToByteArray(string text, Encoding? encoding = null);
 
-	double ToDouble(string? text, double? defaultValue = null);
+	public double ToDouble(string? text, double? defaultValue = null);
 
-	Guid ToGuid(string text);
+	public Guid ToGuid(string text);
 
-	int ToInt(string? text, int? defaultValue = null);
+	public int ToInt(string? text, int? defaultValue = null);
 
-	long ToLong(string? text, long? defaultValue = null);
+	public long ToLong(string? text, long? defaultValue = null);
 
-	string ToSlug(string text);
+	public string ToSlug(string text);
 
-	Stream ToStream(string? text);
+	public Stream ToStream(string? text);
 
-	ushort ToUShort(string? text, ushort? defaultValue = null);
+	public ushort ToUShort(string? text, ushort? defaultValue = null);
 
-	string TruncateString(string text, int maxLength);
+	public string TruncateString(string text, int maxLength);
 
-	byte[] WithEmbeddedHexCodesToByteArray(string? text);
+	public byte[] WithEmbeddedHexCodesToByteArray(string? text);
 }
 
 public class StringUtilities : IStringUtilities

@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using FatCat.Toolkit.Data.Mongo;
 
 namespace SampleDocker;

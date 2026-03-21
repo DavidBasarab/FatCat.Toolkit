@@ -1,4 +1,4 @@
-﻿using FatCat.Toolkit.Extensions;
+using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Web.Api;
 
 namespace Tests.FatCat.Toolkit;

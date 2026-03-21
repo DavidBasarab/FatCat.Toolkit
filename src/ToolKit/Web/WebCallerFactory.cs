@@ -5,7 +5,7 @@ namespace FatCat.Toolkit.Web;
 
 public interface IWebCallerFactory
 {
-	IWebCaller GetWebCaller(Uri baseUri);
+	public IWebCaller GetWebCaller(Uri baseUri);
 }
 
 public class WebCallerFactory(IToolkitLogger toolkitLogger, IJsonOperations jsonOperations) : IWebCallerFactory

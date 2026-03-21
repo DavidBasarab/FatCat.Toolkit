@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Autofac;
 using Autofac.Core;
 using FatCat.Toolkit.Data.Mongo;

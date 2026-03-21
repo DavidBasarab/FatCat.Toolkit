@@ -1,7 +1,7 @@
-﻿namespace ProxySpike;
+namespace ProxySpike;
 
 public interface ISpikeWorker<T>
 	where T : class
 {
-	Task DoWork(T options);
+	public Task DoWork(T options);
 }

@@ -1,10 +1,10 @@
-﻿using FatCat.Fakes;
+using FatCat.Fakes;
 
 namespace SampleDocker;
 
 public interface IExampleWorker
 {
-	string GetMessage();
+	public string GetMessage();
 }
 
 public class ExampleWorker : IExampleWorker

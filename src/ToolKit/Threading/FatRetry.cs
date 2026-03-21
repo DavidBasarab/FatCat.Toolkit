@@ -12,7 +12,7 @@ public interface IFatRetry
 	/// <param name="maxRetries">Max retries defaults to 10</param>
 	/// <param name="delay">Delay between retries defaults to 5 seconds</param>
 	/// <returns></returns>
-	Task<bool> Execute(Func<Task<bool>> action, int maxRetries = 10, TimeSpan delay = default);
+	public Task<bool> Execute(Func<Task<bool>> action, int maxRetries = 10, TimeSpan delay = default);
 
 	/// <summary>
 	///  Will execute function until it returns true or maxRetries is reached
@@ -21,7 +21,7 @@ public interface IFatRetry
 	/// <param name="maxRetries">Max retries defaults to 10</param>
 	/// <param name="delay">Delay between retries defaults to 5 seconds</param>
 	/// <returns></returns>
-	bool Execute(Func<bool> action, int maxRetries = 10, TimeSpan delay = default);
+	public bool Execute(Func<bool> action, int maxRetries = 10, TimeSpan delay = default);
 }
 
 [ExcludeFromCodeCoverage(Justification = "This is a simple wrapper around a retry pattern")]

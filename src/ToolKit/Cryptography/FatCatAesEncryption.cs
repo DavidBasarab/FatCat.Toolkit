@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 namespace FatCat.Toolkit.Cryptography;
 
@@ -20,6 +19,7 @@ public class FatCatAesEncryption : IFatCatAesEncryption
 		{
 			throw new ArgumentException("AES-GCM requires a 12-byte IV (nonce).", nameof(iv));
 		}
+
 		if (cypherData == null || cypherData.Length < TagSizeBytes)
 		{
 			throw new ArgumentException("Ciphertext is too short.", nameof(cypherData));
@@ -44,6 +44,7 @@ public class FatCatAesEncryption : IFatCatAesEncryption
 		{
 			throw new ArgumentException("AES-GCM requires a 12-byte IV (nonce).", nameof(iv));
 		}
+
 		if (openData == null)
 		{
 			throw new ArgumentNullException(nameof(openData));

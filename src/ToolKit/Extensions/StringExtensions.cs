@@ -115,7 +115,7 @@ public static class StringExtensions
 
 	public static List<string> SplitByLine(this string? data)
 	{
-		return SplitByString(data, Environment.NewLine).ToList();
+		return data.SplitByString(Environment.NewLine).ToList();
 	}
 
 	public static string[] SplitByString(this string? data, string separator)

@@ -16,7 +16,7 @@ public static class TestExtensions
 			return true;
 		}
 
-		return Matches(manager, Matcher);
+		return manager.Matches(Matcher);
 	}
 
 	public static T Matches<T>(this IArgumentConstraintManager<T> manager, Action<T> predicate)
@@ -28,7 +28,7 @@ public static class TestExtensions
 			return true;
 		}
 
-		return Matches(manager, Matcher);
+		return manager.Matches(Matcher);
 	}
 
 	/// <summary>

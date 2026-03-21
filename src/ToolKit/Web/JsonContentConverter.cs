@@ -10,15 +10,9 @@ public static class JsonContentConverter
 
 	public static T ConvertTo<T>(string json)
 	{
-		if (json.IsNullOrEmpty())
-		{
-			return ToDefaultValue<T>();
-		}
+		if (json.IsNullOrEmpty()) { return ToDefaultValue<T>(); }
 
-		if (TypeSetters.ContainsKey(typeof(T)))
-		{
-			return (T)TypeSetters[typeof(T)](json);
-		}
+		if (TypeSetters.ContainsKey(typeof(T))) { return (T)TypeSetters[typeof(T)](json); }
 
 		return new JsonOperations().Deserialize<T>(json);
 	}
@@ -46,45 +40,21 @@ public static class JsonContentConverter
 		return (T)listAsInstance!;
 	}
 
-	private static bool IsList(Type type)
-	{
-		return type.IsGenericType && type.Implements(typeof(IEnumerable));
-	}
+	private static bool IsList(Type type) { return type.IsGenericType && type.Implements(typeof(IEnumerable)); }
 
-	private static object SetBool(string content)
-	{
-		return bool.Parse(content);
-	}
+	private static object SetBool(string content) { return bool.Parse(content); }
 
-	private static object SetDateTime(string content)
-	{
-		return DateTime.Parse(content);
-	}
+	private static object SetDateTime(string content) { return DateTime.Parse(content); }
 
-	private static object SetDouble(string content)
-	{
-		return double.Parse(content);
-	}
+	private static object SetDouble(string content) { return double.Parse(content); }
 
-	private static object SetGuid(string content)
-	{
-		return Guid.Parse(content);
-	}
+	private static object SetGuid(string content) { return Guid.Parse(content); }
 
-	private static object SetInt(string content)
-	{
-		return int.Parse(content);
-	}
+	private static object SetInt(string content) { return int.Parse(content); }
 
-	private static object SetString(string content)
-	{
-		return content;
-	}
+	private static object SetString(string content) { return content; }
 
-	private static object SetTimespan(string content)
-	{
-		return TimeSpan.Parse(content);
-	}
+	private static object SetTimespan(string content) { return TimeSpan.Parse(content); }
 
 	private static T ToDefaultValue<T>()
 	{

@@ -2,7 +2,6 @@
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Logging;
-using FatCat.Toolkit.Messaging;
 using FatCat.Toolkit.WebServer;
 using OneOff.Old;
 using OneOffLib;

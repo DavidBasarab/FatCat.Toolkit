@@ -33,7 +33,7 @@ internal static class ObjectEquals
 
 		foreach (var propertyInfo in propertyInfos)
 		{
-			if (result == false)
+			if (!result)
 			{
 				break;
 			}

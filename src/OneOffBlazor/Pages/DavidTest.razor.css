@@ -39,8 +39,8 @@
 /* Stretch background to cover layout article padding on wider screens */
 @media (min-width: 641px) {
     .david-page {
-        margin-left: -2rem;   /* matches article padding-left in layout */
-        margin-right: -1.5rem;/* matches article padding-right in layout */
+        margin-left: -2rem; /* matches article padding-left in layout */
+        margin-right: -1.5rem; /* matches article padding-right in layout */
         padding-left: 2rem;
         padding-right: 1.5rem;
     }

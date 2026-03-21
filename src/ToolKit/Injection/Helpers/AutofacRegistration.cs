@@ -24,7 +24,7 @@ public static class AutofacRegistration
 	/// </param>
 	public static void Populate(this ContainerBuilder builder, IEnumerable<ServiceDescriptor> descriptors)
 	{
-		Populate(builder, descriptors, null);
+		builder.Populate(descriptors, null);
 	}
 
 	/// <summary>

@@ -2,6 +2,8 @@ using System.Reflection;
 using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
 
 namespace FatCat.Toolkit.WebServer;
 
@@ -33,6 +35,10 @@ public class ToolkitWebApplicationSettings : EqualObject
 	public CertificationSettings TlsCertificate { get; set; }
 
 	public IToolkitTokenParameters ToolkitTokenParameters { get; set; }
+
+	internal Action<WebApplicationBuilder> ConfigureDiForBuilder { get; set; }
+
+	internal Action<WebApplication> ConfigureDiForApp { get; set; }
 
 	public event ToolkitHubClientConnected ClientConnected;
 

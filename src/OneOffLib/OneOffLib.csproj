@@ -16,6 +16,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\FatCat.Toolkit.Autofac\FatCat.Toolkit.Autofac.csproj"/>
         <ProjectReference Include="..\ToolKit\ToolKit.csproj"/>
     </ItemGroup>
 

@@ -1,9 +1,7 @@
 using System.Text.Json.Serialization;
-using Autofac;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Injection;
-using FatCat.Toolkit.Injection.Helpers;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.WebServer.SignalR;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -57,14 +55,7 @@ internal sealed class ApplicationStartUp
 
 		app.UseEndpoints(endpoints => endpoints.MapControllers());
 
-		SystemScope.Container.LifetimeScope = app.ApplicationServices.GetAutofacRoot();
-
 		SetUpSignalR(app);
-	}
-
-	public void ConfigureContainer(ContainerBuilder builder)
-	{
-		SystemScope.Initialize(builder, ToolkitWebApplication.Settings.ContainerAssemblies);
 	}
 
 	public void ConfigureServices(IServiceCollection services)

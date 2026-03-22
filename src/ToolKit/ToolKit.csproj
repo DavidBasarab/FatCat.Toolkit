@@ -35,6 +35,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="9.0.0" />
+		<PackageReference Include="Scrutor" Version="5.0.1" />
 		<PackageReference Include="CSharpier.MsBuild" Version="1.2.5">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

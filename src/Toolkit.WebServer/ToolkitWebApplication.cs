@@ -1,4 +1,3 @@
-using Autofac;
 using FatCat.Toolkit.Extensions;
 using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Threading;
@@ -6,6 +5,7 @@ using Humanizer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
 
@@ -32,8 +32,6 @@ public static class ToolkitWebApplication
 
 		var builder = WebApplication.CreateBuilder(settings.Args);
 
-		builder.Host.UseServiceProviderFactory(new ToolkitServiceProviderFactory(new AutofacOptions()));
-
 		builder.Services.AddHttpContextAccessor();
 
 		builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -43,13 +41,9 @@ public static class ToolkitWebApplication
 				| ForwardedHeaders.XForwardedProto
 				| ForwardedHeaders.XForwardedHost;
 
-			// Azure front-ends/proxies often have dynamic IPs; this tells ASP.NET Core
-			// to accept forwarded headers from any proxy. Only do this if your app is
-			// NOT directly exposed to the internet except through Azure's proxy/ingress.
 			options.KnownIPNetworks.Clear();
 			options.KnownProxies.Clear();
 
-			// Helps prevent header chain abuse; usually 1 is correct for App Service/ACA.
 			options.ForwardLimit = 1;
 		});
 
@@ -59,11 +53,31 @@ public static class ToolkitWebApplication
 
 		applicationStartUp.ConfigureServices(builder.Services);
 
-		builder.Host.ConfigureContainer<ContainerBuilder>(
-			(a, b) => SystemScope.Initialize(b, Settings.ContainerAssemblies)
-		);
+		if (settings.ConfigureDiForBuilder != null)
+		{
+			settings.ConfigureDiForBuilder(builder);
+		}
+		else
+		{
+			builder.Host.UseDefaultServiceProvider(options =>
+			{
+				options.ValidateOnBuild = false;
+				options.ValidateScopes = false;
+			});
+
+			SystemScope.Initialize(builder.Services, Settings.ContainerAssemblies);
+		}
 
 		var app = builder.Build();
+
+		if (settings.ConfigureDiForApp != null)
+		{
+			settings.ConfigureDiForApp(app);
+		}
+		else
+		{
+			SystemScope.SetServiceProvider(app.Services);
+		}
 
 		applicationStartUp.Configure(app, app.Environment, app.Services.GetRequiredService<ILoggerFactory>());
 
@@ -76,7 +90,12 @@ public static class ToolkitWebApplication
 
 		app.MapControllers();
 
-		var thread = SystemScope.Container.Resolve<IThread>();
+		IThread thread;
+
+		using (var scope = app.Services.CreateScope())
+		{
+			thread = scope.ServiceProvider.GetRequiredService<IThread>();
+		}
 
 		thread.Run(async () =>
 		{
@@ -110,32 +129,24 @@ public static class ToolkitWebApplication
 		}
 
 		builder.Services.AddCors(options =>
-		{
 			options.AddPolicy(
 				CorsPolicyName,
 				policy =>
 					policy
-						.WithOrigins(Settings.CorsSevers.ToArray())
+						.WithOrigins([.. Settings.CorsSevers])
 						.AllowAnyHeader()
 						.AllowAnyMethod()
 						.AllowCredentials()
-			);
-		});
+			));
 	}
 
 	private static void AddDefaultCors(WebApplicationBuilder builder)
 	{
 		builder.Services.AddCors(options =>
-		{
 			options.AddPolicy(
 				CorsPolicyName,
-				policy =>
-					policy
-						.AllowAnyOrigin() // Allows all domains
-						.AllowAnyMethod() // Allows all HTTP methods
-						.AllowAnyHeader()
-			);
-		});
+				policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+			));
 	}
 
 	private static void WriteMessage(string message)

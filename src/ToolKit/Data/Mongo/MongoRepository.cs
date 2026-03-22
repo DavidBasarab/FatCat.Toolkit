@@ -19,13 +19,20 @@ public interface IMongoRepository<T> : IDataRepository<T>
 	public Task<T?> GetById(ObjectId id);
 }
 
-public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongoNames mongoNames)
-	: IMongoRepository<T>
+public class MongoRepository<T>(
+	IMongoDataConnection mongoDataConnection,
+	IMongoNames mongoNames,
+	IMongoConnectionInformation connectionInformation
+) : IMongoRepository<T>
 	where T : MongoObject, new()
 {
-	public IMongoCollection<T> Collection { get; set; }
+	public IMongoCollection<T> Collection { get; set; } =
+		mongoDataConnection.GetCollection<T>(
+			connectionInformation.GetConnectionString(),
+			connectionInformation.GetDatabaseName()
+		);
 
-	public string DatabaseName { get; set; } = null!;
+	public string DatabaseName { get; set; } = connectionInformation.GetDatabaseName();
 
 	public void Connect(string? connectionString = null, string? databaseName = null)
 	{

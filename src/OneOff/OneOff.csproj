@@ -18,6 +18,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\FatCat.Toolkit.Autofac\FatCat.Toolkit.Autofac.csproj"/>
         <ProjectReference Include="..\OneOffLib\OneOffLib.csproj"/>
         <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj"/>
         <ProjectReference Include="..\ToolKit\ToolKit.csproj"/>

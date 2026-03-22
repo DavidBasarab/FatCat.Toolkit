@@ -41,9 +41,10 @@ public class AutofacServiceProviderFactory(Action<ContainerBuilder> configuratio
 
 		var container = containerBuilder.Build();
 
-		var systemScope = container.Resolve<ISystemScope>();
-
-		systemScope.LifetimeScope ??= container;
+		if (container.Resolve<ISystemScope>() is SystemScope systemScope)
+		{
+			systemScope.LifetimeScope ??= container;
+		}
 
 		return new AutofacServiceProvider(container);
 	}

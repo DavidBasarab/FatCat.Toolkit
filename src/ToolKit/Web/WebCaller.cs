@@ -267,9 +267,7 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 		{
 			logger.Debug("Adding Basic Authorization");
 
-			var encodedUsernameAndPassword = Convert.ToBase64String(
-				Encoding.UTF8.GetBytes($"{basicUsername}:{basicPassword}")
-			);
+			var encodedUsernameAndPassword = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{basicUsername}:{basicPassword}"));
 
 			request.Headers.Authorization = new AuthenticationHeaderValue("Basic", encodedUsernameAndPassword);
 		}

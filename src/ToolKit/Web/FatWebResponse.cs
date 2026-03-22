@@ -40,50 +40,32 @@ public class FatWebResponse<T> : EqualObject
 
 	public string Content
 	{
-		get
-		{
-			return BaseResponse.Content;
-		}
+		get { return BaseResponse.Content; }
 	}
 
 	public string ContentType
 	{
-		get
-		{
-			return BaseResponse.ContentType;
-		}
+		get { return BaseResponse.ContentType; }
 	}
 
 	public T Data
 	{
-		get
-		{
-			return BaseResponse.IsSuccessful ? BaseResponse.To<T>() : null;
-		}
+		get { return BaseResponse.IsSuccessful ? BaseResponse.To<T>() : null; }
 	}
 
 	public bool IsSuccessful
 	{
-		get
-		{
-			return BaseResponse.IsSuccessful;
-		}
+		get { return BaseResponse.IsSuccessful; }
 	}
 
 	public bool IsUnsuccessful
 	{
-		get
-		{
-			return !IsSuccessful;
-		}
+		get { return !IsSuccessful; }
 	}
 
 	public HttpStatusCode StatusCode
 	{
-		get
-		{
-			return BaseResponse.StatusCode;
-		}
+		get { return BaseResponse.StatusCode; }
 	}
 
 	public FatWebResponse(HttpStatusCode statusCode)
@@ -103,11 +85,7 @@ public class FatWebResponse<T> : EqualObject
 
 	public FatWebResponse(HttpStatusCode statusCode, T data)
 	{
-		BaseResponse = new FatWebResponse
-		{
-			StatusCode = statusCode,
-			Content = new JsonOperations().Serialize(data),
-		};
+		BaseResponse = new FatWebResponse { StatusCode = statusCode, Content = new JsonOperations().Serialize(data) };
 	}
 
 	public override string ToString()
@@ -165,28 +143,19 @@ public class FatWebResponse : EqualObject
 
 			return content;
 		}
-		set
-		{
-			content = value;
-		}
+		set { content = value; }
 	}
 
 	public string ContentType { get; set; } = "application/json; charset=UTF-8";
 
 	public bool IsSuccessful
 	{
-		get
-		{
-			return (int)StatusCode >= 200 && (int)StatusCode <= 299;
-		}
+		get { return (int)StatusCode >= 200 && (int)StatusCode <= 299; }
 	}
 
 	public bool IsUnsuccessful
 	{
-		get
-		{
-			return !IsSuccessful;
-		}
+		get { return !IsSuccessful; }
 	}
 
 	public HttpStatusCode StatusCode { get; set; }

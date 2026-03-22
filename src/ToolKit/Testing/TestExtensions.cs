@@ -43,10 +43,7 @@ public static class TestExtensions
 		configuration.ReturnsNextFromSequence(values.ToArray());
 	}
 
-	public static void ReturnsNextFromSequence<T>(
-		this IReturnValueConfiguration<Task<T>> configuration,
-		List<T> values
-	)
+	public static void ReturnsNextFromSequence<T>(this IReturnValueConfiguration<Task<T>> configuration, List<T> values)
 	{
 		configuration.ReturnsNextFromSequence(values.ToArray());
 	}

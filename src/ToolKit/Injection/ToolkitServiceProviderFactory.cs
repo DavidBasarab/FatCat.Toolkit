@@ -17,8 +17,7 @@ public class AutofacOptions
 	}
 }
 
-public class ToolkitServiceProviderFactory(AutofacOptions autofacOptions)
-	: IServiceProviderFactory<ContainerBuilder>
+public class ToolkitServiceProviderFactory(AutofacOptions autofacOptions) : IServiceProviderFactory<ContainerBuilder>
 {
 	public ContainerBuilder CreateBuilder(IServiceCollection services)
 	{

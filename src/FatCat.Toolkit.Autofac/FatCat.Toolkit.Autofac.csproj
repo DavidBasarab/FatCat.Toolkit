@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<RootNamespace>FatCat.Toolkit.Autofac</RootNamespace>
+		<AssemblyName>FatCat.Toolkit.Autofac</AssemblyName>
+		<DebugType>full</DebugType>
+		<LangVersion>default</LangVersion>
+		<VersionPrefix>1.0.330</VersionPrefix>
+		<Authors>David Basarab</Authors>
+		<PackageTags>tools</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<TargetFramework>net10.0</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);NETSDK1206</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<NoWarn>CS8002,CS1700;IL2121;CS8618;IL2121;CS8603;NU1903</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<NoWarn>CS8002,CS1700;IL2121;CS8618;IL2121;CS8603;NU1903</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Autofac" Version="9.0.0" />
+		<PackageReference Include="CSharpier.MsBuild" Version="1.2.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
+	</ItemGroup>
+</Project>

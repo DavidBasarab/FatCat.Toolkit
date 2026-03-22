@@ -1,12 +1,11 @@
-#nullable enable
 using Autofac;
-using Autofac.Core;
 using FatCat.Toolkit.Data.Mongo;
 using FatCat.Toolkit.Injection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FatCat.Toolkit.Data;
 
-public class DataModule : Module
+public class DataModule : Module, IToolkitModule
 {
 	protected override void Load(ContainerBuilder builder)
 	{
@@ -15,25 +14,17 @@ public class DataModule : Module
 			.As<IMongoConnection>()
 			.SingleInstance();
 
-		builder
-			.RegisterGeneric(typeof(MongoRepository<>))
-			.As(typeof(IMongoRepository<>))
-			.OnActivated(MongoRepositoryActivated);
+		builder.RegisterGeneric(typeof(MongoRepository<>)).As(typeof(IMongoRepository<>));
 
 		builder.RegisterType<EnvironmentConnectionInformation>().As<IMongoConnectionInformation>();
 	}
 
-	private void MongoRepositoryActivated(IActivatedEventArgs<object> args)
+	public void Register(IServiceCollection services)
 	{
-		var connectMethodName = nameof(IMongoRepository<MongoObject>.Connect);
+		services.AddSingleton<IMongoConnection>(new MongoConnection(SystemScope.ContainerAssemblies));
 
-		var connectMethod = args.Instance.GetType().GetMethod(connectMethodName);
+		services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
 
-		var connectionInformation = args.Context.Resolve<IMongoConnectionInformation>();
-
-		var connectionString = connectionInformation.GetConnectionString();
-		var databaseName = connectionInformation.GetDatabaseName();
-
-		connectMethod!.Invoke(args.Instance, new object?[] { connectionString, databaseName });
+		services.AddScoped<IMongoConnectionInformation, EnvironmentConnectionInformation>();
 	}
 }

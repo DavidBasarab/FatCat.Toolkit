@@ -27,10 +27,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 {
 	protected override string Identifier
 	{
-		get
-		{
-			return "Web Results assertions";
-		}
+		get { return "Web Results assertions"; }
 	}
 
 	public FatWebResponseAssertions Be(FatWebResponse expectedResult)
@@ -199,11 +196,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 		return HaveOneOfStatusCode(new[] { statusCode }, because, becauseArgs);
 	}
 
-	public FatWebResponseAssertions WithMessage(
-		string expectedMessage,
-		string? because = null,
-		params object[] becauseArgs
-	)
+	public FatWebResponseAssertions WithMessage(string expectedMessage, string? because = null, params object[] becauseArgs)
 	{
 		Subject.Content.Should().MatchEquivalentOf(expectedMessage, because, becauseArgs);
 

@@ -1,9 +1,10 @@
 using Autofac;
 using FatCat.Toolkit;
+using FatCat.Toolkit.Autofac;
 
 namespace OneOffLib;
 
-public class OneOffModule : Module
+public class OneOffModule : AutofacModule
 {
 	protected override void Load(ContainerBuilder builder)
 	{

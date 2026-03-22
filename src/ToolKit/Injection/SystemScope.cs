@@ -3,27 +3,13 @@ using System.Reflection;
 using Autofac;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 #pragma warning disable CS8767
 
 namespace FatCat.Toolkit.Injection;
 
-public interface ISystemScope
-{
-	public ILifetimeScope LifetimeScope { get; set; }
-
-	public List<Assembly> SystemAssemblies { get; }
-
-	public TItem Resolve<TItem>()
-		where TItem : class;
-
-	public object Resolve(Type type);
-
-	public bool TryResolve(Type type, out object instance);
-
-	public bool TryResolve<TItem>(out TItem instance)
-		where TItem : class;
-}
+public interface ISystemScope : IToolkitServiceFactory { }
 
 public class SystemScope : ISystemScope
 {
@@ -33,24 +19,18 @@ public class SystemScope : ISystemScope
 
 	public static SystemScope Container
 	{
-		get
-		{
-			return instance.Value;
-		}
+		get { return instance.Value; }
 	}
 
 	public static List<Assembly> ContainerAssemblies { get; set; } = defaultAssemblies;
 
+	// Autofac path — unchanged
 	public static void Initialize(ContainerBuilder builder, ScopeOptions options = ScopeOptions.None)
 	{
 		Initialize(builder, defaultAssemblies.ToList(), options);
 	}
 
-	public static void Initialize(
-		ContainerBuilder builder,
-		List<Assembly> assemblies,
-		ScopeOptions options = ScopeOptions.None
-	)
+	public static void Initialize(ContainerBuilder builder, List<Assembly> assemblies, ScopeOptions options = ScopeOptions.None)
 	{
 		EnsureAssembly(assemblies, typeof(IFileSystem).Assembly);
 		EnsureAssembly(assemblies, typeof(SystemScope).Assembly);
@@ -60,64 +40,115 @@ public class SystemScope : ISystemScope
 			ConsoleLog.Write($"    Using assembly {assembly.FullName}");
 		}
 
-		Container.BuildContainer(builder, assemblies);
+		Container.BuildAutofacContainer(builder, assemblies);
 
 		if (options.IsFlagSet(ScopeOptions.SetLifetimeScope))
 		{
 			ConsoleLog.WriteMagenta("Setting lifetime scope");
 
-			Container.LifetimeScope = builder.Build();
+			SetServiceProvider(new AutofacServiceProviderAdapter(builder.Build()));
 		}
 	}
 
-	public ILifetimeScope LifetimeScope { get; set; }
+	// MS DI path — new
+	public static void Initialize(IServiceCollection services, List<Assembly> assemblies)
+	{
+		EnsureAssembly(assemblies, typeof(IFileSystem).Assembly);
+		EnsureAssembly(assemblies, typeof(SystemScope).Assembly);
 
-	public List<Assembly> SystemAssemblies
+		ContainerAssemblies = assemblies;
+
+		foreach (var assembly in assemblies)
+		{
+			ConsoleLog.Write($"    Using assembly {assembly.FullName}");
+		}
+
+		foreach (var module in DiscoverModules(assemblies))
+		{
+			module.Register(services);
+		}
+
+		services.Scan(scan =>
+			scan.FromAssemblies(assemblies)
+				.AddClasses(c => c.Where(t => t.GetConstructors().Any() && !typeof(IToolkitModule).IsAssignableFrom(t)))
+				.UsingRegistrationStrategy(Scrutor.RegistrationStrategy.Skip)
+				.AsImplementedInterfaces()
+				.WithScopedLifetime()
+		);
+
+		services.AddSingleton<IToolkitServiceFactory>(Container);
+		services.AddSingleton<ISystemScope>(Container);
+	}
+
+	public static void SetServiceProvider(IServiceProvider serviceProvider)
+	{
+		Container.provider = serviceProvider;
+	}
+
+	public ILifetimeScope LifetimeScope
 	{
 		get
 		{
-			return ContainerAssemblies;
+			if (provider is AutofacServiceProviderAdapter adapter)
+			{
+				return adapter.LifetimeScope;
+			}
+
+			return null;
 		}
+		set { SetServiceProvider(new AutofacServiceProviderAdapter(value)); }
 	}
+
+	public List<Assembly> SystemAssemblies
+	{
+		get { return ContainerAssemblies; }
+	}
+
+	private IServiceProvider provider;
 
 	private SystemScope() { }
 
 	public TItem Resolve<TItem>()
 		where TItem : class
 	{
-		return LifetimeScope.Resolve<TItem>();
+		return provider.GetRequiredService<TItem>();
 	}
 
 	public object Resolve(Type type)
 	{
-		return LifetimeScope.Resolve(type);
+		return provider.GetRequiredService(type);
 	}
 
 	public bool TryResolve(Type type, out object instance)
 	{
-		if (LifetimeScope == null)
+		if (provider == null)
 		{
 			instance = null;
+
 			return false;
 		}
 
-		return LifetimeScope.TryResolve(type, out instance);
+		instance = provider.GetService(type);
+
+		return instance != null;
 	}
 
 	public bool TryResolve<TItem>(out TItem instance)
 		where TItem : class
 	{
-		if (LifetimeScope != null)
+		if (provider == null)
 		{
-			return LifetimeScope.TryResolve(out instance);
+			instance = null;
+
+			return false;
 		}
 
-		instance = null;
+		instance = provider.GetService<TItem>();
 
-		return false;
+		return instance != null;
 	}
 
-	private void BuildContainer(ContainerBuilder builder, List<Assembly> assemblies)
+	private void BuildAutofacContainer(ContainerBuilder builder, List<Assembly> assemblies)
 	{
 		ContainerAssemblies = assemblies;
 
@@ -135,11 +166,35 @@ public class SystemScope : ISystemScope
 			.AsSelf();
 	}
 
+	private static IEnumerable<IToolkitModule> DiscoverModules(List<Assembly> assemblies)
+	{
+		return assemblies
+			.SelectMany(a => a.GetTypes())
+			.Where(t =>
+				typeof(IToolkitModule).IsAssignableFrom(t)
+				&& t.IsClass
+				&& !t.IsAbstract
+				&& !typeof(IAutofacOnlyModule).IsAssignableFrom(t)
+			)
+			.Select(Activator.CreateInstance)
+			.Cast<IToolkitModule>();
+	}
+
 	private static void EnsureAssembly(List<Assembly> assemblies, Assembly assemblyToEnsure)
 	{
 		if (!assemblies.Contains(assemblyToEnsure))
 		{
 			assemblies.Insert(0, assemblyToEnsure);
+		}
+	}
+
+	private sealed class AutofacServiceProviderAdapter(ILifetimeScope lifetimeScope) : IServiceProvider
+	{
+		public ILifetimeScope LifetimeScope { get; } = lifetimeScope;
+
+		public object GetService(Type serviceType)
+		{
+			return LifetimeScope.ResolveOptional(serviceType);
 		}
 	}
 }

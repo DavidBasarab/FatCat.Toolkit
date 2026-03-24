@@ -15,12 +15,7 @@ public class SecureFatTcpClient(X509Certificate certificate, IFatTcpLogger logge
 
 		var clientCertificateCollection = new X509CertificateCollection(new[] { certificate });
 
-		sslStream.AuthenticateAsClient(
-			certificate.Subject,
-			clientCertificateCollection,
-			SslProtocols.Tls12,
-			false
-		);
+		sslStream.AuthenticateAsClient(certificate.Subject, clientCertificateCollection, SslProtocols.Tls12, false);
 
 		return sslStream;
 	}

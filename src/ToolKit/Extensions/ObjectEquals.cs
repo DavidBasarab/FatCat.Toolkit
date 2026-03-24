@@ -251,14 +251,12 @@ internal static class ObjectEquals
 
 	private static bool ImplementsIDictionary(Type type)
 	{
-		return type.GetInterfaces()
-			.Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+		return type.GetInterfaces().Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDictionary<,>));
 	}
 
 	private static bool ImplementsIEnumerable(Type type)
 	{
-		return type.GetInterfaces()
-			.Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+		return type.GetInterfaces().Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
 	}
 
 	private static bool IsOneNull(object? rhs, object? lhs)

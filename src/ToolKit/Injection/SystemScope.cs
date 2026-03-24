@@ -33,10 +33,7 @@ public class SystemScope : ISystemScope
 
 	public static SystemScope Container
 	{
-		get
-		{
-			return instance.Value;
-		}
+		get { return instance.Value; }
 	}
 
 	public static List<Assembly> ContainerAssemblies { get; set; } = defaultAssemblies;
@@ -46,11 +43,7 @@ public class SystemScope : ISystemScope
 		Initialize(builder, defaultAssemblies.ToList(), options);
 	}
 
-	public static void Initialize(
-		ContainerBuilder builder,
-		List<Assembly> assemblies,
-		ScopeOptions options = ScopeOptions.None
-	)
+	public static void Initialize(ContainerBuilder builder, List<Assembly> assemblies, ScopeOptions options = ScopeOptions.None)
 	{
 		EnsureAssembly(assemblies, typeof(IFileSystem).Assembly);
 		EnsureAssembly(assemblies, typeof(SystemScope).Assembly);
@@ -74,10 +67,7 @@ public class SystemScope : ISystemScope
 
 	public List<Assembly> SystemAssemblies
 	{
-		get
-		{
-			return ContainerAssemblies;
-		}
+		get { return ContainerAssemblies; }
 	}
 
 	private SystemScope() { }

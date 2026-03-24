@@ -35,10 +35,7 @@ public class FifoThreadQueue : IFifoThreadQueue
 
 	public int QueueCount
 	{
-		get
-		{
-			return queue.Count;
-		}
+		get { return queue.Count; }
 	}
 
 	public FifoThreadQueue()

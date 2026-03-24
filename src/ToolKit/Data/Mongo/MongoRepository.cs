@@ -19,8 +19,7 @@ public interface IMongoRepository<T> : IDataRepository<T>
 	public Task<T?> GetById(ObjectId id);
 }
 
-public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongoNames mongoNames)
-	: IMongoRepository<T>
+public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongoNames mongoNames) : IMongoRepository<T>
 	where T : MongoObject, new()
 {
 	public IMongoCollection<T> Collection { get; set; }

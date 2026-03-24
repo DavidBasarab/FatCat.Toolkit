@@ -15,10 +15,7 @@ public class DataModule : Module
 			.As<IMongoConnection>()
 			.SingleInstance();
 
-		builder
-			.RegisterGeneric(typeof(MongoRepository<>))
-			.As(typeof(IMongoRepository<>))
-			.OnActivated(MongoRepositoryActivated);
+		builder.RegisterGeneric(typeof(MongoRepository<>)).As(typeof(IMongoRepository<>)).OnActivated(MongoRepositoryActivated);
 
 		builder.RegisterType<EnvironmentConnectionInformation>().As<IMongoConnectionInformation>();
 	}

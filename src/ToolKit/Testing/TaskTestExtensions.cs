@@ -11,15 +11,11 @@ public static class TaskTestExtensions
 	}
 }
 
-public class TaskTestAssertions<T>(Task<T> subject)
-	: ReferenceTypeAssertions<Task<T>, TaskTestAssertions<T>>(subject)
+public class TaskTestAssertions<T>(Task<T> subject) : ReferenceTypeAssertions<Task<T>, TaskTestAssertions<T>>(subject)
 {
 	protected override string Identifier
 	{
-		get
-		{
-			return "Task Test Assertions";
-		}
+		get { return "Task Test Assertions"; }
 	}
 
 	public TaskTestAssertions<T> Be(T expectedValue)

@@ -82,11 +82,7 @@ public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger log
 		return await WaitForResponse(message, timeout, sessionId);
 	}
 
-	public async Task<ToolkitMessage> SendDataBuffer(
-		ToolkitMessage message,
-		byte[] dataBuffer,
-		TimeSpan? timeout = null
-	)
+	public async Task<ToolkitMessage> SendDataBuffer(ToolkitMessage message, byte[] dataBuffer, TimeSpan? timeout = null)
 	{
 		timeout ??= 30.Seconds();
 
@@ -163,12 +159,7 @@ public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger log
 		return Task.CompletedTask;
 	}
 
-	private async Task OnServerOriginatedDataBufferMessage(
-		int messageType,
-		string sessionId,
-		string data,
-		byte[] bufferData
-	)
+	private async Task OnServerOriginatedDataBufferMessage(int messageType, string sessionId, string data, byte[] bufferData)
 	{
 		logger.Debug(new string('-', 80));
 
@@ -184,12 +175,7 @@ public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger log
 
 		if (response is not null)
 		{
-			await connection.SendAsync(
-				nameof(ToolkitHubMethodNames.ClientResponseMessage),
-				messageType,
-				sessionId,
-				response
-			);
+			await connection.SendAsync(nameof(ToolkitHubMethodNames.ClientResponseMessage), messageType, sessionId, response);
 		}
 	}
 
@@ -197,9 +183,7 @@ public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger log
 	{
 		logger.Debug(new string('-', 80));
 
-		logger.Debug(
-			$"OnServerOriginatedMessage | MessageType <{messageType}> | SessionId <{sessionId}> | Data <{data}>"
-		);
+		logger.Debug($"OnServerOriginatedMessage | MessageType <{messageType}> | SessionId <{sessionId}> | Data <{data}>");
 
 		logger.Debug(new string('-', 80));
 
@@ -209,20 +193,13 @@ public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger log
 
 		if (response is not null)
 		{
-			await connection.SendAsync(
-				nameof(ToolkitHubMethodNames.ClientResponseMessage),
-				messageType,
-				sessionId,
-				response
-			);
+			await connection.SendAsync(nameof(ToolkitHubMethodNames.ClientResponseMessage), messageType, sessionId, response);
 		}
 	}
 
 	private void OnServerResponseMessageReceived(int messageType, string sessionId, string data)
 	{
-		logger.Debug(
-			$"On ServerMessageReceived | MessageType <{messageType}> | SessionId <{sessionId}> | Data <{data}>"
-		);
+		logger.Debug($"On ServerMessageReceived | MessageType <{messageType}> | SessionId <{sessionId}> | Data <{data}>");
 
 		if (timedOutResponses.TryRemove(sessionId, out _))
 		{
@@ -280,9 +257,7 @@ public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger log
 
 			if (DateTime.UtcNow - startTime > timeout)
 			{
-				logger.Debug(
-					$"!!!! Timing out for | MessageType <{message.MessageType}> | SessionId <{sessionId}>"
-				);
+				logger.Debug($"!!!! Timing out for | MessageType <{message.MessageType}> | SessionId <{sessionId}>");
 
 				timedOutResponses.TryAdd(sessionId, message.MessageType);
 

@@ -40,7 +40,6 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="DebounceThrottle" Version="3.0.1" />
-		<PackageReference Include="DeepCloner" Version="0.10.4" />
 		<PackageReference Include="FakeItEasy" Version="9.0.1" />
 		<PackageReference Include="fasterflect" Version="3.0.0" />
 		<PackageReference Include="FatCat.Fakes" Version="1.0.31" />

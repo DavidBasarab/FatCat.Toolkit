@@ -27,12 +27,7 @@ public abstract class FatTcpClient(IFatTcpLogger logger, IThread thread)
 
 	public event TcpMessageReceived TcpMessageReceivedEvent;
 
-	public async Task Connect(
-		string host,
-		ushort port,
-		int bufferSize = 1024,
-		CancellationToken cancellationToken = default
-	)
+	public async Task Connect(string host, ushort port, int bufferSize = 1024, CancellationToken cancellationToken = default)
 	{
 		this.host = host;
 		this.port = port;

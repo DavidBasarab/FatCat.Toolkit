@@ -23,26 +23,17 @@ public class EasyCapture<T>
 
 	public bool HasValues
 	{
-		get
-		{
-			return values.Any();
-		}
+		get { return values.Any(); }
 	}
 
 	public T Value
 	{
-		get
-		{
-			return values.First();
-		}
+		get { return values.First(); }
 	}
 
 	public IReadOnlyList<T> Values
 	{
-		get
-		{
-			return values.AsReadOnly();
-		}
+		get { return values.AsReadOnly(); }
 	}
 
 	private void CaptureValue(T value)

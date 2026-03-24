@@ -265,8 +265,7 @@ public static class StringExtensions
 
 			if (startingHereWithHexDoesNotGoPastEndOfString)
 			{
-				var nextTwoCharactersPossiblyIndicateHex =
-					value[currentPosition] == '0' && value[currentPosition + 1] == 'x';
+				var nextTwoCharactersPossiblyIndicateHex = value[currentPosition] == '0' && value[currentPosition + 1] == 'x';
 
 				if (nextTwoCharactersPossiblyIndicateHex)
 				{

@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace FatCat.Toolkit.Extensions;
 
 public static class ObjectExtensions
@@ -12,8 +10,6 @@ public static class ObjectExtensions
 			return null;
 		}
 
-		var bytes = JsonSerializer.SerializeToUtf8Bytes(objectToCopy);
-
-		return JsonSerializer.Deserialize<T>(bytes);
+		return DeepCopyFactory.Get().Copy(objectToCopy);
 	}
 }

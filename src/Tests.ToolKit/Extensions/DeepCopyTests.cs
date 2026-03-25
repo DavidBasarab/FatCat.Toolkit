@@ -41,6 +41,44 @@ public class DeepCopyTests
 		copy.Should().BeEquivalentTo(original);
 	}
 
+	[Fact]
+	public void CanDeepCopyObjectWithAbstractProperty()
+	{
+		var concreteInput = new ConcreteInput { Name = "HDMI-1", Port = 42 };
+
+		var original = new ObjectWithAbstractProperty
+		{
+			Label = "Test Device",
+			Input = concreteInput,
+		};
+
+		var copy = original.DeepCopy();
+
+		copy.Should().BeEquivalentTo(original);
+		copy.Input.Should().BeOfType<ConcreteInput>();
+		copy.Input.Should().NotBeSameAs(original.Input);
+	}
+
+	[Fact]
+	public void CanDeepCopyListOfAbstractTypes()
+	{
+		var original = new ObjectWithAbstractList
+		{
+			Inputs = new List<AbstractInput>
+			{
+				new ConcreteInput { Name = "HDMI-1", Port = 1 },
+				new AnotherConcreteInput { Name = "SDI-1", Channel = 7 },
+			},
+		};
+
+		var copy = original.DeepCopy();
+
+		copy.Should().BeEquivalentTo(original);
+		copy.Inputs[0].Should().BeOfType<ConcreteInput>();
+		copy.Inputs[1].Should().BeOfType<AnotherConcreteInput>();
+		copy.Inputs.Should().NotBeSameAs(original.Inputs);
+	}
+
 	public class ObjectToCopy : EqualObject
 	{
 		public DateTime ADate { get; set; }
@@ -72,5 +110,32 @@ public class DeepCopyTests
 	public class SubSubObject : EqualObject
 	{
 		public string Name { get; set; }
+	}
+
+	public abstract class AbstractInput
+	{
+		public string Name { get; set; }
+	}
+
+	public class ConcreteInput : AbstractInput
+	{
+		public int Port { get; set; }
+	}
+
+	public class AnotherConcreteInput : AbstractInput
+	{
+		public int Channel { get; set; }
+	}
+
+	public class ObjectWithAbstractProperty
+	{
+		public string Label { get; set; }
+
+		public AbstractInput Input { get; set; }
+	}
+
+	public class ObjectWithAbstractList
+	{
+		public List<AbstractInput> Inputs { get; set; }
 	}
 }

@@ -47,6 +47,16 @@ public class ReflectionDeepCopy : IDeepCopy
 			return CloneArray((Array)source, visited);
 		}
 
+		if (IsDictionary(sourceType))
+		{
+			return CloneDictionary((IDictionary)source, sourceType, visited);
+		}
+
+		if (IsList(sourceType))
+		{
+			return CloneList((IList)source, sourceType, visited);
+		}
+
 		var clone = memberwiseCloneMethod.Invoke(source, null);
 
 		visited[source] = clone;
@@ -110,6 +120,47 @@ public class ReflectionDeepCopy : IDeepCopy
 		}
 
 		return clonedArray;
+	}
+
+	private object CloneList(IList sourceList, Type sourceType, Dictionary<object, object> visited)
+	{
+		var clonedList = (IList)Activator.CreateInstance(sourceType);
+
+		visited[sourceList] = clonedList;
+
+		foreach (var item in sourceList)
+		{
+			clonedList.Add(CloneObject(item, visited));
+		}
+
+		return clonedList;
+	}
+
+	private object CloneDictionary(IDictionary sourceDictionary, Type sourceType, Dictionary<object, object> visited)
+	{
+		var clonedDictionary = (IDictionary)Activator.CreateInstance(sourceType);
+
+		visited[sourceDictionary] = clonedDictionary;
+
+		foreach (DictionaryEntry entry in sourceDictionary)
+		{
+			var clonedKey = CloneObject(entry.Key, visited);
+			var clonedValue = CloneObject(entry.Value, visited);
+
+			clonedDictionary.Add(clonedKey, clonedValue);
+		}
+
+		return clonedDictionary;
+	}
+
+	private bool IsList(Type type)
+	{
+		return typeof(IList).IsAssignableFrom(type);
+	}
+
+	private bool IsDictionary(Type type)
+	{
+		return typeof(IDictionary).IsAssignableFrom(type);
 	}
 
 	private bool IsImmutableType(Type type)

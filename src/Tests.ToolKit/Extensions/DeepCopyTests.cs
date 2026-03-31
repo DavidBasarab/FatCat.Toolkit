@@ -79,6 +79,79 @@ public class DeepCopyTests
 		copy.Inputs.Should().NotBeSameAs(original.Inputs);
 	}
 
+	[Fact]
+	public void ModifyingCopyDoesNotAffectOriginalSubObject()
+	{
+		var original = Faker.Create<ObjectToCopy>();
+		var originalName = original.SubObject.Name;
+
+		var copy = original.DeepCopy();
+
+		copy.SubObject.Name = "CHANGED";
+
+		original.SubObject.Name.Should().Be(originalName);
+	}
+
+	[Fact]
+	public void ModifyingCopyDoesNotAffectOriginalList()
+	{
+		var original = Faker.Create<ObjectToCopy>();
+		var originalCount = original.List.Count;
+
+		var copy = original.DeepCopy();
+
+		copy.List.Add(new SubObject { Name = "New Item", Number = 999 });
+
+		original.List.Count.Should().Be(originalCount);
+	}
+
+	[Fact]
+	public void ModifyingCopyListElementDoesNotAffectOriginal()
+	{
+		var original = Faker.Create<ObjectToCopy>();
+		var originalFirstItemName = original.List[0].Name;
+
+		var copy = original.DeepCopy();
+
+		copy.List[0].Name = "CHANGED";
+
+		original.List[0].Name.Should().Be(originalFirstItemName);
+	}
+
+	[Fact]
+	public void CopiedObjectReferencesAreNotSameAsOriginal()
+	{
+		var original = Faker.Create<ObjectToCopy>();
+
+		var copy = original.DeepCopy();
+
+		copy.Should().NotBeSameAs(original);
+		copy.SubObject.Should().NotBeSameAs(original.SubObject);
+		copy.List.Should().NotBeSameAs(original.List);
+		copy.Numbers.Should().NotBeSameAs(original.Numbers);
+	}
+
+	[Fact]
+	public void ModifyingCopyAbstractListElementDoesNotAffectOriginal()
+	{
+		var original = new ObjectWithAbstractList
+		{
+			Inputs = new List<AbstractInput>
+			{
+				new ConcreteInput { Name = "HDMI-1", Port = 1 },
+				new AnotherConcreteInput { Name = "SDI-1", Channel = 7 },
+			},
+		};
+
+		var copy = original.DeepCopy();
+
+		copy.Inputs[0].Name = "CHANGED";
+		((AnotherConcreteInput)copy.Inputs[1]).Channel = 999;
+
+		original.Inputs[0].Name.Should().Be("HDMI-1");
+		((AnotherConcreteInput)original.Inputs[1]).Channel.Should().Be(7);
+	}
+
 	public class ObjectToCopy : EqualObject
 	{
 		public DateTime ADate { get; set; }

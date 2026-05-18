@@ -11,11 +11,12 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <NoWarn>$(NoWarn);NETSDK1206</NoWarn>
+        <NoWarn>$(NoWarn);NETSDK1206;NU1902;NU1903</NoWarn>
+        <NuGetAuditMode>direct</NuGetAuditMode>
     </PropertyGroup>
 
     <ItemGroup>
-        <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true"/>
+        <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
     </ItemGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -33,13 +34,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj"/>
-        <ProjectReference Include="..\ToolKit\ToolKit.csproj"/>
+        <ProjectReference Include="..\Toolkit.WebServer\Toolkit.WebServer.csproj" />
+        <ProjectReference Include="..\ToolKit\ToolKit.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Identity" Version="1.17.1"/>
-        <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0"/>
+        <PackageReference Include="Azure.Identity" Version="1.21.0" />
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.28.0" />
     </ItemGroup>
 
 </Project>

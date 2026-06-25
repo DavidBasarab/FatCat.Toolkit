@@ -11,7 +11,7 @@ public class AesKeyGeneratorTests
 
 	public AesKeyGeneratorTests()
 	{
-		A.CallTo(() => generator.Bytes(A<int>._)).Returns(createdBytes);
+		A.CallTo(() => generator.CsprngBytes(A<int>._)).Returns(createdBytes);
 
 		keyGenerator = new AesKeyGenerator(generator);
 	}
@@ -25,11 +25,11 @@ public class AesKeyGeneratorTests
 	}
 
 	[Fact]
-	public void WillCreateBytesForIv()
+	public void WillCreateCryptographicBytesForIv()
 	{
 		keyGenerator.CreateIv();
 
-		A.CallTo(() => generator.Bytes(12)).MustHaveHappened();
+		A.CallTo(() => generator.CsprngBytes(12)).MustHaveHappened();
 	}
 
 	[Theory]
@@ -40,7 +40,7 @@ public class AesKeyGeneratorTests
 	{
 		keyGenerator.CreateKey(keySize);
 
-		A.CallTo(() => generator.Bytes(expectedSize)).MustHaveHappened();
+		A.CallTo(() => generator.CsprngBytes(expectedSize)).MustHaveHappened();
 	}
 
 	[Fact]

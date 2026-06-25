@@ -18,6 +18,22 @@ public class GeneratorTests
 	}
 
 	[Fact]
+	public void CsprngBytesLengthIsCorrect()
+	{
+		var bytes = generator.CsprngBytes(32);
+
+		bytes.Should().HaveCount(32);
+	}
+
+	[Fact]
+	public void CsprngBytesProducesDistinctValues()
+	{
+		var results = Enumerable.Range(0, 100).Select(_ => Convert.ToBase64String(generator.CsprngBytes(32)));
+
+		results.Should().OnlyHaveUniqueItems();
+	}
+
+	[Fact]
 	public void CanGenerateALargeByteArrayQuickly()
 	{
 		var testSizeInMb = 113;

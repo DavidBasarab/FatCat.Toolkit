@@ -11,12 +11,12 @@ public class AesKeyGenerator(IGenerator generator) : IAesKeyGenerator
 {
 	public byte[] CreateIv()
 	{
-		// AES-GCM standard 96-bit nonce (12 bytes)
-		return generator.Bytes(12).ToArray();
+		// AES-GCM standard 96-bit nonce (12 bytes), drawn from a cryptographically secure RNG
+		return generator.CsprngBytes(12);
 	}
 
 	public byte[] CreateKey(AesKeySize keySize)
 	{
-		return generator.Bytes((int)keySize / 8).ToArray();
+		return generator.CsprngBytes((int)keySize / 8);
 	}
 }

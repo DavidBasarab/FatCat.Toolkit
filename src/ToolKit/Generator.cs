@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using FatCat.Fakes;
 using MongoDB.Bson;
 
@@ -6,6 +7,8 @@ namespace FatCat.Toolkit;
 public interface IGenerator
 {
 	public IEnumerable<byte> Bytes(int length);
+
+	public byte[] CsprngBytes(int length);
 
 	public bool IsValidObjectId(string idToTest);
 
@@ -27,6 +30,11 @@ public class Generator : IGenerator
 	public IEnumerable<byte> Bytes(int length)
 	{
 		return Faker.RandomBytes(length);
+	}
+
+	public byte[] CsprngBytes(int length)
+	{
+		return RandomNumberGenerator.GetBytes(length);
 	}
 
 	public bool IsValidObjectId(string idToTest)

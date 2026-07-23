@@ -1,5 +1,6 @@
-using FluentAssertions;
-using FluentAssertions.Primitives;
+using FatCat.Testing;
+using FatCat.Testing.Comparers;
+using FatCat.Testing.Objects;
 
 namespace FatCat.Toolkit.Testing;
 
@@ -20,24 +21,24 @@ public static class FatResultAssertionsExtensions
 	}
 }
 
-public class FatResultAssertions<T>(FatResult<T> subject)
-	: ReferenceTypeAssertions<FatResult<T>, FatResultAssertions<T>>(subject)
+public class FatResultAssertions<T>(FatResult<T> subject) : ComparerBase<FatResult<T>, FatResultAssertions<T>>(subject)
+	where T : class
 {
-	protected override string Identifier
+	private ObjectComparer<FatResult<T>> SubjectAsObject
 	{
-		get { return "FatResultAssertions"; }
+		get { return new ObjectComparer<FatResult<T>>(Subject); }
 	}
 
 	public FatResultAssertions<T> Be(FatResult<T> expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		SubjectAsObject.BeEquivalentTo(expectedResult);
 
 		return this;
 	}
 
 	public FatResultAssertions<T> Be(T expectedValue)
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		Subject.Data.Should().BeEquivalentTo(expectedValue);
 
@@ -46,7 +47,7 @@ public class FatResultAssertions<T>(FatResult<T> subject)
 
 	public FatResultAssertions<T> BeSuccessful()
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		Subject.IsSuccessful.Should().BeTrue();
 
@@ -55,7 +56,7 @@ public class FatResultAssertions<T>(FatResult<T> subject)
 
 	public FatResultAssertions<T> BeUnsuccessful()
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		Subject.IsUnsuccessful.Should().BeTrue();
 

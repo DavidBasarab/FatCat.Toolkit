@@ -1,7 +1,7 @@
 using FakeItEasy;
 using FakeItEasy.Configuration;
+using FatCat.Testing.Objects;
 using FatCat.Toolkit.Threading;
-using FluentAssertions;
 
 namespace FatCat.Toolkit.Testing;
 
@@ -11,7 +11,7 @@ public static class TestExtensions
 	{
 		bool Matcher(T matchItem)
 		{
-			matchItem.Should().Be(expectedItem);
+			new ObjectComparer<object>(matchItem!).Be(expectedItem!);
 
 			return true;
 		}

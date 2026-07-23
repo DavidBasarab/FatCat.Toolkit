@@ -37,7 +37,7 @@ public class GetByIdTests : EnsureCollectionTests
 			)
 			.MustHaveHappened();
 
-		expressionCapture.Value.Should().NotBeNull();
+		expressionCapture.Value.Should().Not.BeNull();
 
 		var filter = expressionCapture.Value.Expression.Compile();
 

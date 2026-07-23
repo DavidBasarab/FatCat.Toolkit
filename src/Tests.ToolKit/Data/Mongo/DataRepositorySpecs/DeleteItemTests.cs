@@ -18,7 +18,7 @@ public class DeleteItemTests : EnsureCollectionTests
 		A.CallTo(() => collection.DeleteOneAsync(A<ExpressionFilterDefinition<TestingMongoObject>>._, default))
 			.MustHaveHappened();
 
-		filterCapture.Value.Should().NotBeNull();
+		filterCapture.Value.Should().Not.BeNull();
 
 		var filter = filterCapture.Value.Expression.Compile();
 

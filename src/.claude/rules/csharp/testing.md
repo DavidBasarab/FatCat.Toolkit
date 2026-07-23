@@ -19,7 +19,7 @@
 ## Test Stack
 - Framework: xUnit
 - Faking: FakeItEasy (`A.Fake<T>()`, `A.CallTo()`)
-- Assertions: FluentAssertions (`.Should()`, `.BeOk()`, `.BePost()`)
+- Assertions: FatCat.Testing (`.Should()`, `.BeOk()`, `.BePost()`) — negation is the `Not` property (`.Should().Not.BeNull()`), never a `NotXxx` method
 - Base class: `BddBase` — always use the non-generic form. Do not use `BddBase<T>`.
 - Thread substitute: `FakeThread` (runs IThread operations synchronously in tests)
 - Test data: `Faker.Create<T>()` for generating test objects — do not hard-code values
@@ -32,7 +32,7 @@ Each test project has a single `GlobalUsings.cs` file that declares `global usin
 global using System.Threading.Tasks;
 global using FakeItEasy;
 global using FatCat.Fakes;
-global using FluentAssertions;
+global using FatCat.Testing;
 global using Haivision.Tests;
 global using Xunit;
 ```

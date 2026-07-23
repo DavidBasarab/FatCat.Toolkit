@@ -90,7 +90,7 @@ public class GetTests : FileSystemRepositoryTests
 	{
 		await repository.Get();
 
-		repository.Data.Should().NotBeNull();
+		repository.Data.Should().Not.BeNull();
 
 		repository.Data.Should().Be(testObject);
 	}

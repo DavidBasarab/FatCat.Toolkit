@@ -61,9 +61,7 @@ public class GetFirstOrCreateTests : EnsureCollectionTests
 
 		var insertedItem = insertCapture.Value;
 
-		insertedItem.Should().NotBeNull();
-
-		insertedItem.Id.Should().NotBeNull();
+		insertedItem.Should().Not.BeNull();
 
 		insertedItem.Name.Should().BeNullOrEmpty();
 

@@ -108,6 +108,6 @@ public class FatCatAesEncryptionTests
 
 		var encryptedData = await encryption.Encrypt(openData, key, iv);
 
-		encryptedData.Should().NotBeEquivalentTo(openData);
+		encryptedData.Should().Not.BeEquivalentTo(openData);
 	}
 }

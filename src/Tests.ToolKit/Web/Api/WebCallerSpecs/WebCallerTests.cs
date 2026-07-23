@@ -32,7 +32,7 @@ public abstract class WebCallerTests
 	{
 		await MakeCall(BasicPath);
 
-		response.QueryParameters.Should().BeEmpty();
+		response.QueryParameters.Count.Should().Be(0);
 	}
 
 	[Fact]

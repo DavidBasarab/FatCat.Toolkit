@@ -15,7 +15,7 @@ public class CallsWithMorePathInUri
 
 		var expectedFullUrl = GetExpectedUrl(endingPath);
 
-		webCaller.GetFullUrl(endingPath).Should().Be(expectedFullUrl);
+		webCaller.GetFullUrl(endingPath).ToString().Should().Be(expectedFullUrl);
 	}
 
 	[Theory]

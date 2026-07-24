@@ -1,9 +1,10 @@
 #nullable enable
 using System.Net;
+using FatCat.Testing;
+using FatCat.Testing.Comparers;
+using FatCat.Testing.Objects;
+using FatCat.Testing.Strings;
 using FatCat.Toolkit.Web;
-using FluentAssertions;
-using FluentAssertions.Equivalency;
-using FluentAssertions.Primitives;
 
 namespace FatCat.Toolkit.Testing;
 
@@ -22,26 +23,25 @@ public static class FatCatWebResponseAssertionsExtensions
 	}
 }
 
-public class FatWebResponseAssertions(FatWebResponse result)
-	: ReferenceTypeAssertions<FatWebResponse, FatWebResponseAssertions>(result)
+public class FatWebResponseAssertions(FatWebResponse result) : ComparerBase<FatWebResponse, FatWebResponseAssertions>(result)
 {
-	protected override string Identifier
+	private ObjectComparer<FatWebResponse> SubjectAsObject
 	{
-		get { return "Web Results assertions"; }
+		get { return new ObjectComparer<FatWebResponse>(Subject); }
 	}
 
 	public FatWebResponseAssertions Be(FatWebResponse expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		SubjectAsObject.BeEquivalentTo(expectedResult);
 
 		return this;
 	}
 
 	public FatWebResponseAssertions Be<T>(T expectedValue)
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
-		Subject.To<T>().Should().BeEquivalentTo(expectedValue);
+		new ObjectComparer<object>(Subject.To<T>()!).BeEquivalentTo(expectedValue!);
 
 		return this;
 	}
@@ -58,7 +58,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions BeEmptyListOf<T>()
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		var list = Subject.To<List<T>>();
 
@@ -69,14 +69,14 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions BeEquivalentTo(FatWebResponse expectedResult)
 	{
-		new ObjectAssertions(Subject).BeEquivalentTo(expectedResult);
+		SubjectAsObject.BeEquivalentTo(expectedResult);
 
 		return this;
 	}
 
 	public FatWebResponseAssertions BeEquivalentTo<T>(T expectedValue)
 	{
-		Subject.To<T>().Should().BeEquivalentTo(expectedValue);
+		new ObjectComparer<object>(Subject.To<T>()!).BeEquivalentTo(expectedValue!);
 
 		return this;
 	}
@@ -93,12 +93,12 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions BeOk()
 	{
-		return HaveOneOfStatusCode(new[] { HttpStatusCode.OK, HttpStatusCode.NoContent });
+		return HaveOneOfStatusCode([HttpStatusCode.OK, HttpStatusCode.NoContent]);
 	}
 
 	public FatWebResponseAssertions BeSuccessful()
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		Subject.IsSuccessful.Should().BeTrue(Subject.Content);
 
@@ -112,7 +112,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions BeUnsuccessful()
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		Subject.IsUnsuccessful.Should().BeTrue(Subject.Content);
 
@@ -121,7 +121,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions For<T>(Action<T> action)
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		action(Subject.To<T>()!);
 
@@ -130,7 +130,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions ForList<T>(Action<List<T>> action)
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		action(Subject.To<List<T>>()!);
 
@@ -139,7 +139,7 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions HaveContent(string content)
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		Subject.Content.Should().Be(content);
 
@@ -148,34 +148,21 @@ public class FatWebResponseAssertions(FatWebResponse result)
 
 	public FatWebResponseAssertions HaveContentEquivalentTo<TContentType>(TContentType expectedContent)
 	{
-		return HaveContentEquivalentTo(expectedContent, config => config);
-	}
+		SubjectAsObject.Not.BeNull("FatWebResponse should never be null");
 
-	public FatWebResponseAssertions HaveContentEquivalentTo<TContentType>(
-		TContentType expectedContent,
-		Func<EquivalencyAssertionOptions<TContentType>, EquivalencyAssertionOptions<TContentType>> config
-	)
-	{
-		Subject.Should().NotBeNull("FatWebResponse should never be null");
+		HaveStatusCode(
+			HttpStatusCode.OK,
+			$"you cannot test for content from an unsuccessful status code: {Subject.StatusCode}"
+		);
 
-		Subject
-			.Should()
-			.HaveStatusCode(
-				HttpStatusCode.OK,
-				"you cannot test for content from an unsuccessful status code: {0}",
-				Subject.StatusCode
-			);
-
-		var actualContent = Subject.To<TContentType>();
-
-		actualContent.Should().BeEquivalentTo(expectedContent);
+		new ObjectComparer<object>(Subject.To<TContentType>()!).BeEquivalentTo(expectedContent!);
 
 		return this;
 	}
 
 	public FatWebResponseAssertions HaveContentTypeOf(string contentType)
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
 		Subject.ContentType.Should().Be(contentType);
 
@@ -187,31 +174,23 @@ public class FatWebResponseAssertions(FatWebResponse result)
 		return HaveStatusCode(HttpStatusCode.NoContent);
 	}
 
-	public FatWebResponseAssertions HaveStatusCode(
-		HttpStatusCode statusCode,
-		string? because = null,
-		params object[] becauseArgs
-	)
+	public FatWebResponseAssertions HaveStatusCode(HttpStatusCode statusCode, string? because = null)
 	{
-		return HaveOneOfStatusCode(new[] { statusCode }, because, becauseArgs);
+		return HaveOneOfStatusCode([statusCode], because);
 	}
 
-	public FatWebResponseAssertions WithMessage(string expectedMessage, string? because = null, params object[] becauseArgs)
+	public FatWebResponseAssertions WithMessage(string expectedMessage, string? because = null)
 	{
-		Subject.Content.Should().MatchEquivalentOf(expectedMessage, because, becauseArgs);
+		Subject.Content.Should().Match(expectedMessage, Options.IgnoreCase, because);
 
 		return this;
 	}
 
-	private FatWebResponseAssertions HaveOneOfStatusCode(
-		HttpStatusCode[] acceptableStatusCodes,
-		string? because = null,
-		params object[] becauseArgs
-	)
+	private FatWebResponseAssertions HaveOneOfStatusCode(HttpStatusCode[] acceptableStatusCodes, string? because = null)
 	{
-		Subject.Should().NotBeNull();
+		SubjectAsObject.Not.BeNull();
 
-		Subject.StatusCode.Should().BeOneOf(acceptableStatusCodes, because, becauseArgs);
+		Subject.StatusCode.Should().BeOneOf(acceptableStatusCodes, because);
 
 		return this;
 	}

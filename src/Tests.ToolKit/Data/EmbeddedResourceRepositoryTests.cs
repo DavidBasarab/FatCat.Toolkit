@@ -17,7 +17,7 @@ public class EmbeddedResourceRepositoryTests
 	{
 		var stream = repository.GetStream(GetType().Assembly, ValidResourceName);
 
-		stream.Should().NotBeNull();
+		stream.Should().Not.BeNull();
 
 		var streamReader = new StreamReader(stream);
 

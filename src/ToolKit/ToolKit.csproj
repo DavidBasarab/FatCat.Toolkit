@@ -6,7 +6,7 @@
 		<AssemblyName>FatCat.Toolkit</AssemblyName>
 		<DebugType>full</DebugType>
 		<LangVersion>default</LangVersion>
-    <VersionPrefix>1.0.340</VersionPrefix>
+		<VersionPrefix>1.0.340</VersionPrefix>
 		<Authors>David Basarab</Authors>
 		<PackageTags>tools</PackageTags>
 		<PackageProjectUrl>https://github.com/DavidBasarab/FatCat.Toolkit</PackageProjectUrl>
@@ -48,7 +48,7 @@
 		<PackageReference Include="FakeItEasy" Version="9.0.1" />
 		<PackageReference Include="fasterflect" Version="3.0.0" />
 		<PackageReference Include="FatCat.Fakes" Version="1.0.31" />
-		<PackageReference Include="FluentAssertions" Version="7.0.0" />
+		<PackageReference Include="FatCat.Testing" Version="1.0.2" />
 		<PackageReference Include="Humanizer.Core" Version="3.0.10" />
 		<PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.10" />

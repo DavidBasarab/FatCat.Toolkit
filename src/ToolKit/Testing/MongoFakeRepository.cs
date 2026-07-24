@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using FakeItEasy;
 using FatCat.Fakes;
+using FatCat.Testing;
 using FatCat.Toolkit.Data.Mongo;
-using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -194,7 +194,7 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 
 	public void VerifyGetByFilterByItemFalse(T item)
 	{
-		FilterCapture.Value.Should().NotBeNull();
+		FilterCapture.Value.Should().Not.BeNull();
 
 		var compliedExpression = FilterCapture.Value.Compile();
 
@@ -203,7 +203,7 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 
 	public void VerifyGetByFilterByItemTrue(T item)
 	{
-		FilterCapture.Value.Should().NotBeNull();
+		FilterCapture.Value.Should().Not.BeNull();
 
 		var compliedExpression = FilterCapture.Value.Compile();
 

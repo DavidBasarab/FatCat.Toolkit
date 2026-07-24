@@ -56,7 +56,7 @@ public class DeepCopyTests
 
 		copy.Should().BeEquivalentTo(original);
 		copy.Input.Should().BeOfType<ConcreteInput>();
-		copy.Input.Should().NotBeSameAs(original.Input);
+		copy.Input.Should().Not.BeSameAs(original.Input);
 	}
 
 	[Fact]
@@ -76,7 +76,7 @@ public class DeepCopyTests
 		copy.Should().BeEquivalentTo(original);
 		copy.Inputs[0].Should().BeOfType<ConcreteInput>();
 		copy.Inputs[1].Should().BeOfType<AnotherConcreteInput>();
-		copy.Inputs.Should().NotBeSameAs(original.Inputs);
+		((object)copy.Inputs).Should().Not.BeSameAs(original.Inputs);
 	}
 
 	[Fact]
@@ -125,10 +125,10 @@ public class DeepCopyTests
 
 		var copy = original.DeepCopy();
 
-		copy.Should().NotBeSameAs(original);
-		copy.SubObject.Should().NotBeSameAs(original.SubObject);
-		copy.List.Should().NotBeSameAs(original.List);
-		copy.Numbers.Should().NotBeSameAs(original.Numbers);
+		copy.Should().Not.BeSameAs(original);
+		copy.SubObject.Should().Not.BeSameAs(original.SubObject);
+		((object)copy.List).Should().Not.BeSameAs(original.List);
+		((object)copy.Numbers).Should().Not.BeSameAs(original.Numbers);
 	}
 
 	[Fact]

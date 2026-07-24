@@ -1,5 +1,5 @@
-using FluentAssertions;
-using FluentAssertions.Primitives;
+using FatCat.Testing.Comparers;
+using FatCat.Testing.Objects;
 
 namespace FatCat.Toolkit.Testing;
 
@@ -11,37 +11,37 @@ public static class TaskTestExtensions
 	}
 }
 
-public class TaskTestAssertions<T>(Task<T> subject) : ReferenceTypeAssertions<Task<T>, TaskTestAssertions<T>>(subject)
+public class TaskTestAssertions<T>(Task<T> subject) : ComparerBase<Task<T>, TaskTestAssertions<T>>(subject)
 {
-	protected override string Identifier
+	private ObjectComparer<object> ResultAsObject
 	{
-		get { return "Task Test Assertions"; }
+		get { return new ObjectComparer<object>(Subject.Result!); }
 	}
 
 	public TaskTestAssertions<T> Be(T expectedValue)
 	{
-		Subject.Result.Should().Be(expectedValue);
+		ResultAsObject.Be(expectedValue!);
 
 		return this;
 	}
 
 	public TaskTestAssertions<T> BeEquivalentTo(T expectedValue)
 	{
-		Subject.Result.Should().BeEquivalentTo(expectedValue);
+		ResultAsObject.BeEquivalentTo(expectedValue!);
 
 		return this;
 	}
 
 	public TaskTestAssertions<T> BeFalse()
 	{
-		Subject.Result.Should().Be(false);
+		ResultAsObject.Be(false);
 
 		return this;
 	}
 
 	public TaskTestAssertions<T> BeTrue()
 	{
-		Subject.Result.Should().Be(true);
+		ResultAsObject.Be(true);
 
 		return this;
 	}

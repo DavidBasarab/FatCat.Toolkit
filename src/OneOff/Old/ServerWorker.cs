@@ -34,6 +34,7 @@ public class ServerWorker(IThread thread)
 			Args = args,
 			AllowAllOrigins = false,
 			CorsSevers = ["http://localhost:14555", "https://localhost:5003"],
+			ConfigureLogging = loggingBuilder => ConsoleLog.WriteCyan("ConfigureLogging hook invoked"),
 			ConfigureMiddleware = applicationBuilder =>
 				applicationBuilder.Use(
 					async (context, next) =>

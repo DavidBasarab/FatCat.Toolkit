@@ -3,6 +3,7 @@ using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
 using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
 
 namespace FatCat.Toolkit.WebServer;
@@ -16,6 +17,8 @@ public class ToolkitWebApplicationSettings : EqualObject
 	public string BasePath { get; set; }
 
 	public List<Assembly> ContainerAssemblies { get; set; } = new();
+
+	public Action<ILoggingBuilder> ConfigureLogging { get; set; }
 
 	public Action<IApplicationBuilder> ConfigureMiddleware { get; set; }
 

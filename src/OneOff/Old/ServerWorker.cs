@@ -7,6 +7,8 @@ using FatCat.Toolkit.Web;
 using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using FatCat.Toolkit.WebServer;
+using Microsoft.AspNetCore.Builder;
+using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
 
 namespace OneOff.Old;
 
@@ -32,6 +34,15 @@ public class ServerWorker(IThread thread)
 			Args = args,
 			AllowAllOrigins = false,
 			CorsSevers = ["http://localhost:14555", "https://localhost:5003"],
+			ConfigureMiddleware = applicationBuilder =>
+				applicationBuilder.Use(
+					async (context, next) =>
+					{
+						ConsoleLog.WriteCyan($"ConfigureMiddleware hook: {context.Request.Method} {context.Request.Path}");
+
+						await next();
+					}
+				),
 			OnLogEvent = m =>
 			{
 				ConsoleLog.WriteMagenta(m);

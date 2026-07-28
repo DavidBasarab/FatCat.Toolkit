@@ -43,6 +43,8 @@ internal sealed class ApplicationStartUp
 
 		app.Use(CaptureMiddlewareExceptions);
 
+		ToolkitWebApplication.Settings.ConfigureMiddleware?.Invoke(app);
+
 		// Static files/file server typically early
 		app.UseFileServer();
 		SetUpStaticFiles(app);
@@ -93,6 +95,8 @@ internal sealed class ApplicationStartUp
 			services.AddLogging(options =>
 			{
 				options.ClearProviders();
+
+				ToolkitWebApplication.Settings.ConfigureLogging?.Invoke(options);
 			});
 		}
 		catch (Exception ex)

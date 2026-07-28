@@ -2,6 +2,9 @@ using System.Reflection;
 using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
+using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
 
 namespace FatCat.Toolkit.WebServer;
 
@@ -15,6 +18,10 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public List<Assembly> ContainerAssemblies { get; set; } = new();
 
+	public Action<ILoggingBuilder> ConfigureLogging { get; set; }
+
+	public Action<IApplicationBuilder> ConfigureMiddleware { get; set; }
+
 	public List<string> CorsSevers { get; set; } = [];
 
 	public Func<JwtBearerEvents> JwtBearerEvents { get; set; } = OAuthExtensions.GetTokenBearerEvents;
@@ -23,8 +30,7 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public Action OnWebApplicationStarted { get; set; }
 
-	public WebApplicationOptions Options { get; set; } =
-		WebApplicationOptions.Cors | WebApplicationOptions.HttpsRedirection;
+	public WebApplicationOptions Options { get; set; } = WebApplicationOptions.Cors | WebApplicationOptions.HttpsRedirection;
 
 	public string SignalRPath { get; set; } = "/api/events";
 

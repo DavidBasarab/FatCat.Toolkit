@@ -28,7 +28,11 @@ public interface IToolkitHubClientConnection : IAsyncDisposable
 	public Task<bool> TryToConnect(string hubUrl, Action onConnectionLost = null);
 }
 
-public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger logger) : IToolkitHubClientConnection
+public class ToolkitHubClientConnection(
+	IGenerator generator,
+	IToolkitLogger logger,
+	IHubConnectionBuilderFactory hubConnectionBuilderFactory
+) : IToolkitHubClientConnection
 {
 	private readonly ConcurrentDictionary<string, ToolkitMessage> responses = new();
 	private readonly ConcurrentDictionary<string, int> timedOutResponses = new();
@@ -41,7 +45,7 @@ public class ToolkitHubClientConnection(IGenerator generator, IToolkitLogger log
 
 	public async Task Connect(string hubUrl, Action onConnectionLost = null)
 	{
-		connection = new HubConnectionBuilder().WithUrl(hubUrl, options => { }).Build();
+		connection = hubConnectionBuilderFactory.Create(hubUrl, options => { }).Build();
 
 		connection.Closed += a =>
 		{

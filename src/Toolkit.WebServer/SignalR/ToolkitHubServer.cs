@@ -38,8 +38,18 @@ public interface IToolkitHubServer
 	public Task SendToClientNoResponse(string connectionId, ToolkitMessage message);
 }
 
+public interface IToolkitHubGroups
+{
+	public Task AddToGroup(string connectionId, string groupName);
+
+	public Task RemoveFromGroup(string connectionId, string groupName);
+
+	public Task SendToGroup(string groupName, ToolkitMessage message);
+}
+
 public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator generator, IToolkitLogger logger)
-	: IToolkitHubServer
+	: IToolkitHubServer,
+		IToolkitHubGroups
 {
 	private readonly ConcurrentDictionary<string, string> connections = new();
 	private readonly ConcurrentDictionary<string, ToolkitMessage> responses = new();
@@ -135,9 +145,36 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 		return await WaitForClientResponse(message, timeout, sessionId);
 	}
 
-	public Task SendToAllClients(ToolkitMessage message)
+	public async Task AddToGroup(string connectionId, string groupName)
 	{
-		throw new NotImplementedException();
+		await hubContext.Groups.AddToGroupAsync(connectionId, groupName);
+	}
+
+	public async Task RemoveFromGroup(string connectionId, string groupName)
+	{
+		await hubContext.Groups.RemoveFromGroupAsync(connectionId, groupName);
+	}
+
+	public async Task SendToGroup(string groupName, ToolkitMessage message)
+	{
+		var sessionId = generator.NewId();
+
+		await hubContext
+			.Clients.Group(groupName)
+			.SendAsync(ToolkitHubMethodNames.ServerOriginatedMessage, message.MessageType, sessionId, message.Data);
+	}
+
+	public async Task SendToAllClients(ToolkitMessage message)
+	{
+		var sessionId = generator.NewId();
+
+		await hubContext
+			.Clients.All.SendAsync(
+				ToolkitHubMethodNames.ServerOriginatedMessage,
+				message.MessageType,
+				sessionId,
+				message.Data
+			);
 	}
 
 	public async Task<ToolkitMessage> SendToClient(

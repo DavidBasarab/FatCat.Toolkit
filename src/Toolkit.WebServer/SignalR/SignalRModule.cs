@@ -9,6 +9,6 @@ public class SignalRModule : Module
 	{
 		builder.RegisterType<ToolkitHubClientFactory>().As<IToolkitHubClientFactory>().SingleInstance();
 
-		builder.RegisterType<ToolkitHubServer>().As<IToolkitHubServer>().SingleInstance();
+		builder.RegisterType<ToolkitHubServer>().As<IToolkitHubServer>().As<IToolkitHubGroups>().SingleInstance();
 	}
 }

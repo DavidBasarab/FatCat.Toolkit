@@ -222,7 +222,10 @@ internal sealed class ApplicationStartUp
 		{
 			var endpointOption = endpoints.MapHub<ToolkitHub>(ToolkitWebApplication.Settings.SignalRPath);
 
-			if (ToolkitWebApplication.Settings.Options.IsFlagSet(WebApplicationOptions.Authentication))
+			if (
+				ToolkitWebApplication.Settings.Options.IsFlagSet(WebApplicationOptions.Authentication)
+				&& ToolkitWebApplication.Settings.SignalRRequireAuthorization
+			)
 			{
 				endpointOption.RequireAuthorization();
 			}

@@ -32,6 +32,8 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public WebApplicationOptions Options { get; set; } = WebApplicationOptions.Cors | WebApplicationOptions.HttpsRedirection;
 
+	public bool SignalRRequireAuthorization { get; set; } = true;
+
 	public string SignalRPath { get; set; } = "/api/events";
 
 	public string StaticFileLocation { get; set; }

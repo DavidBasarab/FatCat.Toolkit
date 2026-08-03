@@ -21,6 +21,12 @@ public class ToolkitWebApplicationSettingsTests
 	}
 
 	[Fact]
+	public void SignalRRequireAuthorizationDefaultsToTrue()
+	{
+		sut.SignalRRequireAuthorization.Should().BeTrue();
+	}
+
+	[Fact]
 	public async Task OnClientHubMessageReturnsNullWhenNoSubscriber()
 	{
 		var result = await sut.OnClientHubMessage(message);

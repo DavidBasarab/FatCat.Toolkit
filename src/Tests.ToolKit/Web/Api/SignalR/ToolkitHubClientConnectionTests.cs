@@ -201,6 +201,68 @@ public class ToolkitHubClientConnectionTests
 		result.Should().Be(expected);
 	}
 
+	[Fact]
+	public async Task SendReturnsTheResponseMessageWhenTheServerResponds()
+	{
+		var sessionId = Faker.Create<string>();
+		A.CallTo(() => generator.NewId()).Returns(sessionId);
+
+		await sut.Connect(hubUrl);
+
+		var responseData = Faker.Create<string>();
+		var responseMessageType = Faker.Create<int>();
+
+		var sendTask = sut.Send(Faker.Create<ToolkitMessage>(), TimeSpan.FromSeconds(5));
+
+		DeliverServerResponse(responseMessageType, sessionId, responseData);
+
+		var result = await sendTask;
+
+		result.Data.Should().Be(responseData);
+	}
+
+	[Fact]
+	public async Task SendThrowsTimeoutExceptionWhenNoResponseArrives()
+	{
+		var sessionId = Faker.Create<string>();
+		A.CallTo(() => generator.NewId()).Returns(sessionId);
+
+		await sut.Connect(hubUrl);
+
+		var exception = await Record.ExceptionAsync(
+			() => sut.Send(Faker.Create<ToolkitMessage>(), TimeSpan.FromMilliseconds(50))
+		);
+
+		exception.Should().BeOfType<TimeoutException>();
+	}
+
+	[Fact]
+	public async Task SendSwallowsAResponseThatArrivesAfterTimeout()
+	{
+		var sessionId = Faker.Create<string>();
+		A.CallTo(() => generator.NewId()).Returns(sessionId);
+
+		await sut.Connect(hubUrl);
+
+		await Record.ExceptionAsync(() => sut.Send(Faker.Create<ToolkitMessage>(), TimeSpan.FromMilliseconds(50)));
+
+		var lateException = Record.Exception(
+			() => DeliverServerResponse(Faker.Create<int>(), sessionId, Faker.Create<string>())
+		);
+
+		lateException.Should().BeNull();
+	}
+
+	private void DeliverServerResponse(int messageType, string sessionId, string data)
+	{
+		var method = typeof(ToolkitHubClientConnection).GetMethod(
+			"OnServerResponseMessageReceived",
+			BindingFlags.Instance | BindingFlags.NonPublic
+		);
+
+		method.Invoke(sut, new object[] { messageType, sessionId, data });
+	}
+
 	private Task<string> InvokeServerMessage(ToolkitMessage message)
 	{
 		var method = typeof(ToolkitHubClientConnection).GetMethod(

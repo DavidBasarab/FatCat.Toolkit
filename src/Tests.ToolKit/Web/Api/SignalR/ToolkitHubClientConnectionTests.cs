@@ -1,8 +1,14 @@
+using System.Net;
+using System.Reflection;
 using FatCat.Toolkit;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.Web.Api.SignalR;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Connections.Client;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Protocol;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Tests.FatCat.Toolkit.Web.Api.SignalR;
 
@@ -10,6 +16,7 @@ public class ToolkitHubClientConnectionTests
 {
 	private readonly IHubConnectionBuilder builder;
 	private readonly IHubConnectionBuilderFactory builderFactory;
+	private readonly HubConnection connection;
 	private readonly IGenerator generator;
 	private readonly string hubUrl;
 	private readonly IToolkitLogger logger;
@@ -21,9 +28,12 @@ public class ToolkitHubClientConnectionTests
 		logger = A.Fake<IToolkitLogger>();
 		builderFactory = A.Fake<IHubConnectionBuilderFactory>();
 		builder = A.Fake<IHubConnectionBuilder>();
+		connection = CreateFakeConnection();
 		hubUrl = Faker.Create<string>();
 
 		A.CallTo(() => builderFactory.Create(A<string>._, A<Action<HttpConnectionOptions>>._)).Returns(builder);
+		A.CallTo(() => builder.Build()).Returns(connection);
+		A.CallTo(() => connection.StartAsync(A<CancellationToken>._)).Returns(Task.CompletedTask);
 
 		sut = new ToolkitHubClientConnection(generator, logger, builderFactory);
 	}
@@ -31,7 +41,7 @@ public class ToolkitHubClientConnectionTests
 	[Fact]
 	public async Task BuildTheConnectionFromTheBuilder()
 	{
-		await RunConnect();
+		await sut.Connect(hubUrl);
 
 		A.CallTo(() => builder.Build()).MustHaveHappened();
 	}
@@ -39,7 +49,7 @@ public class ToolkitHubClientConnectionTests
 	[Fact]
 	public async Task CreateTheBuilderBeforeBuildingTheConnection()
 	{
-		await RunConnect();
+		await sut.Connect(hubUrl);
 
 		A.CallTo(() => builderFactory.Create(hubUrl, A<Action<HttpConnectionOptions>>._))
 			.MustHaveHappened()
@@ -49,20 +59,132 @@ public class ToolkitHubClientConnectionTests
 	[Fact]
 	public async Task CreateTheBuilderWithTheHubUrl()
 	{
-		await RunConnect();
+		await sut.Connect(hubUrl);
 
 		A.CallTo(() => builderFactory.Create(hubUrl, A<Action<HttpConnectionOptions>>._)).MustHaveHappened();
 	}
 
-	private async Task RunConnect()
+	[Fact]
+	public async Task RegisterServerMessageHandlersBeforeStartingConnection()
 	{
-		try
+		await sut.Connect(hubUrl);
+
+		A.CallTo(
+				() =>
+					connection.On(
+						ToolkitHubMethodNames.ServerResponseMessage,
+						A<Type[]>._,
+						A<Func<object[], object, Task>>._,
+						A<object>._
+					)
+			)
+			.MustHaveHappened()
+			.Then(
+				A.CallTo(
+						() =>
+							connection.On(
+								ToolkitHubMethodNames.ServerOriginatedMessage,
+								A<Type[]>._,
+								A<Func<object[], object, Task>>._,
+								A<object>._
+							)
+					)
+					.MustHaveHappened()
+			)
+			.Then(
+				A.CallTo(
+						() =>
+							connection.On(
+								ToolkitHubMethodNames.ServerDataBufferMessage,
+								A<Type[]>._,
+								A<Func<object[], object, Task>>._,
+								A<object>._
+							)
+					)
+					.MustHaveHappened()
+			)
+			.Then(A.CallTo(() => connection.StartAsync(A<CancellationToken>._)).MustHaveHappened());
+	}
+
+	[Fact]
+	public async Task InvokeServerMessageReturnsNullWhenNoSubscriber()
+	{
+		var result = await InvokeServerMessage(Faker.Create<ToolkitMessage>());
+
+		result.Should().BeNull();
+	}
+
+	[Fact]
+	public async Task InvokeServerMessageFlowsSubscriberResult()
+	{
+		var expected = Faker.Create<string>();
+
+		sut.ServerMessage += incoming =>
 		{
-			await sut.Connect(hubUrl);
-		}
-		catch
+			return Task.FromResult(expected);
+		};
+
+		var result = await InvokeServerMessage(Faker.Create<ToolkitMessage>());
+
+		result.Should().Be(expected);
+	}
+
+	[Fact]
+	public async Task InvokeDataBufferMessageReturnsNullWhenNoSubscriber()
+	{
+		var result = await InvokeDataBufferMessage(Faker.Create<ToolkitMessage>(), Faker.Create<byte[]>());
+
+		result.Should().BeNull();
+	}
+
+	[Fact]
+	public async Task InvokeDataBufferMessageFlowsSubscriberResult()
+	{
+		var expected = Faker.Create<string>();
+
+		sut.ServerDataBufferMessage += (incoming, buffer) =>
 		{
-			// ignored — the faked builder yields no live HubConnection, so Connect cannot reach a server; this phase asserts only the builder seam
-		}
+			return Task.FromResult(expected);
+		};
+
+		var result = await InvokeDataBufferMessage(Faker.Create<ToolkitMessage>(), Faker.Create<byte[]>());
+
+		result.Should().Be(expected);
+	}
+
+	private Task<string> InvokeServerMessage(ToolkitMessage message)
+	{
+		var method = typeof(ToolkitHubClientConnection).GetMethod(
+			nameof(InvokeServerMessage),
+			BindingFlags.Instance | BindingFlags.NonPublic
+		);
+
+		return (Task<string>)method.Invoke(sut, new object[] { message });
+	}
+
+	private Task<string> InvokeDataBufferMessage(ToolkitMessage message, byte[] dataBuffer)
+	{
+		var method = typeof(ToolkitHubClientConnection).GetMethod(
+			nameof(InvokeDataBufferMessage),
+			BindingFlags.Instance | BindingFlags.NonPublic
+		);
+
+		return (Task<string>)method.Invoke(sut, new object[] { message, dataBuffer });
+	}
+
+	private static HubConnection CreateFakeConnection()
+	{
+		return A.Fake<HubConnection>(options =>
+			options.WithArgumentsForConstructor(
+				new object[]
+				{
+					A.Fake<IConnectionFactory>(),
+					A.Fake<IHubProtocol>(),
+					new DnsEndPoint("localhost", 0),
+					new ServiceCollection().BuildServiceProvider(),
+					NullLoggerFactory.Instance,
+				}
+			)
+		);
 	}
 }

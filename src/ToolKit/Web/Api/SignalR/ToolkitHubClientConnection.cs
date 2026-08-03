@@ -54,9 +54,9 @@ public class ToolkitHubClientConnection(
 			return Task.CompletedTask;
 		};
 
-		await connection.StartAsync();
-
 		RegisterForServerMessages();
+
+		await connection.StartAsync();
 	}
 
 	public async Task Disconnect()
@@ -143,12 +143,12 @@ public class ToolkitHubClientConnection(
 
 	private Task<string> InvokeDataBufferMessage(ToolkitMessage message, byte[] dataBuffer)
 	{
-		return ServerDataBufferMessage?.Invoke(message, dataBuffer)!;
+		return ServerDataBufferMessage?.Invoke(message, dataBuffer) ?? Task.FromResult<string>(null);
 	}
 
 	private Task<string> InvokeServerMessage(ToolkitMessage message)
 	{
-		return ServerMessage?.Invoke(message)!;
+		return ServerMessage?.Invoke(message) ?? Task.FromResult<string>(null);
 	}
 
 	private Task OnConnectionClosed(Exception arg)

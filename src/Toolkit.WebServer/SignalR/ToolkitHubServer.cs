@@ -162,12 +162,12 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 
 	private Task InvokeClientConnected(ToolkitUser user, string connectionId)
 	{
-		return ClientConnected?.Invoke(user, connectionId);
+		return ClientConnected?.Invoke(user, connectionId) ?? Task.CompletedTask;
 	}
 
 	private Task InvokeClientDisconnected(ToolkitUser user, string connectionId)
 	{
-		return ClientDisconnected?.Invoke(user, connectionId);
+		return ClientDisconnected?.Invoke(user, connectionId) ?? Task.CompletedTask;
 	}
 
 	private async Task SendMessageToClient(string connectionId, ToolkitMessage message, string sessionId)

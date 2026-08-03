@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using FatCat.Toolkit.Console;
 using FatCat.Toolkit.Logging;
 using Humanizer;
+using Microsoft.AspNetCore.Http.Connections.Client;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace FatCat.Toolkit.Web.Api.SignalR;
@@ -13,7 +14,16 @@ public interface IToolkitHubClientConnection : IAsyncDisposable
 
 	public event ToolkitHubMessage ServerMessage;
 
-	public Task Connect(string hubUrl, Action onConnectionLost = null);
+	public event ToolkitHubReconnecting Reconnecting;
+
+	public event ToolkitHubReconnected Reconnected;
+
+	public Task Connect(
+		string hubUrl,
+		Action onConnectionLost = null,
+		Action<HttpConnectionOptions> configureOptions = null,
+		bool automaticReconnect = false
+	);
 
 	public Task Disconnect();
 
@@ -25,7 +35,12 @@ public interface IToolkitHubClientConnection : IAsyncDisposable
 
 	public Task SendNoResponse(ToolkitMessage message);
 
-	public Task<bool> TryToConnect(string hubUrl, Action onConnectionLost = null);
+	public Task<bool> TryToConnect(
+		string hubUrl,
+		Action onConnectionLost = null,
+		Action<HttpConnectionOptions> configureOptions = null,
+		bool automaticReconnect = false
+	);
 }
 
 public class ToolkitHubClientConnection(
@@ -43,15 +58,41 @@ public class ToolkitHubClientConnection(
 
 	public event ToolkitHubMessage ServerMessage;
 
-	public async Task Connect(string hubUrl, Action onConnectionLost = null)
+	public event ToolkitHubReconnecting Reconnecting;
+
+	public event ToolkitHubReconnected Reconnected;
+
+	public async Task Connect(
+		string hubUrl,
+		Action onConnectionLost = null,
+		Action<HttpConnectionOptions> configureOptions = null,
+		bool automaticReconnect = false
+	)
 	{
-		connection = hubConnectionBuilderFactory.Create(hubUrl, options => { }).Build();
+		var builder = hubConnectionBuilderFactory.Create(hubUrl, options => configureOptions?.Invoke(options));
+
+		if (automaticReconnect)
+		{
+			builder = builder.WithAutomaticReconnect();
+		}
+
+		connection = builder.Build();
 
 		connection.Closed += a =>
 		{
 			onConnectionLost?.Invoke();
 
 			return Task.CompletedTask;
+		};
+
+		connection.Reconnecting += exception =>
+		{
+			return Reconnecting?.Invoke(exception) ?? Task.CompletedTask;
+		};
+
+		connection.Reconnected += connectionId =>
+		{
+			return Reconnected?.Invoke(connectionId) ?? Task.CompletedTask;
 		};
 
 		RegisterForServerMessages();
@@ -127,11 +168,16 @@ public class ToolkitHubClientConnection(
 		return SendSessionMessage(message.MessageType, message.Data ?? string.Empty, generator.NewId());
 	}
 
-	public async Task<bool> TryToConnect(string hubUrl, Action onConnectionLost = null)
+	public async Task<bool> TryToConnect(
+		string hubUrl,
+		Action onConnectionLost = null,
+		Action<HttpConnectionOptions> configureOptions = null,
+		bool automaticReconnect = false
+	)
 	{
 		try
 		{
-			await Connect(hubUrl, onConnectionLost);
+			await Connect(hubUrl, onConnectionLost, configureOptions, automaticReconnect);
 
 			return true;
 		}

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using FatCat.Toolkit;
@@ -104,6 +105,54 @@ public class ToolkitHubClientConnectionTests
 					.MustHaveHappened()
 			)
 			.Then(A.CallTo(() => connection.StartAsync(A<CancellationToken>._)).MustHaveHappened());
+	}
+
+	[Fact]
+	public async Task InvokeCallerConfigureOptionsWithTheRealOptionsInstance()
+	{
+		var realOptions = new HttpConnectionOptions();
+		HttpConnectionOptions optionsSeenByCaller = null;
+
+		Action<HttpConnectionOptions> callerConfigure = options =>
+		{
+			optionsSeenByCaller = options;
+		};
+
+		Action<HttpConnectionOptions> configurePassedToFactory = null;
+
+		A.CallTo(() => builderFactory.Create(A<string>._, A<Action<HttpConnectionOptions>>._))
+			.Invokes((string url, Action<HttpConnectionOptions> configure) => configurePassedToFactory = configure)
+			.Returns(builder);
+
+		await sut.Connect(hubUrl, configureOptions: callerConfigure);
+
+		configurePassedToFactory.Invoke(realOptions);
+
+		optionsSeenByCaller.Should().Be(realOptions);
+	}
+
+	[Fact]
+	public async Task ConfigureBuilderForAutomaticReconnectWhenOptedIn()
+	{
+		var services = new ServiceCollection();
+
+		A.CallTo(() => builder.Services).Returns(services);
+
+		await sut.Connect(hubUrl, automaticReconnect: true);
+
+		services.Any(descriptor => descriptor.ServiceType == typeof(IRetryPolicy)).Should().BeTrue();
+	}
+
+	[Fact]
+	public async Task NotConfigureBuilderForAutomaticReconnectWhenNotOptedIn()
+	{
+		var services = new ServiceCollection();
+
+		A.CallTo(() => builder.Services).Returns(services);
+
+		await sut.Connect(hubUrl);
+
+		services.Any(descriptor => descriptor.ServiceType == typeof(IRetryPolicy)).Should().Not.BeTrue();
 	}
 
 	[Fact]

@@ -94,7 +94,7 @@ public class ToolkitHub : Hub
 		HubServer.ClientResponseMessage(sessionId, toolkitMessage);
 	}
 
-	public override Task OnConnectedAsync()
+	public override async Task OnConnectedAsync()
 	{
 		try
 		{
@@ -106,17 +106,17 @@ public class ToolkitHub : Hub
 
 			HubServer.OnClientConnected(toolkitUser, Context.ConnectionId);
 
-			ToolkitWebApplication.Settings.OnClientConnected(toolkitUser, Context.ConnectionId);
+			await ToolkitWebApplication.Settings.OnClientConnected(toolkitUser, Context.ConnectionId);
 		}
 		catch (Exception ex)
 		{
 			Logger.Exception(ex);
 		}
 
-		return base.OnConnectedAsync();
+		await base.OnConnectedAsync();
 	}
 
-	public override Task OnDisconnectedAsync(Exception? exception)
+	public override async Task OnDisconnectedAsync(Exception? exception)
 	{
 		try
 		{
@@ -124,14 +124,14 @@ public class ToolkitHub : Hub
 
 			HubServer.OnClientDisconnected(toolkitUser, Context.ConnectionId);
 
-			ToolkitWebApplication.Settings.OnClientDisconnected(toolkitUser, Context.ConnectionId);
+			await ToolkitWebApplication.Settings.OnClientDisconnected(toolkitUser, Context.ConnectionId);
 		}
 		catch (Exception ex)
 		{
 			Logger.Exception(ex);
 		}
 
-		return base.OnDisconnectedAsync(exception);
+		await base.OnDisconnectedAsync(exception);
 	}
 
 	private ToolkitUser GetUser()

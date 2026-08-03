@@ -1,23 +1,37 @@
 #nullable enable
 using System.Collections.Concurrent;
 using FatCat.Toolkit.Injection;
+using Microsoft.AspNetCore.Http.Connections.Client;
 
 namespace FatCat.Toolkit.Web.Api.SignalR;
 
 public interface IToolkitHubClientFactory : IAsyncDisposable
 {
-	public Task<IToolkitHubClientConnection> ConnectToClient(string hubUrl);
+	public Task<IToolkitHubClientConnection> ConnectToClient(
+		string hubUrl,
+		Action<HttpConnectionOptions>? configureOptions = null,
+		bool automaticReconnect = false
+	);
 
 	public void RemoveHubFromConnections(string hubUrl);
 
-	public Task<ConnectionResult> TryToConnectToClient(string hubUrl, Action? onConnectionLost = null);
+	public Task<ConnectionResult> TryToConnectToClient(
+		string hubUrl,
+		Action? onConnectionLost = null,
+		Action<HttpConnectionOptions>? configureOptions = null,
+		bool automaticReconnect = false
+	);
 }
 
 public class ToolkitHubClientFactory(ISystemScope scope) : IToolkitHubClientFactory
 {
 	private readonly ConcurrentDictionary<string, IToolkitHubClientConnection> connections = new();
 
-	public async Task<IToolkitHubClientConnection> ConnectToClient(string hubUrl)
+	public async Task<IToolkitHubClientConnection> ConnectToClient(
+		string hubUrl,
+		Action<HttpConnectionOptions>? configureOptions = null,
+		bool automaticReconnect = false
+	)
 	{
 		if (connections.TryGetValue(hubUrl, out var connection))
 		{
@@ -26,7 +40,7 @@ public class ToolkitHubClientFactory(ISystemScope scope) : IToolkitHubClientFact
 
 		connection = scope.Resolve<IToolkitHubClientConnection>();
 
-		await connection.Connect(hubUrl);
+		await connection.Connect(hubUrl, configureOptions: configureOptions, automaticReconnect: automaticReconnect);
 
 		connections.TryAdd(hubUrl, connection);
 
@@ -46,7 +60,12 @@ public class ToolkitHubClientFactory(ISystemScope scope) : IToolkitHubClientFact
 		connections.TryRemove(hubUrl, out _);
 	}
 
-	public async Task<ConnectionResult> TryToConnectToClient(string hubUrl, Action? onConnectionLost = null)
+	public async Task<ConnectionResult> TryToConnectToClient(
+		string hubUrl,
+		Action? onConnectionLost = null,
+		Action<HttpConnectionOptions>? configureOptions = null,
+		bool automaticReconnect = false
+	)
 	{
 		if (connections.TryGetValue(hubUrl, out var connection))
 		{
@@ -62,7 +81,9 @@ public class ToolkitHubClientFactory(ISystemScope scope) : IToolkitHubClientFact
 				RemoveHubFromConnections(hubUrl);
 
 				onConnectionLost?.Invoke();
-			}
+			},
+			configureOptions,
+			automaticReconnect
 		);
 
 		if (!result)

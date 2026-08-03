@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="OneOff/OneOff.csproj" />
+  <Project Path="OneOffBlazor/OneOffBlazor.csproj" />
+  <Project Path="OneOffLib/OneOffLib.csproj" />
+  <Project Path="OneOffToolkitOnly/OneOffToolkitOnly.csproj" />
+  <Project Path="ProxySpike/ProxySpike.csproj" />
+  <Project Path="SampleDocker/SampleDocker.csproj" />
+  <Project Path="Tests.ToolKit/Tests.ToolKit.csproj" />
+  <Project Path="Toolkit.WebServer/Toolkit.WebServer.csproj" />
+  <Project Path="ToolKit/ToolKit.csproj" />
+</Solution>

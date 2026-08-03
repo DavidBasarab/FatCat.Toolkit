@@ -38,13 +38,22 @@ public interface IToolkitHubServer
 	public Task SendToClientNoResponse(string connectionId, ToolkitMessage message);
 }
 
+public interface IToolkitHubGroups
+{
+	public Task AddToGroup(string connectionId, string groupName);
+
+	public Task RemoveFromGroup(string connectionId, string groupName);
+
+	public Task SendToGroup(string groupName, ToolkitMessage message);
+}
+
 public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator generator, IToolkitLogger logger)
-	: IToolkitHubServer
+	: IToolkitHubServer,
+		IToolkitHubGroups
 {
 	private readonly ConcurrentDictionary<string, string> connections = new();
-	private readonly ConcurrentDictionary<string, ToolkitMessage> responses = new();
 	private readonly ConcurrentDictionary<string, int> timedOutResponses = new();
-	private readonly ConcurrentDictionary<string, ToolkitMessage> waitingForResponses = new();
+	private readonly ConcurrentDictionary<string, TaskCompletionSource<ToolkitMessage>> waitingForResponses = new();
 
 	public event ToolkitHubClientConnected ClientConnected;
 
@@ -57,7 +66,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 			return;
 		}
 
-		if (!waitingForResponses.TryRemove(sessionId, out _))
+		if (!waitingForResponses.TryRemove(sessionId, out var completionSource))
 		{
 			return;
 		}
@@ -66,7 +75,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 			$"Got a client response for data buffer!!!!!!! | SessionId {sessionId} | {new JsonOperations().Serialize(toolkitMessage)}"
 		);
 
-		responses.TryAdd(sessionId, toolkitMessage);
+		completionSource.TrySetResult(toolkitMessage);
 	}
 
 	public void ClientResponseMessage(string sessionId, ToolkitMessage toolkitMessage)
@@ -76,7 +85,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 			return;
 		}
 
-		if (!waitingForResponses.TryRemove(sessionId, out _))
+		if (!waitingForResponses.TryRemove(sessionId, out var completionSource))
 		{
 			return;
 		}
@@ -85,7 +94,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 			$"Got a client response!!!!!!! | SessionId {sessionId} | {new JsonOperations().Serialize(toolkitMessage)}"
 		);
 
-		responses.TryAdd(sessionId, toolkitMessage);
+		completionSource.TrySetResult(toolkitMessage);
 	}
 
 	public List<string> GetConnections()
@@ -120,7 +129,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 	{
 		var sessionId = generator.NewId();
 
-		waitingForResponses.TryAdd(sessionId, message);
+		var completionSource = CreateResponseCompletionSource(sessionId);
 
 		await hubContext
 			.Clients.Client(connectionId)
@@ -132,12 +141,39 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 				dataBuffer
 			);
 
-		return await WaitForClientResponse(message, timeout, sessionId);
+		return await WaitForClientResponse(message, timeout, sessionId, completionSource);
 	}
 
-	public Task SendToAllClients(ToolkitMessage message)
+	public async Task AddToGroup(string connectionId, string groupName)
 	{
-		throw new NotImplementedException();
+		await hubContext.Groups.AddToGroupAsync(connectionId, groupName);
+	}
+
+	public async Task RemoveFromGroup(string connectionId, string groupName)
+	{
+		await hubContext.Groups.RemoveFromGroupAsync(connectionId, groupName);
+	}
+
+	public async Task SendToGroup(string groupName, ToolkitMessage message)
+	{
+		var sessionId = generator.NewId();
+
+		await hubContext
+			.Clients.Group(groupName)
+			.SendAsync(ToolkitHubMethodNames.ServerOriginatedMessage, message.MessageType, sessionId, message.Data);
+	}
+
+	public async Task SendToAllClients(ToolkitMessage message)
+	{
+		var sessionId = generator.NewId();
+
+		await hubContext
+			.Clients.All.SendAsync(
+				ToolkitHubMethodNames.ServerOriginatedMessage,
+				message.MessageType,
+				sessionId,
+				message.Data
+			);
 	}
 
 	public async Task<ToolkitMessage> SendToClient(
@@ -148,11 +184,11 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 	{
 		var sessionId = generator.NewId();
 
-		waitingForResponses.TryAdd(sessionId, message);
+		var completionSource = CreateResponseCompletionSource(sessionId);
 
 		await SendMessageToClient(connectionId, message, sessionId);
 
-		return await WaitForClientResponse(message, timeout, sessionId);
+		return await WaitForClientResponse(message, timeout, sessionId, completionSource);
 	}
 
 	public async Task SendToClientNoResponse(string connectionId, ToolkitMessage message)
@@ -162,12 +198,12 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 
 	private Task InvokeClientConnected(ToolkitUser user, string connectionId)
 	{
-		return ClientConnected?.Invoke(user, connectionId);
+		return ClientConnected?.Invoke(user, connectionId) ?? Task.CompletedTask;
 	}
 
 	private Task InvokeClientDisconnected(ToolkitUser user, string connectionId)
 	{
-		return ClientDisconnected?.Invoke(user, connectionId);
+		return ClientDisconnected?.Invoke(user, connectionId) ?? Task.CompletedTask;
 	}
 
 	private async Task SendMessageToClient(string connectionId, ToolkitMessage message, string sessionId)
@@ -182,31 +218,37 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 			);
 	}
 
+	private TaskCompletionSource<ToolkitMessage> CreateResponseCompletionSource(string sessionId)
+	{
+		var completionSource = new TaskCompletionSource<ToolkitMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+		waitingForResponses.TryAdd(sessionId, completionSource);
+
+		return completionSource;
+	}
+
 	private async Task<ToolkitMessage> WaitForClientResponse(
 		ToolkitMessage message,
 		TimeSpan? timeout,
-		string sessionId
+		string sessionId,
+		TaskCompletionSource<ToolkitMessage> completionSource
 	)
 	{
 		timeout ??= 30.Seconds();
 
-		var startTime = DateTime.UtcNow;
+		using var cancellationSource = new CancellationTokenSource(timeout.Value);
+		using var cancellationRegistration = cancellationSource.Token.Register(() => completionSource.TrySetCanceled());
 
-		while (true)
+		try
 		{
-			if (responses.TryRemove(sessionId, out var response))
-			{
-				return response;
-			}
+			return await completionSource.Task;
+		}
+		catch (OperationCanceledException)
+		{
+			timedOutResponses.TryAdd(sessionId, message.MessageType);
+			waitingForResponses.TryRemove(sessionId, out _);
 
-			if (DateTime.UtcNow - startTime > timeout)
-			{
-				timedOutResponses.TryAdd(sessionId, message.MessageType);
-
-				throw new TimeoutException();
-			}
-
-			await Task.Delay(35);
+			throw new TimeoutException();
 		}
 	}
 }

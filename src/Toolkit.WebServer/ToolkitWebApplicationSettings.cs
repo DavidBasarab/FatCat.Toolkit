@@ -32,6 +32,8 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public WebApplicationOptions Options { get; set; } = WebApplicationOptions.Cors | WebApplicationOptions.HttpsRedirection;
 
+	public bool SignalRRequireAuthorization { get; set; } = true;
+
 	public string SignalRPath { get; set; } = "/api/events";
 
 	public string StaticFileLocation { get; set; }
@@ -50,21 +52,21 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public Task OnClientConnected(ToolkitUser user, string connectionId)
 	{
-		return ClientConnected?.Invoke(user, connectionId);
+		return ClientConnected?.Invoke(user, connectionId) ?? Task.CompletedTask;
 	}
 
 	public Task OnClientDisconnected(ToolkitUser user, string connectionId)
 	{
-		return ClientDisconnected?.Invoke(user, connectionId);
+		return ClientDisconnected?.Invoke(user, connectionId) ?? Task.CompletedTask;
 	}
 
 	public Task<string> OnClientHubMessage(ToolkitMessage message)
 	{
-		return ClientMessage.Invoke(message)!;
+		return ClientMessage?.Invoke(message) ?? Task.FromResult<string>(null);
 	}
 
 	public Task<string> OnOnClientDataBufferMessage(ToolkitMessage message, byte[] dataBuffer)
 	{
-		return ClientDataBufferMessage?.Invoke(message, dataBuffer)!;
+		return ClientDataBufferMessage?.Invoke(message, dataBuffer) ?? Task.FromResult<string>(null);
 	}
 }

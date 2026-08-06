@@ -1,5 +1,6 @@
 using FatCat.Toolkit.Web.Api.SignalR;
 using FatCat.Toolkit.WebServer;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.FatCat.Toolkit.WebServer.SignalR;
 
@@ -24,6 +25,29 @@ public class ToolkitWebApplicationSettingsTests
 	public void SignalRRequireAuthorizationDefaultsToTrue()
 	{
 		sut.SignalRRequireAuthorization.Should().BeTrue();
+	}
+
+	[Fact]
+	public void ConfigureServicesDefaultsToNull()
+	{
+		sut.ConfigureServices.Should().BeNull();
+	}
+
+	[Fact]
+	public void ConfigureServicesInvokesWithTheGivenServiceCollection()
+	{
+		IServiceCollection invokedWithCollection = null;
+
+		sut.ConfigureServices = incomingCollection =>
+		{
+			invokedWithCollection = incomingCollection;
+		};
+
+		var serviceCollection = new ServiceCollection();
+
+		sut.ConfigureServices.Invoke(serviceCollection);
+
+		invokedWithCollection.Should().BeSameAs(serviceCollection);
 	}
 
 	[Fact]

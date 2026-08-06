@@ -3,6 +3,7 @@ using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
 
@@ -21,6 +22,8 @@ public class ToolkitWebApplicationSettings : EqualObject
 	public Action<ILoggingBuilder> ConfigureLogging { get; set; }
 
 	public Action<IApplicationBuilder> ConfigureMiddleware { get; set; }
+
+	public Action<IServiceCollection> ConfigureServices { get; set; }
 
 	public List<string> CorsSevers { get; set; } = [];
 

@@ -106,6 +106,8 @@ internal sealed class ApplicationStartUp
 				logger!.Exception(ex);
 			}
 		}
+
+		ToolkitWebApplication.Settings.ConfigureServices?.Invoke(services);
 	}
 
 	private void AddAuthentication(IServiceCollection services)

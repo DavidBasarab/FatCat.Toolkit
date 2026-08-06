@@ -355,3 +355,9 @@ MigrationBackup/
 *.sln.iml
 .vsCode/
 *appsettings.development.json*
+
+# Standards / unit-test review reports (/standards-review, /unit-test-review)
+.reviews/
+
+# Security review reports are committed on purpose — never ignore them:
+# src/vulnerabilities/unresolved/, src/vulnerabilities/resolved/, src/vulnerabilities/audits/

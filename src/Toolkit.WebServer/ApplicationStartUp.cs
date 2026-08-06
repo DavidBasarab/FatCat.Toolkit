@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -50,6 +49,8 @@ internal sealed class ApplicationStartUp
 		SetUpStaticFiles(app);
 
 		app.UseRouting();
+
+		ToolkitWebApplication.Settings.ConfigureRoutedMiddleware?.Invoke(app);
 
 		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.Authentication))
 		{
@@ -106,6 +107,8 @@ internal sealed class ApplicationStartUp
 				logger!.Exception(ex);
 			}
 		}
+
+		ToolkitWebApplication.Settings.ConfigureServices?.Invoke(services);
 	}
 
 	private void AddAuthentication(IServiceCollection services)
@@ -157,7 +160,7 @@ internal sealed class ApplicationStartUp
 		}
 		catch (TaskCanceledException)
 		{
-			var displayUrl = context.Request.GetDisplayUrl();
+			var displayUrl = context.Request.DisplayPath();
 
 			if (SystemScope.Container.TryResolve<IToolkitLogger>(out var logger))
 			{
@@ -166,7 +169,7 @@ internal sealed class ApplicationStartUp
 		}
 		catch (Exception e)
 		{
-			var displayUrl = context.Request.GetDisplayUrl();
+			var displayUrl = context.Request.DisplayPath();
 
 			if (SystemScope.Container.TryResolve<IToolkitLogger>(out var logger))
 			{

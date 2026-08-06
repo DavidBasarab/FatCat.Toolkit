@@ -7,7 +7,11 @@ using FatCat.Toolkit.Web;
 using FatCat.Toolkit.Web.Api;
 using FatCat.Toolkit.Web.Api.SignalR;
 using FatCat.Toolkit.WebServer;
+using Humanizer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.DependencyInjection;
 using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
 
 namespace OneOff.Old;
@@ -44,6 +48,29 @@ public class ServerWorker(IThread thread)
 						await next();
 					}
 				),
+			ConfigureRoutedMiddleware = applicationBuilder =>
+			{
+				applicationBuilder.UseRateLimiter();
+			},
+			ConfigureServices = services =>
+			{
+				ConsoleLog.WriteCyan("ConfigureServices hook invoked");
+
+				services.AddRateLimiter(options =>
+				{
+					options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+					options.AddFixedWindowLimiter(
+						"oneoff-fixed",
+						limiterOptions =>
+						{
+							limiterOptions.PermitLimit = 3;
+							limiterOptions.Window = 10.Seconds();
+							limiterOptions.QueueLimit = 0;
+						}
+					);
+				});
+			},
 			OnLogEvent = m =>
 			{
 				ConsoleLog.WriteMagenta(m);

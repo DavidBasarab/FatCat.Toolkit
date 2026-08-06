@@ -1,5 +1,7 @@
 using FatCat.Toolkit.Web.Api.SignalR;
 using FatCat.Toolkit.WebServer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.FatCat.Toolkit.WebServer.SignalR;
 
@@ -24,6 +26,68 @@ public class ToolkitWebApplicationSettingsTests
 	public void SignalRRequireAuthorizationDefaultsToTrue()
 	{
 		sut.SignalRRequireAuthorization.Should().BeTrue();
+	}
+
+	[Fact]
+	public void ConfigureServicesDefaultsToNull()
+	{
+		sut.ConfigureServices.Should().BeNull();
+	}
+
+	[Fact]
+	public void ConfigureServicesInvokesWithTheGivenServiceCollection()
+	{
+		IServiceCollection invokedWithCollection = null;
+
+		sut.ConfigureServices = incomingCollection =>
+		{
+			invokedWithCollection = incomingCollection;
+		};
+
+		var serviceCollection = new ServiceCollection();
+
+		sut.ConfigureServices.Invoke(serviceCollection);
+
+		invokedWithCollection.Should().BeSameAs(serviceCollection);
+	}
+
+	[Fact]
+	public void ConfigureRoutedMiddlewareDefaultsToNull()
+	{
+		sut.ConfigureRoutedMiddleware.Should().BeNull();
+	}
+
+	[Fact]
+	public void ConfigureRoutedMiddlewareInvokesWithTheGivenApplicationBuilder()
+	{
+		IApplicationBuilder invokedWithBuilder = null;
+
+		sut.ConfigureRoutedMiddleware = incomingBuilder =>
+		{
+			invokedWithBuilder = incomingBuilder;
+		};
+
+		var applicationBuilder = A.Fake<IApplicationBuilder>();
+
+		sut.ConfigureRoutedMiddleware.Invoke(applicationBuilder);
+
+		invokedWithBuilder.Should().BeSameAs(applicationBuilder);
+	}
+
+	[Fact]
+	public void SettingConfigureMiddlewareLeavesConfigureRoutedMiddlewareNull()
+	{
+		sut.ConfigureMiddleware = applicationBuilder => { };
+
+		sut.ConfigureRoutedMiddleware.Should().BeNull();
+	}
+
+	[Fact]
+	public void SettingConfigureRoutedMiddlewareLeavesConfigureMiddlewareNull()
+	{
+		sut.ConfigureRoutedMiddleware = applicationBuilder => { };
+
+		sut.ConfigureMiddleware.Should().BeNull();
 	}
 
 	[Fact]

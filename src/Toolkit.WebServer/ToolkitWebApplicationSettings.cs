@@ -23,6 +23,8 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public Action<IApplicationBuilder> ConfigureMiddleware { get; set; }
 
+	public Action<IApplicationBuilder> ConfigureRoutedMiddleware { get; set; }
+
 	public Action<IServiceCollection> ConfigureServices { get; set; }
 
 	public List<string> CorsSevers { get; set; } = [];

@@ -48,6 +48,10 @@ public class ServerWorker(IThread thread)
 						await next();
 					}
 				),
+			ConfigureRoutedMiddleware = applicationBuilder =>
+			{
+				applicationBuilder.UseRateLimiter();
+			},
 			ConfigureServices = services =>
 			{
 				ConsoleLog.WriteCyan("ConfigureServices hook invoked");

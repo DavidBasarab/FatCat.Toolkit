@@ -51,6 +51,8 @@ internal sealed class ApplicationStartUp
 
 		app.UseRouting();
 
+		ToolkitWebApplication.Settings.ConfigureRoutedMiddleware?.Invoke(app);
+
 		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.Authentication))
 		{
 			app.UseAuthentication();

@@ -5,44 +5,57 @@ namespace Tests.FatCat.Toolkit.Data.Mongo.DataRepositorySpecs;
 
 public class UpdateListTests : EnsureCollectionTests
 {
-	private readonly EasyCapture<ExpressionFilterDefinition<TestingMongoObject>> updateFilterCapture;
-
-	public UpdateListTests()
-	{
-		updateFilterCapture = new EasyCapture<ExpressionFilterDefinition<TestingMongoObject>>();
-		var updateCapture = new EasyCapture<TestingMongoObject>();
-
-		A.CallTo(
-				() => collection.ReplaceOneAsync(updateFilterCapture, updateCapture, A<ReplaceOptions>._, default)
-			)
-			.Returns(new ReplaceOneResult.Acknowledged(1, 1, default));
-	}
-
 	[Fact]
-	public async Task CallReplaceOneToUpdate()
+	public async Task CallBulkWriteOnce()
 	{
 		await repository.Update(itemList);
 
-		foreach (var currentItem in itemList)
-		{
-			A.CallTo(
-					() =>
-						collection.ReplaceOneAsync(
-							A<ExpressionFilterDefinition<TestingMongoObject>>._,
-							currentItem,
-							A<ReplaceOptions>._,
-							default
-						)
+		A.CallTo(() => collection.BulkWriteAsync(A<IEnumerable<WriteModel<TestingMongoObject>>>._, default, default))
+			.MustHaveHappenedOnceExactly();
+	}
+
+	[Fact]
+	public async Task ReplaceEveryItemInTheBulkWrite()
+	{
+		await repository.Update(itemList);
+
+		A.CallTo(() =>
+				collection.BulkWriteAsync(
+					A<IEnumerable<WriteModel<TestingMongoObject>>>.That.Matches(requests =>
+						requests
+							.Cast<ReplaceOneModel<TestingMongoObject>>()
+							.Select(model => model.Replacement)
+							.SequenceEqual(itemList)
+					),
+					default,
+					default
 				)
-				.MustHaveHappened();
-		}
+			)
+			.MustHaveHappenedOnceExactly();
+	}
 
-		var filter = updateFilterCapture.Values.FirstOrDefault()!.Expression.Compile();
+	[Fact]
+	public async Task NotCallReplaceOne()
+	{
+		await repository.Update(itemList);
 
-		foreach (var currentItem in itemList)
-		{
-			filter(currentItem).Should().BeTrue();
-		}
+		A.CallTo(() =>
+				collection.ReplaceOneAsync(
+					A<FilterDefinition<TestingMongoObject>>._,
+					A<TestingMongoObject>._,
+					A<ReplaceOptions>._,
+					default
+				)
+			)
+			.MustNotHaveHappened();
+	}
+
+	[Fact]
+	public async Task NotTouchTheCollectionForAnEmptyList()
+	{
+		await repository.Update([]);
+
+		A.CallTo(collection).MustNotHaveHappened();
 	}
 
 	[Fact]

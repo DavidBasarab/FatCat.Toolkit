@@ -43,10 +43,14 @@ public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongo
 
 	public async Task<List<T>> Create(List<T> items)
 	{
-		foreach (var item in items)
+		if (items.Count == 0)
 		{
-			await Create(item);
+			return items;
 		}
+
+		EnsureCollection();
+
+		await Collection.InsertManyAsync(items);
 
 		return items;
 	}
@@ -62,10 +66,14 @@ public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongo
 
 	public async Task<List<T>> Delete(List<T> items)
 	{
-		foreach (var item in items)
+		if (items.Count == 0)
 		{
-			await Delete(item);
+			return items;
 		}
+
+		EnsureCollection();
+
+		await Collection.DeleteManyAsync(Builders<T>.Filter.In(item => item.Id, items.Select(item => item.Id)));
 
 		return items;
 	}
@@ -135,12 +143,21 @@ public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongo
 
 	public async Task<List<T>> Update(List<T> items)
 	{
-		foreach (var item in items)
+		if (items.Count == 0)
 		{
-			await Update(item);
+			return items;
 		}
 
+		EnsureCollection();
+
+		await Collection.BulkWriteAsync(items.Select(ReplaceModelFor));
+
 		return items;
+	}
+
+	private ReplaceOneModel<T> ReplaceModelFor(T item)
+	{
+		return new ReplaceOneModel<T>(Builders<T>.Filter.Eq(current => current.Id, item.Id), item);
 	}
 
 	private void EnsureCollection()

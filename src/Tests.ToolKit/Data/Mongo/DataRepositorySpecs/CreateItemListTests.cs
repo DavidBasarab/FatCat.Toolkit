@@ -5,14 +5,27 @@ namespace Tests.FatCat.Toolkit.Data.Mongo.DataRepositorySpecs;
 public class CreateItemListTests : EnsureCollectionTests
 {
 	[Fact]
-	public async Task CallInsertOneForEachItemInList()
+	public async Task CallInsertManyOnce()
 	{
 		await repository.Create(itemList);
 
-		foreach (var currentItem in itemList)
-		{
-			A.CallTo(() => collection.InsertOneAsync(currentItem, default, default)).MustHaveHappened();
-		}
+		A.CallTo(() => collection.InsertManyAsync(itemList, default, default)).MustHaveHappenedOnceExactly();
+	}
+
+	[Fact]
+	public async Task NotCallInsertOne()
+	{
+		await repository.Create(itemList);
+
+		A.CallTo(() => collection.InsertOneAsync(A<TestingMongoObject>._, default, default)).MustNotHaveHappened();
+	}
+
+	[Fact]
+	public async Task NotTouchTheCollectionForAnEmptyList()
+	{
+		await repository.Create([]);
+
+		A.CallTo(collection).MustNotHaveHappened();
 	}
 
 	[Fact]

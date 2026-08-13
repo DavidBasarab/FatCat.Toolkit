@@ -14,6 +14,24 @@ public interface IMongoRepository<T> : IDataRepository<T>
 
 	public void Connect(string? connectionString = null, string? databaseName = null);
 
+	/// <summary>
+	/// The number of documents matching <paramref name="filter" />, counted <b>on the server</b>: no
+	/// document is transferred or deserialised. Returns <c>0</c> when nothing matches.
+	/// </summary>
+	public Task<long> CountByFilter(Expression<Func<T, bool>> filter);
+
+	/// <summary>
+	/// The distinct values of <paramref name="field" /> across the documents matching
+	/// <paramref name="filter" />, computed <b>on the server</b>. Returns an empty list when nothing
+	/// matches.
+	/// <para>
+	/// <b>A matching document that carries no value for the field contributes <c>null</c> to the result,
+	/// and that entry is deliberately not filtered out.</b> "Some documents have no value here" is
+	/// frequently the answer a caller is asking for — dropping it would make that state invisible.
+	/// </para>
+	/// </summary>
+	public Task<List<TValue>> DistinctByFilter<TValue>(Expression<Func<T, TValue>> field, Expression<Func<T, bool>> filter);
+
 	public Task<T?> GetById(string id);
 
 	public Task<T?> GetById(ObjectId id);
@@ -30,6 +48,13 @@ public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongo
 	{
 		Collection = mongoDataConnection.GetCollection<T>(connectionString, databaseName);
 		DatabaseName = databaseName ?? mongoNames.GetDatabaseName<T>();
+	}
+
+	public async Task<long> CountByFilter(Expression<Func<T, bool>> filter)
+	{
+		EnsureCollection();
+
+		return await Collection.CountDocumentsAsync(filter);
 	}
 
 	public async Task<T> Create(T item)
@@ -76,6 +101,18 @@ public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongo
 		await Collection.DeleteManyAsync(Builders<T>.Filter.In(item => item.Id, items.Select(item => item.Id)));
 
 		return items;
+	}
+
+	public async Task<List<TValue>> DistinctByFilter<TValue>(
+		Expression<Func<T, TValue>> field,
+		Expression<Func<T, bool>> filter
+	)
+	{
+		EnsureCollection();
+
+		var cursor = await Collection.DistinctAsync(new ExpressionFieldDefinition<T, TValue>(field), filter);
+
+		return await cursor.ToListAsync();
 	}
 
 	public async Task<List<T>> GetAll()

@@ -32,6 +32,28 @@ public interface IMongoRepository<T> : IDataRepository<T>
 	/// </summary>
 	public Task<List<TValue>> DistinctByFilter<TValue>(Expression<Func<T, TValue>> field, Expression<Func<T, bool>> filter);
 
+	/// <summary>
+	/// A single page of the documents matching <paramref name="filter" />, sorted on
+	/// <paramref name="sortBy" /> (<paramref name="sortDescending" /> chooses the direction), sliced by
+	/// <paramref name="skip" /> and <paramref name="limit" /> — all <b>on the server</b>. The returned
+	/// <see cref="PagedResults{T}.TotalCount" /> is <b>every</b> document matching the filter, independent of
+	/// <paramref name="skip" /> and <paramref name="limit" />. Returns an empty page with a <c>0</c> count
+	/// when nothing matches.
+	/// </summary>
+	public Task<PagedResults<T>> QueryByFilter<TSort>(
+		Expression<Func<T, bool>> filter,
+		Expression<Func<T, TSort>> sortBy,
+		bool sortDescending,
+		int skip,
+		int limit
+	);
+
+	/// <summary>
+	/// Deletes every document matching <paramref name="filter" /> in one server-side command and returns how
+	/// many were removed. A filter matching nothing is a legal no-op that returns <c>0</c> and does not throw.
+	/// </summary>
+	public Task<long> DeleteByFilter(Expression<Func<T, bool>> filter);
+
 	public Task<T?> GetById(string id);
 
 	public Task<T?> GetById(ObjectId id);
@@ -103,6 +125,15 @@ public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongo
 		return items;
 	}
 
+	public async Task<long> DeleteByFilter(Expression<Func<T, bool>> filter)
+	{
+		EnsureCollection();
+
+		var result = await Collection.DeleteManyAsync(filter);
+
+		return result.DeletedCount;
+	}
+
 	public async Task<List<TValue>> DistinctByFilter<TValue>(
 		Expression<Func<T, TValue>> field,
 		Expression<Func<T, bool>> filter
@@ -131,6 +162,27 @@ public class MongoRepository<T>(IMongoDataConnection mongoDataConnection, IMongo
 		var cursor = await Collection.FindAsync(filter);
 
 		return await cursor.ToListAsync();
+	}
+
+	public async Task<PagedResults<T>> QueryByFilter<TSort>(
+		Expression<Func<T, bool>> filter,
+		Expression<Func<T, TSort>> sortBy,
+		bool sortDescending,
+		int skip,
+		int limit
+	)
+	{
+		EnsureCollection();
+
+		var totalCount = await Collection.CountDocumentsAsync(filter);
+
+		var sortField = Expression.Lambda<Func<T, object>>(Expression.Convert(sortBy.Body, typeof(object)), sortBy.Parameters);
+
+		var sort = sortDescending ? Builders<T>.Sort.Descending(sortField) : Builders<T>.Sort.Ascending(sortField);
+
+		var items = await Collection.Find(filter).Sort(sort).Skip(skip).Limit(limit).ToListAsync();
+
+		return new PagedResults<T> { Items = items, TotalCount = totalCount };
 	}
 
 	public async Task<T?> GetByFilter(Expression<Func<T, bool>> filter)

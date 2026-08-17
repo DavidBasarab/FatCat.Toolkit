@@ -84,6 +84,22 @@ public class QueryByFilterTests : EnsureCollectionTests
 	}
 
 	[Fact]
+	public async Task SortDescendingOnADateTimeFieldWhenAsked()
+	{
+		await repository.QueryByFilter(i => i.Number == filterNumber, i => i.SomeDate, true, skip, limit);
+
+		RenderedSort().Should().Be(new BsonDocument("SomeDate", -1));
+	}
+
+	[Fact]
+	public async Task SortAscendingOnADateTimeFieldWhenAsked()
+	{
+		await repository.QueryByFilter(i => i.Number == filterNumber, i => i.SomeDate, false, skip, limit);
+
+		RenderedSort().Should().Be(new BsonDocument("SomeDate", 1));
+	}
+
+	[Fact]
 	public async Task ReturnAnEmptyPageWhenNothingMatches()
 	{
 		totalCount = 0;

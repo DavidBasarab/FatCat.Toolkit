@@ -18,7 +18,15 @@ public class ToolkitHubClientFactoryTests
 		hubUrl = Faker.Create<string>();
 
 		A.CallTo(() => scope.Resolve<IToolkitHubClientConnection>()).Returns(connection);
-		A.CallTo(() => connection.TryToConnect(A<string>._, A<Action>._, A<Action<HttpConnectionOptions>>._, A<bool>._))
+		A.CallTo(() =>
+				connection.TryToConnect(
+					A<string>._,
+					A<Action>._,
+					A<Action<HttpConnectionOptions>>._,
+					A<bool>._,
+					A<TimeSpan[]>._
+				)
+			)
 			.Returns(true);
 
 		sut = new ToolkitHubClientFactory(scope);
@@ -31,7 +39,8 @@ public class ToolkitHubClientFactoryTests
 
 		await sut.ConnectToClient(hubUrl, configureOptions);
 
-		A.CallTo(() => connection.Connect(hubUrl, A<Action>._, configureOptions, A<bool>._)).MustHaveHappened();
+		A.CallTo(() => connection.Connect(hubUrl, A<Action>._, configureOptions, A<bool>._, A<TimeSpan[]>._))
+			.MustHaveHappened();
 	}
 
 	[Fact]
@@ -39,7 +48,8 @@ public class ToolkitHubClientFactoryTests
 	{
 		await sut.ConnectToClient(hubUrl, automaticReconnect: true);
 
-		A.CallTo(() => connection.Connect(hubUrl, A<Action>._, A<Action<HttpConnectionOptions>>._, true)).MustHaveHappened();
+		A.CallTo(() => connection.Connect(hubUrl, A<Action>._, A<Action<HttpConnectionOptions>>._, true, A<TimeSpan[]>._))
+			.MustHaveHappened();
 	}
 
 	[Fact]
@@ -49,7 +59,8 @@ public class ToolkitHubClientFactoryTests
 
 		await sut.TryToConnectToClient(hubUrl, configureOptions: configureOptions);
 
-		A.CallTo(() => connection.TryToConnect(hubUrl, A<Action>._, configureOptions, A<bool>._)).MustHaveHappened();
+		A.CallTo(() => connection.TryToConnect(hubUrl, A<Action>._, configureOptions, A<bool>._, A<TimeSpan[]>._))
+			.MustHaveHappened();
 	}
 
 	[Fact]
@@ -57,7 +68,7 @@ public class ToolkitHubClientFactoryTests
 	{
 		await sut.TryToConnectToClient(hubUrl, automaticReconnect: true);
 
-		A.CallTo(() => connection.TryToConnect(hubUrl, A<Action>._, A<Action<HttpConnectionOptions>>._, true))
+		A.CallTo(() => connection.TryToConnect(hubUrl, A<Action>._, A<Action<HttpConnectionOptions>>._, true, A<TimeSpan[]>._))
 			.MustHaveHappened();
 	}
 }

@@ -14,3 +14,5 @@ public delegate Task ToolkitHubClientDisconnected(ToolkitUser user, string conne
 public delegate Task ToolkitHubReconnecting(Exception? exception);
 
 public delegate Task ToolkitHubReconnected(string? connectionId);
+
+public delegate Task ToolkitHubConnectionLost();

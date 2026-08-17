@@ -18,11 +18,14 @@ public interface IToolkitHubClientConnection : IAsyncDisposable
 
 	public event ToolkitHubReconnected Reconnected;
 
+	public event ToolkitHubConnectionLost ConnectionLost;
+
 	public Task Connect(
 		string hubUrl,
 		Action onConnectionLost = null,
 		Action<HttpConnectionOptions> configureOptions = null,
-		bool automaticReconnect = false
+		bool automaticReconnect = false,
+		TimeSpan[] retryDelays = null
 	);
 
 	public Task Disconnect();
@@ -39,7 +42,8 @@ public interface IToolkitHubClientConnection : IAsyncDisposable
 		string hubUrl,
 		Action onConnectionLost = null,
 		Action<HttpConnectionOptions> configureOptions = null,
-		bool automaticReconnect = false
+		bool automaticReconnect = false,
+		TimeSpan[] retryDelays = null
 	);
 }
 
@@ -61,18 +65,21 @@ public class ToolkitHubClientConnection(
 
 	public event ToolkitHubReconnected Reconnected;
 
+	public event ToolkitHubConnectionLost ConnectionLost;
+
 	public async Task Connect(
 		string hubUrl,
 		Action onConnectionLost = null,
 		Action<HttpConnectionOptions> configureOptions = null,
-		bool automaticReconnect = false
+		bool automaticReconnect = false,
+		TimeSpan[] retryDelays = null
 	)
 	{
 		var builder = hubConnectionBuilderFactory.Create(hubUrl, options => configureOptions?.Invoke(options));
 
 		if (automaticReconnect)
 		{
-			builder = builder.WithAutomaticReconnect();
+			builder = ConfigureAutomaticReconnect(builder, retryDelays);
 		}
 
 		connection = builder.Build();
@@ -81,7 +88,7 @@ public class ToolkitHubClientConnection(
 		{
 			onConnectionLost?.Invoke();
 
-			return Task.CompletedTask;
+			return ConnectionLost?.Invoke() ?? Task.CompletedTask;
 		};
 
 		connection.Reconnecting += exception =>
@@ -110,7 +117,11 @@ public class ToolkitHubClientConnection(
 	public async ValueTask DisposeAsync()
 	{
 		await Disconnect();
-		await connection.DisposeAsync();
+
+		if (connection is not null)
+		{
+			await connection.DisposeAsync();
+		}
 	}
 
 	public async Task<ToolkitMessage> Send(ToolkitMessage message, TimeSpan? timeout = null)
@@ -171,12 +182,13 @@ public class ToolkitHubClientConnection(
 		string hubUrl,
 		Action onConnectionLost = null,
 		Action<HttpConnectionOptions> configureOptions = null,
-		bool automaticReconnect = false
+		bool automaticReconnect = false,
+		TimeSpan[] retryDelays = null
 	)
 	{
 		try
 		{
-			await Connect(hubUrl, onConnectionLost, configureOptions, automaticReconnect);
+			await Connect(hubUrl, onConnectionLost, configureOptions, automaticReconnect, retryDelays);
 
 			return true;
 		}
@@ -184,6 +196,16 @@ public class ToolkitHubClientConnection(
 		{
 			return false;
 		}
+	}
+
+	private static IHubConnectionBuilder ConfigureAutomaticReconnect(IHubConnectionBuilder builder, TimeSpan[] retryDelays)
+	{
+		if (retryDelays is null)
+		{
+			return builder.WithAutomaticReconnect();
+		}
+
+		return builder.WithAutomaticReconnect(retryDelays);
 	}
 
 	private Task<string> InvokeDataBufferMessage(ToolkitMessage message, byte[] dataBuffer)

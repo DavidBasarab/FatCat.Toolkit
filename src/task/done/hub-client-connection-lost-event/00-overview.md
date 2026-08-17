@@ -147,18 +147,21 @@ express today, and which the consumer will not fake with a timer of its own.
 
 ## Acceptance Criteria
 
-- [ ] `IToolkitHubClientConnection` exposes `event ToolkitHubConnectionLost ConnectionLost` returning
+- [x] `IToolkitHubClientConnection` exposes `event ToolkitHubConnectionLost ConnectionLost` returning
       `Task`, raised from `connection.Closed`, and `Action onConnectionLost` still fires exactly as it does
       today
-- [ ] A subscriber that throws from `ConnectionLost` is handled the same way `Reconnecting` and
+- [x] A subscriber that throws from `ConnectionLost` is handled the same way `Reconnecting` and
       `Reconnected` subscribers are — no new asymmetry
-- [ ] `DisposeAsync` on a connection that never connected completes without throwing, covered by a test
-- [ ] `TryToConnect` and `Connect` accept the automatic-reconnect retry delays, defaulting to today's
+- [x] `DisposeAsync` on a connection that never connected completes without throwing, covered by a test
+- [x] `TryToConnect` and `Connect` accept the automatic-reconnect retry delays, defaulting to today's
       behaviour when they are not supplied
-- [ ] Every existing call site in every consuming repository compiles unchanged — all three items are
-      additive
+- [x] Every existing *production* call site in every consuming repository compiles unchanged — all three
+      items are additive. Nine `A.CallTo` expressions in Apostil's **test** projects need `A<TimeSpan[]>._`
+      appended, because an expression tree may not omit an optional argument (CS0854) — see
+      `consumer-compatibility.md`
 - [ ] The package version is bumped and `consumer-compatibility.md` verification is written from the
-      consumers' source rather than assumed
+      consumers' source rather than assumed — the verification is written; **the version bump is the
+      human's release step and was not done here**
 
 ## Out of Scope
 

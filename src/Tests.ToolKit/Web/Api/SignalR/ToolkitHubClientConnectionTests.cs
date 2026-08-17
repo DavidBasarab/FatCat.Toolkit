@@ -4,6 +4,7 @@ using System.Reflection;
 using FatCat.Toolkit;
 using FatCat.Toolkit.Logging;
 using FatCat.Toolkit.Web.Api.SignalR;
+using Humanizer;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Connections.Client;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -70,37 +71,34 @@ public class ToolkitHubClientConnectionTests
 	{
 		await sut.Connect(hubUrl);
 
-		A.CallTo(
-				() =>
-					connection.On(
-						ToolkitHubMethodNames.ServerResponseMessage,
-						A<Type[]>._,
-						A<Func<object[], object, Task>>._,
-						A<object>._
-					)
+		A.CallTo(() =>
+				connection.On(
+					ToolkitHubMethodNames.ServerResponseMessage,
+					A<Type[]>._,
+					A<Func<object[], object, Task>>._,
+					A<object>._
+				)
 			)
 			.MustHaveHappened()
 			.Then(
-				A.CallTo(
-						() =>
-							connection.On(
-								ToolkitHubMethodNames.ServerOriginatedMessage,
-								A<Type[]>._,
-								A<Func<object[], object, Task>>._,
-								A<object>._
-							)
+				A.CallTo(() =>
+						connection.On(
+							ToolkitHubMethodNames.ServerOriginatedMessage,
+							A<Type[]>._,
+							A<Func<object[], object, Task>>._,
+							A<object>._
+						)
 					)
 					.MustHaveHappened()
 			)
 			.Then(
-				A.CallTo(
-						() =>
-							connection.On(
-								ToolkitHubMethodNames.ServerDataBufferMessage,
-								A<Type[]>._,
-								A<Func<object[], object, Task>>._,
-								A<object>._
-							)
+				A.CallTo(() =>
+						connection.On(
+							ToolkitHubMethodNames.ServerDataBufferMessage,
+							A<Type[]>._,
+							A<Func<object[], object, Task>>._,
+							A<object>._
+						)
 					)
 					.MustHaveHappened()
 			)
@@ -153,6 +151,163 @@ public class ToolkitHubClientConnectionTests
 		await sut.Connect(hubUrl);
 
 		services.Any(descriptor => descriptor.ServiceType == typeof(IRetryPolicy)).Should().Not.BeTrue();
+	}
+
+	[Fact]
+	public async Task UseTheSuppliedRetryDelaysForAutomaticReconnect()
+	{
+		var services = new ServiceCollection();
+
+		A.CallTo(() => builder.Services).Returns(services);
+
+		TimeSpan[] retryDelays = [3.Seconds(), 5.Seconds()];
+
+		await sut.Connect(hubUrl, automaticReconnect: true, retryDelays: retryDelays);
+
+		GetRetryDelay(services, 0).Should().Be(3.Seconds());
+	}
+
+	[Fact]
+	public async Task UseSignalRDefaultRetryDelaysWhenNoRetryDelaysAreSupplied()
+	{
+		var services = new ServiceCollection();
+
+		A.CallTo(() => builder.Services).Returns(services);
+
+		await sut.Connect(hubUrl, automaticReconnect: true);
+
+		GetRetryDelay(services, 1).Should().Be(2.Seconds());
+	}
+
+	[Fact]
+	public async Task NotConfigureAutomaticReconnectWhenRetryDelaysAreSuppliedWithoutOptingIn()
+	{
+		var services = new ServiceCollection();
+
+		A.CallTo(() => builder.Services).Returns(services);
+
+		TimeSpan[] retryDelays = [3.Seconds(), 5.Seconds()];
+
+		await sut.Connect(hubUrl, retryDelays: retryDelays);
+
+		services.Any(descriptor => descriptor.ServiceType == typeof(IRetryPolicy)).Should().Not.BeTrue();
+	}
+
+	[Fact]
+	public async Task UseTheSuppliedRetryDelaysWhenTryingToConnect()
+	{
+		var services = new ServiceCollection();
+
+		A.CallTo(() => builder.Services).Returns(services);
+
+		TimeSpan[] retryDelays = [7.Seconds(), 11.Seconds()];
+
+		await sut.TryToConnect(hubUrl, automaticReconnect: true, retryDelays: retryDelays);
+
+		GetRetryDelay(services, 0).Should().Be(7.Seconds());
+	}
+
+	[Fact]
+	public async Task RaiseConnectionLostWhenTheConnectionCloses()
+	{
+		var connectionLostWasRaised = false;
+
+		sut.ConnectionLost += () =>
+		{
+			connectionLostWasRaised = true;
+
+			return Task.CompletedTask;
+		};
+
+		await sut.Connect(hubUrl);
+
+		await RaiseConnectionClosed();
+
+		connectionLostWasRaised.Should().BeTrue();
+	}
+
+	[Fact]
+	public async Task InvokeTheConnectionLostActionWhenTheConnectionCloses()
+	{
+		var connectionLostActionWasInvoked = false;
+
+		Action onConnectionLost = () =>
+		{
+			connectionLostActionWasInvoked = true;
+		};
+
+		await sut.Connect(hubUrl, onConnectionLost);
+
+		await RaiseConnectionClosed();
+
+		connectionLostActionWasInvoked.Should().BeTrue();
+	}
+
+	[Fact]
+	public async Task InvokeTheConnectionLostActionBeforeRaisingConnectionLost()
+	{
+		var callCount = 0;
+		var actionCallNumber = 0;
+		var eventCallNumber = 0;
+
+		Action onConnectionLost = () =>
+		{
+			actionCallNumber = ++callCount;
+		};
+
+		sut.ConnectionLost += () =>
+		{
+			eventCallNumber = ++callCount;
+
+			return Task.CompletedTask;
+		};
+
+		await sut.Connect(hubUrl, onConnectionLost);
+
+		await RaiseConnectionClosed();
+
+		actionCallNumber.Should().BeLessThan(eventCallNumber);
+	}
+
+	[Fact]
+	public async Task WaitOnTheConnectionLostSubscriberWhenTheConnectionCloses()
+	{
+		var subscriberCompletion = new TaskCompletionSource();
+
+		sut.ConnectionLost += () =>
+		{
+			return subscriberCompletion.Task;
+		};
+
+		await sut.Connect(hubUrl);
+
+		var closedTask = RaiseConnectionClosed();
+
+		var completedBeforeTheSubscriberDid = closedTask.IsCompleted;
+
+		subscriberCompletion.SetResult();
+
+		await closedTask;
+
+		completedBeforeTheSubscriberDid.Should().BeFalse();
+	}
+
+	[Fact]
+	public async Task CloseWithoutThrowingWhenNothingIsSubscribedToConnectionLost()
+	{
+		await sut.Connect(hubUrl);
+
+		var exception = await Record.ExceptionAsync(() => RaiseConnectionClosed());
+
+		exception.Should().BeNull();
+	}
+
+	[Fact]
+	public async Task DisposeWithoutThrowingWhenTheConnectionWasNeverMade()
+	{
+		var exception = await Record.ExceptionAsync(() => sut.DisposeAsync().AsTask());
+
+		exception.Should().BeNull();
 	}
 
 	[Fact]
@@ -229,8 +384,8 @@ public class ToolkitHubClientConnectionTests
 
 		await sut.Connect(hubUrl);
 
-		var exception = await Record.ExceptionAsync(
-			() => sut.Send(Faker.Create<ToolkitMessage>(), TimeSpan.FromMilliseconds(50))
+		var exception = await Record.ExceptionAsync(() =>
+			sut.Send(Faker.Create<ToolkitMessage>(), TimeSpan.FromMilliseconds(50))
 		);
 
 		exception.Should().BeOfType<TimeoutException>();
@@ -246,11 +401,31 @@ public class ToolkitHubClientConnectionTests
 
 		await Record.ExceptionAsync(() => sut.Send(Faker.Create<ToolkitMessage>(), TimeSpan.FromMilliseconds(50)));
 
-		var lateException = Record.Exception(
-			() => DeliverServerResponse(Faker.Create<int>(), sessionId, Faker.Create<string>())
+		var lateException = Record.Exception(() =>
+			DeliverServerResponse(Faker.Create<int>(), sessionId, Faker.Create<string>())
 		);
 
 		lateException.Should().BeNull();
+	}
+
+	private Task RaiseConnectionClosed()
+	{
+		var closedField = typeof(HubConnection).GetField(
+			nameof(HubConnection.Closed),
+			BindingFlags.Instance | BindingFlags.NonPublic
+		);
+
+		var closedHandler = (Func<Exception, Task>)closedField.GetValue(connection);
+
+		return closedHandler.Invoke(null);
+	}
+
+	private static TimeSpan GetRetryDelay(ServiceCollection services, int previousRetryCount)
+	{
+		var retryPolicy = (IRetryPolicy)
+			services.First(descriptor => descriptor.ServiceType == typeof(IRetryPolicy)).ImplementationInstance;
+
+		return retryPolicy.NextRetryDelay(new RetryContext { PreviousRetryCount = previousRetryCount }).Value;
 	}
 
 	private void DeliverServerResponse(int messageType, string sessionId, string data)

@@ -19,6 +19,10 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 
 	public EasyCapture<Expression<Func<T, bool>>> CountFilterCapture { get; private set; } = null!;
 
+	public long DeleteByFilterResult { get; set; }
+
+	public EasyCapture<Expression<Func<T, bool>>> DeleteFilterCapture { get; private set; } = null!;
+
 	public EasyCapture<T> CreatedCapture { get; } = new();
 
 	public T CreatedItem { get; set; } = null!;
@@ -44,6 +48,16 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 
 	public List<T> Items { get; set; } = null!;
 
+	public PagedResults<T> QueryByFilterResult { get; set; } = new();
+
+	public EasyCapture<Expression<Func<T, bool>>> QueryFilterCapture { get; private set; } = null!;
+
+	public int QueryLimit { get; private set; }
+
+	public int QuerySkip { get; private set; }
+
+	public bool QuerySortDescending { get; private set; }
+
 	public EasyCapture<T> UpdatedCapture { get; } = new();
 
 	public T UpdatedItem { get; set; } = null!;
@@ -61,6 +75,8 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 		SetUpGetByFilter();
 		SetUpCountByFilter();
 		SetUpDistinctByFilter();
+		SetUpDeleteByFilter();
+		SetUpQueryByFilter();
 	}
 
 	public void Connect(string connectionString = null, string databaseName = null)
@@ -71,6 +87,22 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 	public async Task<long> CountByFilter(Expression<Func<T, bool>> filter)
 	{
 		return await repository.CountByFilter(filter);
+	}
+
+	public async Task<long> DeleteByFilter(Expression<Func<T, bool>> filter)
+	{
+		return await repository.DeleteByFilter(filter);
+	}
+
+	public async Task<PagedResults<T>> QueryByFilter<TSort>(
+		Expression<Func<T, bool>> filter,
+		Expression<Func<T, TSort>> sortBy,
+		bool sortDescending,
+		int skip,
+		int limit
+	)
+	{
+		return await repository.QueryByFilter(filter, sortBy, sortDescending, skip, limit);
 	}
 
 	public async Task<T> Create(T item)
@@ -140,6 +172,26 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 	{
 		A.CallTo(() => repository.DistinctByFilter<TValue>(A<Expression<Func<T, TValue>>>._, DistinctFilterCapture))
 			.ReturnsLazily(() => values);
+	}
+
+	public void SetUpQuery<TSort>()
+	{
+		A.CallTo(() =>
+				repository.QueryByFilter<TSort>(
+					QueryFilterCapture,
+					A<Expression<Func<T, TSort>>>._,
+					A<bool>._,
+					A<int>._,
+					A<int>._
+				)
+			)
+			.Invokes(call =>
+			{
+				QuerySortDescending = call.GetArgument<bool>(2);
+				QuerySkip = call.GetArgument<int>(3);
+				QueryLimit = call.GetArgument<int>(4);
+			})
+			.ReturnsLazily(() => QueryByFilterResult);
 	}
 
 	public void SetUpItemNotInRepository()
@@ -272,6 +324,18 @@ public class MongoFakeRepository<T> : IMongoRepository<T>
 		CountFilterCapture = new EasyCapture<Expression<Func<T, bool>>>();
 
 		A.CallTo(() => repository.CountByFilter(CountFilterCapture)).ReturnsLazily(() => CountByFilterResult);
+	}
+
+	private void SetUpDeleteByFilter()
+	{
+		DeleteFilterCapture = new EasyCapture<Expression<Func<T, bool>>>();
+
+		A.CallTo(() => repository.DeleteByFilter(DeleteFilterCapture)).ReturnsLazily(() => DeleteByFilterResult);
+	}
+
+	private void SetUpQueryByFilter()
+	{
+		QueryFilterCapture = new EasyCapture<Expression<Func<T, bool>>>();
 	}
 
 	private void SetUpCreate()

@@ -94,6 +94,28 @@ public abstract class WebCallerTests
 	}
 
 	[Fact]
+	public async Task CanSendACustomHeader()
+	{
+		webCaller.AddHeader("x-custom-header", "the-value");
+
+		await MakeCall(BasicPath);
+
+		response.Headers.GetValueOrDefault("X-Custom-Header").Should().Be("the-value");
+	}
+
+	[Fact]
+	public async Task CanSendMultipleCustomHeaders()
+	{
+		webCaller.AddHeader("x-api-key", "the-api-key");
+		webCaller.AddHeader("anthropic-version", "2023-06-01");
+
+		await MakeCall(BasicPath);
+
+		response.Headers.GetValueOrDefault("X-Api-Key").Should().Be("the-api-key");
+		response.Headers.GetValueOrDefault("Anthropic-Version").Should().Be("2023-06-01");
+	}
+
+	[Fact]
 	public async Task CanTimeout()
 	{
 		webCaller.Timeout = 1.Seconds();
@@ -123,6 +145,20 @@ public abstract class WebCallerTests
 		await MakeCall(BasicPath);
 
 		VerifyBearerToken();
+	}
+
+	[Fact]
+	public async Task CustomHeaderCoexistsWithBearerToken()
+	{
+		UserBearerToken();
+
+		webCaller.AddHeader("x-custom-header", "the-value");
+
+		await MakeCall(BasicPath);
+
+		VerifyBearerToken();
+
+		response.Headers.GetValueOrDefault("X-Custom-Header").Should().Be("the-value");
 	}
 
 	[Fact]

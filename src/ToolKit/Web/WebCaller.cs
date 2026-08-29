@@ -16,6 +16,8 @@ public interface IWebCaller
 
 	public TimeSpan Timeout { get; set; }
 
+	public void AddHeader(string name, string value);
+
 	public Task<FatWebResponse> Delete(string url);
 
 	public Task<FatWebResponse> Delete(string url, TimeSpan timeout);
@@ -69,6 +71,8 @@ public interface IWebCaller
 
 public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger logger) : IWebCaller
 {
+	private readonly Dictionary<string, string> headers = [];
+
 	private string basicPassword;
 	private string basicUsername;
 	private string bearerToken;
@@ -80,6 +84,11 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 	public Uri BaseUri { get; } = uri;
 
 	public TimeSpan Timeout { get; set; } = 30.Seconds();
+
+	public void AddHeader(string name, string value)
+	{
+		headers[name] = value;
+	}
 
 	public void ClearAuthorization()
 	{
@@ -255,6 +264,21 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 		}
 	}
 
+	private void EnsureHeaders(HttpRequestMessage request)
+	{
+		if (headers.Count == 0)
+		{
+			return;
+		}
+
+		logger.Debug($"Adding <{headers.Count}> request headers");
+
+		foreach (var header in headers)
+		{
+			request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+		}
+	}
+
 	private void EnsureAuthorization(HttpRequestMessage request)
 	{
 		if (bearerToken is not null)
@@ -297,6 +321,7 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 		EnsureAccept(requestMessage);
 		EnsureAuthorization(requestMessage);
+		EnsureHeaders(requestMessage);
 
 		if (data.IsNotNullOrEmpty())
 		{

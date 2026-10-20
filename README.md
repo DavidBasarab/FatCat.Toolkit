@@ -119,6 +119,31 @@ var settings = new ToolkitWebApplicationSettings
 ToolkitWebApplication.Run(settings);
 ```
 
+### Client IP and Forwarded Headers
+
+After the toolkit's forwarded-headers middleware runs, `HttpContext.Connection.RemoteIpAddress` **is** the client IP. Do not parse `X-Forwarded-For` yourself — whatever is left in it was written by the caller.
+
+The default trusts any proxy with `ForwardLimit = 1` and forwards `X-Forwarded-For`, `X-Forwarded-Proto` and `X-Forwarded-Host`. That is correct only when every request passes through exactly one trusted proxy that appends the client address, such as Azure App Service.
+
+| Setting | Default | Use it to |
+|---------|---------|-----------|
+| `ConfigureForwardedHeaders` | `null` | Adjust `ForwardedHeadersOptions` after the toolkit defaults are applied — set `KnownProxies` / `KnownIPNetworks`, raise `ForwardLimit`, or set `ForwardedHeaders = ForwardedHeaders.None`. |
+| `UseForwardedHeaders` | `true` | Set to `false` when nothing sits in front of the app; `RemoteIpAddress` is then the raw socket address. |
+| `StripUnconsumedForwardedFor` | `false` | Remove the caller-written hops left in `X-Forwarded-For` so no downstream code can mistake one for the client. `X-Original-For` still holds the proxy's address. |
+
+```csharp
+var settings = new ToolkitWebApplicationSettings
+{
+    StripUnconsumedForwardedFor = true,
+    // Behind Azure Front Door or a CDN as well as App Service
+    ConfigureForwardedHeaders = options =>
+    {
+        options.ForwardLimit = 2;
+        options.KnownIPNetworks.Add(System.Net.IPNetwork.Parse("10.0.0.0/8"));
+    }
+};
+```
+
 ### Web Results in Controllers
 
 ```csharp

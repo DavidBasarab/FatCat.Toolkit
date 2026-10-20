@@ -19,6 +19,8 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public List<Assembly> ContainerAssemblies { get; set; } = new();
 
+	public Action<ForwardedHeadersOptions> ConfigureForwardedHeaders { get; set; }
+
 	public Action<ILoggingBuilder> ConfigureLogging { get; set; }
 
 	public Action<IApplicationBuilder> ConfigureMiddleware { get; set; }
@@ -43,9 +45,13 @@ public class ToolkitWebApplicationSettings : EqualObject
 
 	public string StaticFileLocation { get; set; }
 
+	public bool StripUnconsumedForwardedFor { get; set; }
+
 	public CertificationSettings TlsCertificate { get; set; }
 
 	public IToolkitTokenParameters ToolkitTokenParameters { get; set; }
+
+	public bool UseForwardedHeaders { get; set; } = true;
 
 	public event ToolkitHubClientConnected ClientConnected;
 

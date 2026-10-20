@@ -4,7 +4,6 @@ using FatCat.Toolkit.Injection;
 using FatCat.Toolkit.Threading;
 using Humanizer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WebApplicationOptions = FatCat.Toolkit.Web.Api.WebApplicationOptions;
@@ -36,22 +35,7 @@ public static class ToolkitWebApplication
 
 		builder.Services.AddHttpContextAccessor();
 
-		builder.Services.Configure<ForwardedHeadersOptions>(options =>
-		{
-			options.ForwardedHeaders =
-				ForwardedHeaders.XForwardedFor
-				| ForwardedHeaders.XForwardedProto
-				| ForwardedHeaders.XForwardedHost;
-
-			// Azure front-ends/proxies often have dynamic IPs; this tells ASP.NET Core
-			// to accept forwarded headers from any proxy. Only do this if your app is
-			// NOT directly exposed to the internet except through Azure's proxy/ingress.
-			options.KnownIPNetworks.Clear();
-			options.KnownProxies.Clear();
-
-			// Helps prevent header chain abuse; usually 1 is correct for App Service/ACA.
-			options.ForwardLimit = 1;
-		});
+		builder.Services.AddToolkitForwardedHeaders(settings);
 
 		AddCors(builder);
 

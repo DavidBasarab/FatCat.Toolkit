@@ -27,7 +27,7 @@ internal sealed class ApplicationStartUp
 {
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
 	{
-		app.UseForwardedHeaders();
+		app.UseToolkitForwardedHeaders(ToolkitWebApplication.Settings);
 
 		// If you want https redirects, do it early (and AFTER forwarded headers)
 		if (ToolkitWebApplication.IsOptionSet(WebApplicationOptions.HttpsRedirection))

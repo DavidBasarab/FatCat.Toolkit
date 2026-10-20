@@ -91,6 +91,24 @@ public class ToolkitWebApplicationSettingsTests
 	}
 
 	[Fact]
+	public void ConfigureForwardedHeadersDefaultsToNull()
+	{
+		sut.ConfigureForwardedHeaders.Should().BeNull();
+	}
+
+	[Fact]
+	public void UseForwardedHeadersDefaultsToTrue()
+	{
+		sut.UseForwardedHeaders.Should().BeTrue();
+	}
+
+	[Fact]
+	public void StripUnconsumedForwardedForDefaultsToFalse()
+	{
+		sut.StripUnconsumedForwardedFor.Should().BeFalse();
+	}
+
+	[Fact]
 	public async Task OnClientHubMessageReturnsNullWhenNoSubscriber()
 	{
 		var result = await sut.OnClientHubMessage(message);

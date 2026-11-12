@@ -168,8 +168,8 @@ cache.Add(item, TimeSpan.FromMinutes(15));
 ## Global Usings
 The shipped projects (`ToolKit`, `Toolkit.WebServer`) do **not** use a `GlobalUsings.cs` — they have `ImplicitUsings` enabled and declare the rest per file. Do not add one. The test project does have one; see `testing.md`.
 
-## C# 14 / .NET 10
-- Both shipped projects target `net10.0` with `LangVersion` at the SDK default, so C# 14 features are available.
+## C# 15 / .NET 11
+- Both shipped projects target `net11.0` with `LangVersion` at the SDK default, so C# 15 features are available. .NET 10 is no longer supported.
 - The `field` keyword is accepted in property getters for backing-field initialization (`field ??= ...`).
 - Extension blocks (`extension(TargetType target) { ... }`) are accepted for grouping multiple extension methods on the same type.
 - Do not adopt a new language feature just because it exists — it must make the call site clearer than what it replaces, and it must not change the public API shape for consumers.

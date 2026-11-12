@@ -12,7 +12,7 @@ It is the single source of truth for what this library does and how consumers us
 The things you must know before touching a line of code:
 
 - **Product:** `FatCat.Toolkit` is a **published NuGet library**, not an application. Its consumers are other products that take a package reference. Every public type, member, and signature is a promise to a caller you cannot see — renaming or re-signing one breaks them at compile time.
-- **Tech stack:** **.NET 10 / C# 14**, Autofac for dependency injection, MongoDB for persistence, SignalR for real-time messaging, xUnit + FakeItEasy + FatCat.Testing + FatCat.Fakes for tests. There is no Serilog, no AutoMapper, no FluentAssertions, and no TypeScript or React in this repository.
+- **Tech stack:** **.NET 11 / C# 15**, Autofac for dependency injection, MongoDB for persistence, SignalR for real-time messaging, xUnit + FakeItEasy + FatCat.Testing + FatCat.Fakes for tests. There is no Serilog, no AutoMapper, no FluentAssertions, and no TypeScript or React in this repository.
 - **Layout:** the git root is `C:/Code/FatCat.Toolkit`; all code and tooling config live in `src/`. The solution is `src/ToolKit.slnx`.
 
 | Project | Assembly | Role |

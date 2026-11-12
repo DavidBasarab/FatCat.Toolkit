@@ -40,7 +40,11 @@ public class CallsWithMorePathInUri
 
 	private WebCaller CreateWebCaller(string baseUrl)
 	{
-		return new WebCaller(new Uri(baseUrl), new JsonOperations(), A.Fake<IToolkitLogger>());
+		var webCaller = new WebCaller(new Uri(baseUrl), new JsonOperations(), A.Fake<IToolkitLogger>());
+
+		webCaller.SetClient(new HttpClient(new FakeHttpBin()));
+
+		return webCaller;
 	}
 
 	private static string GetExpectedUrl(string endingPath)

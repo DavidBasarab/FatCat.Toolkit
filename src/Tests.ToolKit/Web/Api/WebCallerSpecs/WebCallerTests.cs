@@ -16,14 +16,7 @@ public abstract class WebCallerTests
 
 	protected HttpBinResponse response;
 
-	protected WebCaller webCaller = new(
-		new Uri("https://httpbin.org"),
-		new JsonOperations(),
-		A.Fake<IToolkitLogger>()
-	)
-	{
-		Accept = null,
-	};
+	protected WebCaller webCaller = CreateWebCaller("https://httpbin.org");
 
 	protected abstract string BasicPath { get; }
 
@@ -164,7 +157,7 @@ public abstract class WebCallerTests
 	[Fact]
 	public async Task DoACallWithAnExtraSlashOnUrl()
 	{
-		webCaller = new WebCaller(new Uri("https://httpbin.org/"), new JsonOperations(), A.Fake<IToolkitLogger>());
+		webCaller = CreateWebCaller("https://httpbin.org/");
 
 		await MakeCall(BasicPath);
 	}
@@ -199,6 +192,15 @@ public abstract class WebCallerTests
 		statusList.Count.Should().Be(3);
 
 		statusList.Should().BeEquivalentTo(new List<string> { "1", "2", "3" });
+	}
+
+	private static WebCaller CreateWebCaller(string baseUrl)
+	{
+		var caller = new WebCaller(new Uri(baseUrl), new JsonOperations(), A.Fake<IToolkitLogger>());
+
+		caller.SetClient(new HttpClient(new FakeHttpBin()));
+
+		return caller;
 	}
 
 	private async Task MakeCall(string path)

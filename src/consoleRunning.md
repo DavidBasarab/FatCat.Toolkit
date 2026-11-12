@@ -6,14 +6,14 @@ This guide uses the `OneOffToolkitOnly` project as the reference template for a 
 
 ## Project File
 
-Create an `Exe` project targeting `net10.0`. Reference `ToolKit` at minimum. Add `Toolkit.WebServer` if you need the web server.
+Create an `Exe` project targeting `net11.0`. Reference `ToolKit` at minimum. Add `Toolkit.WebServer` if you need the web server.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <LangVersion>default</LangVersion>

@@ -47,10 +47,8 @@ public class FatCatCache<T> : IFatCatCache<T>
 			timeoutEnabled = true;
 		}
 
-		cache.AddOrUpdate(
-			cacheItem.CacheId,
-			new CacheEntry<T>(cacheItem, timeout),
-			(key, value) => new CacheEntry<T>(cacheItem, timeout)
+		cache.AddOrUpdate(cacheItem.CacheId, new CacheEntry<T>(cacheItem, timeout), (key, value) =>
+			new CacheEntry<T>(cacheItem, timeout)
 		);
 	}
 

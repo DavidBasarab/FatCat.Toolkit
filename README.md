@@ -1,6 +1,6 @@
 # FatCat.Toolkit
 
-A comprehensive C# utility library and ASP.NET Core web framework for .NET 10.0. Provides common helpers, extension methods, dependency injection, data access, cryptography, caching, messaging, TCP communication, and a configurable web server with SignalR and JWT authentication.
+A comprehensive C# utility library and ASP.NET Core web framework for .NET 11.0. Provides common helpers, extension methods, dependency injection, data access, cryptography, caching, messaging, TCP communication, and a configurable web server with SignalR and JWT authentication.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

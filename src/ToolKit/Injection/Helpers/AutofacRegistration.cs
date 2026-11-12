@@ -176,14 +176,11 @@ public static class AutofacRegistration
 			else if (descriptor.ImplementationFactory != null)
 			{
 				var registration = RegistrationBuilder
-					.ForDelegate(
-						descriptor.ServiceType,
-						(context, parameters) =>
-						{
-							var serviceProvider = context.Resolve<IServiceProvider>();
-							return descriptor.ImplementationFactory(serviceProvider);
-						}
-					)
+					.ForDelegate(descriptor.ServiceType, (context, parameters) =>
+					{
+						var serviceProvider = context.Resolve<IServiceProvider>();
+						return descriptor.ImplementationFactory(serviceProvider);
+					})
 					.ConfigureLifecycle(descriptor.Lifetime, lifetimeScopeTagForSingletons)
 					.CreateRegistration();
 

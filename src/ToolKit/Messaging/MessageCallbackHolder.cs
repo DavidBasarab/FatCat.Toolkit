@@ -26,16 +26,13 @@ internal class MessageCallbackHolder<TMessage>
 	{
 		var newBag = new ConcurrentBag<Func<TMessage, Task>>();
 
-		Parallel.ForEach(
-			callbacks,
-			currentItem =>
+		Parallel.ForEach(callbacks, currentItem =>
+		{
+			if (!EqualityComparer<Func<TMessage, Task>>.Default.Equals(currentItem, callback))
 			{
-				if (!EqualityComparer<Func<TMessage, Task>>.Default.Equals(currentItem, callback))
-				{
-					newBag.Add(currentItem);
-				}
+				newBag.Add(currentItem);
 			}
-		);
+		});
 
 		callbacks.Clear();
 

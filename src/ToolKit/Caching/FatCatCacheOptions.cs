@@ -11,7 +11,11 @@ public class FatCatCacheOptions<T>
 {
 	/// <summary>
 	///     The most entries the cache holds. <c>null</c>, the default, means the cache is unbounded.
-	///     A capped cache may exceed this transiently by at most the number of concurrent writers.
+	///     When a new key is added to a full cache, expired entries are removed first; if the cache is still full,
+	///     the oldest entries by the time they were added or last updated are evicted until about 90% of this value
+	///     remains, which frees at least one slot when no other thread is writing. Updating an existing key never evicts.
+	///     Under concurrent writes a capped cache may hold more than this by at most the number of concurrent writers;
+	///     that excess stays until the next new key is added.
 	/// </summary>
 	public int? MaximumItems { get; set; }
 

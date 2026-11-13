@@ -30,6 +30,23 @@ public abstract class FatCatCacheTests
 		return item;
 	}
 
+	protected TestCacheItem AddItemAfterASecond(TimeSpan? timeout = null)
+	{
+		AdvanceClock(1.Seconds());
+
+		return AddItem(timeout);
+	}
+
+	protected List<TestCacheItem> AddItems(int count, TimeSpan? timeout = null)
+	{
+		return Enumerable.Range(0, count).Select(_ => AddItem(timeout)).ToList();
+	}
+
+	protected List<TestCacheItem> AddItemsOneSecondApart(int count, TimeSpan? timeout = null)
+	{
+		return Enumerable.Range(0, count).Select(_ => AddItemAfterASecond(timeout)).ToList();
+	}
+
 	protected void AdvanceClock(TimeSpan amount)
 	{
 		now += amount;
@@ -48,6 +65,16 @@ public abstract class FatCatCacheTests
 	protected void DelayTheSweepPastEveryScenario()
 	{
 		options.SweepInterval = 1.Days();
+	}
+
+	protected List<TestCacheItem> FillToCapacity()
+	{
+		return AddItems(options.MaximumItems.Value);
+	}
+
+	protected List<TestCacheItem> FillToCapacityOneSecondApart()
+	{
+		return AddItemsOneSecondApart(options.MaximumItems.Value);
 	}
 
 	protected void PassTheSweepInterval()

@@ -40,7 +40,9 @@ public class FatCatCache<T>(IDateTimeUtilities dateTimeUtilities, FatCatCacheOpt
 		?? throw new ArgumentNullException(nameof(dateTimeUtilities));
 
 	private readonly int? maximumItems = RequirePositiveMaximumItems(RequireOptions(options).MaximumItems);
+	private readonly int? lowWaterMark = LowWaterMarkFor(RequireOptions(options).MaximumItems);
 	private readonly TimeSpan sweepInterval = RequirePositiveSweepInterval(RequireOptions(options).SweepInterval);
+	private readonly Lock trimLock = new();
 
 	private long lastSweepTicks;
 
@@ -62,7 +64,14 @@ public class FatCatCache<T>(IDateTimeUtilities dateTimeUtilities, FatCatCacheOpt
 
 		SweepIfDue(now);
 
-		cache[cacheItem.CacheId] = new CacheEntry(cacheItem, timeout, now);
+		var entry = new CacheEntry(cacheItem, timeout, now);
+
+		if (NeedsRoomFor(cacheItem.CacheId))
+		{
+			MakeRoom(now);
+		}
+
+		cache[cacheItem.CacheId] = entry;
 	}
 
 	public void Add(List<T> cacheItems, TimeSpan? timeout = null)
@@ -112,6 +121,16 @@ public class FatCatCache<T>(IDateTimeUtilities dateTimeUtilities, FatCatCacheOpt
 		cache.TryRemove(cacheId, out _);
 	}
 
+	private static int? LowWaterMarkFor(int? maximumItems)
+	{
+		if (maximumItems == null)
+		{
+			return null;
+		}
+
+		return maximumItems - Math.Max(1, maximumItems.Value / 10);
+	}
+
 	private static FatCatCacheOptions<T> RequireOptions(FatCatCacheOptions<T> options)
 	{
 		if (options == null)
@@ -150,6 +169,17 @@ public class FatCatCache<T>(IDateTimeUtilities dateTimeUtilities, FatCatCacheOpt
 		return sweepInterval;
 	}
 
+	private void EvictOldest()
+	{
+		var entries = cache.ToArray();
+		var excessCount = entries.Length - lowWaterMark.GetValueOrDefault(entries.Length);
+
+		foreach (var pair in entries.OrderBy(pair => pair.Value.EntryTime).Take(excessCount))
+		{
+			cache.TryRemove(pair);
+		}
+	}
+
 	private CacheEntry? FindLiveEntry(string cacheId, DateTime now)
 	{
 		if (!cache.TryGetValue(cacheId, out var entry))
@@ -165,6 +195,39 @@ public class FatCatCache<T>(IDateTimeUtilities dateTimeUtilities, FatCatCacheOpt
 		cache.TryRemove(new KeyValuePair<string, CacheEntry>(cacheId, entry));
 
 		return null;
+	}
+
+	private bool IsFull()
+	{
+		return cache.Count >= maximumItems;
+	}
+
+	private bool IsUpdate(string cacheId)
+	{
+		return cache.ContainsKey(cacheId);
+	}
+
+	private void MakeRoom(DateTime now)
+	{
+		lock (trimLock)
+		{
+			if (!IsFull())
+			{
+				return;
+			}
+
+			SweepNow(now);
+
+			if (IsFull())
+			{
+				EvictOldest();
+			}
+		}
+	}
+
+	private bool NeedsRoomFor(string cacheId)
+	{
+		return maximumItems != null && !IsUpdate(cacheId) && IsFull();
 	}
 
 	private void RemoveExpired(DateTime now)
@@ -190,6 +253,13 @@ public class FatCatCache<T>(IDateTimeUtilities dateTimeUtilities, FatCatCacheOpt
 		}
 
 		RemoveExpired(now);
+	}
+
+	private void SweepNow(DateTime now)
+	{
+		RemoveExpired(now);
+
+		Interlocked.Exchange(ref lastSweepTicks, now.Ticks);
 	}
 
 	private class CacheEntry(T item, TimeSpan? timeout, DateTime entryTime)

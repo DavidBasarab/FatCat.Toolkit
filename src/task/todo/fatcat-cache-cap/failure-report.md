@@ -55,3 +55,7 @@ The implementation was functionally green: 45 new facts, 451 tests passing, no n
 ## Not started
 
 Phases 03, 04 and 05.
+
+## Resolution
+
+Phase 01 was retried from the saved patch (owner decision) and **passed**. Commit `26d2c6c`, 491 tests green. All six code-review #2 findings were resolved; the `SweepTests` rename was declined because the plan mandates the name. Wave 1 is complete.

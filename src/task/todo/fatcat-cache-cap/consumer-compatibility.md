@@ -30,3 +30,9 @@ Any Fog production call to `Add(List<T>, timeout)` that relied, unknowingly, on 
 ## What Fog does next (CG-01, not this plan)
 
 Take the released version and register `FatCatCacheOptions<T>` with a `MaximumItems` for: `IpGeoLocationCacheItem`, `TwilioLookupCacheItem`, `ReversePhoneCacheItem`, `PhoneVerificationCodeCacheItem`, `VerifyNonce`, `FindLokrNonce`, `DesktopNonce`, `TNonce`, `ZipCodeInfo`. Leave the connection, transfer and block caches unbounded.
+
+## Added after phase 01 (2026-11-13)
+
+- **Scoped clock registrations.** `FatCatCache<T>` is a `SingleInstance` that now depends on `IDateTimeUtilities`. A consumer that registers its own `IDateTimeUtilities` with a **tagged-scope** lifetime (`InstancePerRequest` or `InstancePerMatchingLifetimeScope`) gets a `DependencyResolutionException` when it resolves `IFatCatCache<T>`, because a singleton resolves its dependencies from the root scope, where no tagged scope exists. `InstancePerLifetimeScope` does not throw, but the singleton then holds the root-scope clock for the life of the container. Before this change the cache had no dependencies. Phase 05 greps Fog for `IDateTimeUtilities` registrations and records their lifetimes.
+- **Faked or frozen clocks in a consumer container.** Timed entries never expire while the clock does not move. This is by design: the cache now follows the container's clock.
+- **Backward wall-clock steps (ADR-14).** Entries written before the step live for their timeout plus the size of the step. This behaviour predates the change.

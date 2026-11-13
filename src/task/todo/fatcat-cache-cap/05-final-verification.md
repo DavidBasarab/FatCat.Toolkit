@@ -46,6 +46,7 @@ Re-run the checks in `consumer-compatibility.md` against `C:\Code\Fog` **as it i
 - every `new FatCatCache<` construction still compiles against the new constructors (the parameterless constructor exists);
 - every `FakeFatCatCache` usage: `VerifyAdd` / `VerifyAddList` / `VerifyDidNotAdd*` calls keep their meaning; there are no `.Cache.Add(` assertions;
 - Fog's own `RegisterGeneric(typeof(FatCatCache<>))` in `Common/Common/Infrastructure/CommonModule.cs` still resolves (same shape as `ToolkitModule`, proven by phase 03's container tests).
+- every Fog registration of `IDateTimeUtilities` and its lifetime. An `InstancePerRequest` / `InstancePerMatchingLifetimeScope` registration breaks resolution of the `SingleInstance` cache; see `consumer-compatibility.md`, "Added after phase 01";
 - every Fog **production** call to `Add(List<T>, timeout)`, listed so CG-01 can review it. These items will now expire as their callers intended, where before they never did.
 
 **Optional and human-approved only:** pack the toolkit to a local folder and build or test Fog against it. Do not do this without asking, and never change Fog's package references in its repo.

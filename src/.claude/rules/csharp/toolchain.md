@@ -42,7 +42,7 @@ If `dotnet format` changes something, that change is correct — do not revert i
 Both shipped projects set `TreatWarningsAsErrors` in Debug and Release, with a narrow `NoWarn` list. A new warning breaks the build — fix it rather than widening `NoWarn`. Adding an ID to `NoWarn` is a deliberate, explained decision, not a way to get a build green.
 
 ## Rider / ReSharper
-The team uses Rider. Solution-wide inspection settings live in `src/ToolKit.sln.DotSettings`. If ReSharper flags something, address it rather than suppressing it. When a suppression is genuinely necessary:
+The team uses Rider. Solution-wide inspection settings live in `src/ToolKit.slnx.DotSettings`. If ReSharper flags something, address it rather than suppressing it. When a suppression is genuinely necessary:
 ```csharp
 // ReSharper disable once <RuleName> — <reason>
 ```

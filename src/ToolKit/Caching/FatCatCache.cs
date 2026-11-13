@@ -31,32 +31,45 @@ public interface IFatCatCache<T>
 	}
 }
 
-public class FatCatCache<T> : IFatCatCache<T>
+public class FatCatCache<T>(IDateTimeUtilities dateTimeUtilities, FatCatCacheOptions<T> options) : IFatCatCache<T>
 	where T : class, ICacheItem
 {
-	private readonly ConcurrentDictionary<string, CacheEntry<T>> cache = new();
+	private readonly ConcurrentDictionary<string, CacheEntry> cache = new();
 
-	private bool timeoutEnabled;
+	private readonly IDateTimeUtilities dateTimeUtilities = dateTimeUtilities
+		?? throw new ArgumentNullException(nameof(dateTimeUtilities));
+
+	private readonly int? maximumItems = RequirePositiveMaximumItems(RequireOptions(options).MaximumItems);
+	private readonly TimeSpan sweepInterval = RequirePositiveSweepInterval(RequireOptions(options).SweepInterval);
+
+	private long lastSweepTicks;
+
+	public FatCatCache(IDateTimeUtilities dateTimeUtilities)
+		: this(dateTimeUtilities, new FatCatCacheOptions<T>()) { }
+
+	// Kept so consumers can still write new FatCatCache<T>(); containers that register IDateTimeUtilities never select it
+	public FatCatCache()
+		: this(new DateTimeUtilities(), new FatCatCacheOptions<T>()) { }
+
+	internal int StoredCount
+	{
+		get { return cache.Count; }
+	}
 
 	public void Add(T cacheItem, TimeSpan? timeout = null)
 	{
-		RemoveExpiredItems();
+		var now = dateTimeUtilities.UtcNow();
 
-		if (!timeoutEnabled && timeout != null)
-		{
-			timeoutEnabled = true;
-		}
+		SweepIfDue(now);
 
-		cache.AddOrUpdate(cacheItem.CacheId, new CacheEntry<T>(cacheItem, timeout), (key, value) =>
-			new CacheEntry<T>(cacheItem, timeout)
-		);
+		cache[cacheItem.CacheId] = new CacheEntry(cacheItem, timeout, now);
 	}
 
 	public void Add(List<T> cacheItems, TimeSpan? timeout = null)
 	{
 		foreach (var item in cacheItems)
 		{
-			Add(item);
+			Add(item, timeout);
 		}
 	}
 
@@ -67,78 +80,134 @@ public class FatCatCache<T> : IFatCatCache<T>
 
 	public T? Get(string cacheId)
 	{
-		RemoveExpiredItems();
+		var now = dateTimeUtilities.UtcNow();
 
-		cache.TryGetValue(cacheId, out var entry);
+		SweepIfDue(now);
 
-		return entry?.Item;
+		return FindLiveEntry(cacheId, now)?.Item;
 	}
 
 	public IList<T> GetAll()
 	{
-		RemoveExpiredItems();
+		var now = dateTimeUtilities.UtcNow();
 
-		return cache.Values.Select(i => i.Item).ToList();
+		SweepIfDue(now);
+
+		return cache.Where(pair => !pair.Value.HasExpired(now)).Select(pair => pair.Value.Item).ToList();
 	}
 
 	public bool InCache(string cacheId)
 	{
-		RemoveExpiredItems();
+		var now = dateTimeUtilities.UtcNow();
 
-		return cache.ContainsKey(cacheId);
+		SweepIfDue(now);
+
+		return FindLiveEntry(cacheId, now) != null;
 	}
 
 	public void Remove(string cacheId)
 	{
-		RemoveExpiredItems();
+		SweepIfDue(dateTimeUtilities.UtcNow());
 
 		cache.TryRemove(cacheId, out _);
 	}
 
-	private void RemoveExpiredItems()
+	private static FatCatCacheOptions<T> RequireOptions(FatCatCacheOptions<T> options)
 	{
-		if (!timeoutEnabled || cache.IsEmpty)
+		if (options == null)
+		{
+			throw new ArgumentNullException(nameof(options));
+		}
+
+		return options;
+	}
+
+	private static int? RequirePositiveMaximumItems(int? maximumItems)
+	{
+		if (maximumItems <= 0)
+		{
+			throw new ArgumentOutOfRangeException(
+				nameof(FatCatCacheOptions<T>.MaximumItems),
+				maximumItems,
+				"FatCatCacheOptions.MaximumItems must be greater than zero when set"
+			);
+		}
+
+		return maximumItems;
+	}
+
+	private static TimeSpan RequirePositiveSweepInterval(TimeSpan sweepInterval)
+	{
+		if (sweepInterval <= TimeSpan.Zero)
+		{
+			throw new ArgumentOutOfRangeException(
+				nameof(FatCatCacheOptions<T>.SweepInterval),
+				sweepInterval,
+				"FatCatCacheOptions.SweepInterval must be greater than zero"
+			);
+		}
+
+		return sweepInterval;
+	}
+
+	private CacheEntry? FindLiveEntry(string cacheId, DateTime now)
+	{
+		if (!cache.TryGetValue(cacheId, out var entry))
+		{
+			return null;
+		}
+
+		if (!entry.HasExpired(now))
+		{
+			return entry;
+		}
+
+		cache.TryRemove(new KeyValuePair<string, CacheEntry>(cacheId, entry));
+
+		return null;
+	}
+
+	private void RemoveExpired(DateTime now)
+	{
+		foreach (var pair in cache.Where(pair => pair.Value.HasExpired(now)))
+		{
+			cache.TryRemove(pair);
+		}
+	}
+
+	private void SweepIfDue(DateTime now)
+	{
+		var lastSweep = Interlocked.Read(ref lastSweepTicks);
+
+		if (now.Ticks - lastSweep < sweepInterval.Ticks)
 		{
 			return;
 		}
 
-		foreach (var value in cache.Values.Where(i => i.HasExpired()))
+		if (Interlocked.CompareExchange(ref lastSweepTicks, now.Ticks, lastSweep) != lastSweep)
 		{
-			cache.Remove(value.Item.CacheId, out _);
+			return;
 		}
 
-		if (cache.IsEmpty)
-		{
-			timeoutEnabled = false;
-		}
+		RemoveExpired(now);
 	}
 
-	private class CacheEntry<TType>
-		where TType : class, ICacheItem
+	private class CacheEntry(T item, TimeSpan? timeout, DateTime entryTime)
 	{
-		public DateTime EntryTime { get; }
+		public DateTime EntryTime { get; } = entryTime;
 
-		public TType Item { get; }
+		public T Item { get; } = item;
 
-		public TimeSpan? Timeout { get; }
+		public TimeSpan? Timeout { get; } = timeout;
 
-		public CacheEntry(TType item, TimeSpan? timeout)
-		{
-			Item = item;
-			Timeout = timeout;
-			EntryTime = DateTime.UtcNow;
-		}
-
-		public bool HasExpired()
+		public bool HasExpired(DateTime now)
 		{
 			if (Timeout == null)
 			{
 				return false;
 			}
 
-			var timeSinceEntry = DateTime.UtcNow - EntryTime;
-
-			return timeSinceEntry > Timeout;
+			return now - EntryTime > Timeout;
 		}
 	}
 }

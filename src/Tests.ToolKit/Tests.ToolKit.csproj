@@ -8,6 +8,8 @@
         <AssemblyName>Tests.FatCat.Toolkit</AssemblyName>
         <LangVersion>default</LangVersion>
         <OutputType>Library</OutputType>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\ToolKit\FatCatToolKit.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <PropertyGroup>

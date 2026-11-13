@@ -269,6 +269,8 @@ public class SettingsService(IFileSystemRepository<AppSettings> settingsReposito
 Thread-safe in-memory cache with optional expiration:
 
 ```csharp
+using Humanizer;
+
 public class ProductCache
 {
     private readonly IFatCatCache<Product> cache = new FatCatCache<Product>();
@@ -276,7 +278,7 @@ public class ProductCache
     public void Add(Product product)
     {
         // Cache for 5 minutes
-        cache.Add(product, TimeSpan.FromMinutes(5));
+        cache.Add(product, 5.Minutes());
     }
 
     public void AddPermanent(Product product)
@@ -315,6 +317,27 @@ public class Product : ICacheItem
     public decimal Price { get; set; }
 }
 ```
+
+With `SystemScope`, `ToolkitModule` registers `IFatCatCache<T>` as one shared instance per `T` for the life of the container. In classes the container builds, inject `IFatCatCache<T>` rather than creating one with `new`, so every consumer of a type sees the same cache. Direct `new FatCatCache<T>()` still works for code outside the container.
+
+### Bounded Caches
+
+Caches are unbounded by default. To cap a cache, register a `FatCatCacheOptions<T>` for that item type in your own Autofac module; nothing else changes:
+
+```csharp
+public class MyModule : Module
+{
+    protected override void Load(ContainerBuilder builder)
+    {
+        builder.RegisterInstance(new FatCatCacheOptions<IpLookupCacheItem> { MaximumItems = 50_000 });
+    }
+}
+```
+
+- When a new key arrives at a full cache, expired entries are removed first, then the oldest entries by entry time, down to about 90% of `MaximumItems`. Updating an existing key never evicts.
+- Under concurrent adds the cap may be exceeded briefly, by at most the number of concurrent writers.
+- Cap caches keyed by caller-controlled values such as IP addresses, phone numbers or nonces, where each new value adds an entry. Never cap a cache that holds live connections or in-flight work: an evicted entry is silently lost.
+- Expired entries are never returned. They are physically removed when read, or by a sweep that runs at most once per `SweepInterval` (default 30 seconds, also set on `FatCatCacheOptions<T>`).
 
 ---
 

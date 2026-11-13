@@ -69,9 +69,27 @@ public class VerifyAddListTests : FakeFatCatCacheTests
 	}
 
 	[Fact]
+	public void FailWhenOnlyAnItemWasAdded()
+	{
+		fake.Add(item);
+
+		Action verifyAction = () => fake.VerifyAddList();
+
+		verifyAction.Should().Throw<ExpectationException>();
+	}
+
+	[Fact]
 	public void PassForAListAddedWithATimeout()
 	{
 		fake.Add(items, timeout);
+
+		fake.VerifyAddList(items);
+	}
+
+	[Fact]
+	public void PassForAListAddedWithoutATimeout()
+	{
+		fake.Add(items);
 
 		fake.VerifyAddList(items);
 	}
@@ -88,6 +106,14 @@ public class VerifyAddListTests : FakeFatCatCacheTests
 	public void PassForAnyListAddedWithATimeout()
 	{
 		fake.Add(items, timeout);
+
+		fake.VerifyAddList();
+	}
+
+	[Fact]
+	public void PassForAnyListAddedWithoutATimeout()
+	{
+		fake.Add(items);
 
 		fake.VerifyAddList();
 	}

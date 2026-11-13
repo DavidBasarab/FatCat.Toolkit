@@ -7,6 +7,7 @@ namespace OneOffToolkitOnly;
 
 public static class Program
 {
+	private const string CacheCapSampleArgument = "cache-cap";
 	private const int WebPort = 14555;
 
 	public static string[] Args { get; set; }
@@ -26,6 +27,13 @@ public static class Program
 				new List<Assembly> { typeof(Program).Assembly, typeof(ConsoleLog).Assembly },
 				ScopeOptions.SetLifetimeScope
 			);
+
+			if (IsCacheCapSampleRequested(args))
+			{
+				SystemScope.Container.Resolve<CacheCapWorker>().DoWork();
+
+				return;
+			}
 
 			// ConnectClient(args);
 
@@ -52,5 +60,10 @@ public static class Program
 		clientWorker.DoWork(args);
 
 		consoleUtilities.WaitForExit();
+	}
+
+	private static bool IsCacheCapSampleRequested(string[] args)
+	{
+		return string.Equals(args.FirstOrDefault(), CacheCapSampleArgument, StringComparison.OrdinalIgnoreCase);
 	}
 }

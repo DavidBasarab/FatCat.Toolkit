@@ -334,10 +334,11 @@ public class MyModule : Module
 }
 ```
 
-- When a new key arrives at a full cache, expired entries are removed first, then the oldest entries by entry time, down to about 90% of `MaximumItems`. Updating an existing key never evicts.
-- Under concurrent adds the cap may be exceeded briefly, by at most the number of concurrent writers.
+- When a new key arrives at a full cache, expired entries are removed first, then the oldest entries by entry time (when the key was added or last updated; entries with the same entry time go in no particular order), down to about 90% of `MaximumItems`. Updating an existing key never evicts.
+- Under concurrent adds the cap may be exceeded by at most the number of concurrent writers. Eviction runs only when a new key is added, so that excess stays until then unless entries expire or are removed.
+- The cap takes effect only when the container loads the module that registers `FatCatCacheOptions<T>` (with `SystemScope`, its assembly must be in the list passed to `Initialize`) and can also resolve `IDateTimeUtilities`, which `SystemScope` registers. Without the options the cache is unbounded; without the clock the cache is built with the parameterless constructor and also stays unbounded.
 - Cap caches keyed by caller-controlled values such as IP addresses, phone numbers or nonces, where each new value adds an entry. Never cap a cache that holds live connections or in-flight work: an evicted entry is silently lost.
-- Expired entries are never returned. They are physically removed when read, or by a sweep that runs at most once per `SweepInterval` (default 30 seconds, also set on `FatCatCacheOptions<T>`).
+- Expired entries are never returned. `Get` and `InCache` remove an expired entry they find. Other expired entries are removed by a sweep that runs at most once per `SweepInterval` (default 30 seconds, also set on `FatCatCacheOptions<T>`), during an `Add`, `Get`, `GetAll`, `InCache` or `Remove` call once the interval has passed (a new cache sweeps on its first call), and also when a new key arrives at a full capped cache. There is no background thread.
 
 ---
 

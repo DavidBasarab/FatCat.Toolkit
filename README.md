@@ -269,6 +269,8 @@ public class SettingsService(IFileSystemRepository<AppSettings> settingsReposito
 Thread-safe in-memory cache with optional expiration:
 
 ```csharp
+using Humanizer;
+
 public class ProductCache
 {
     private readonly IFatCatCache<Product> cache = new FatCatCache<Product>();
@@ -276,7 +278,7 @@ public class ProductCache
     public void Add(Product product)
     {
         // Cache for 5 minutes
-        cache.Add(product, TimeSpan.FromMinutes(5));
+        cache.Add(product, 5.Minutes());
     }
 
     public void AddPermanent(Product product)
@@ -315,6 +317,28 @@ public class Product : ICacheItem
     public decimal Price { get; set; }
 }
 ```
+
+With `SystemScope`, `ToolkitModule` registers `IFatCatCache<T>` as one shared instance per `T` for the life of the container. In classes the container builds, inject `IFatCatCache<T>` rather than creating one with `new`, so every consumer of a type sees the same cache. Direct `new FatCatCache<T>()` still works for code outside the container.
+
+### Bounded Caches
+
+Caches are unbounded by default. To cap a cache, register a `FatCatCacheOptions<T>` for that item type in your own Autofac module; nothing else changes:
+
+```csharp
+public class MyModule : Module
+{
+    protected override void Load(ContainerBuilder builder)
+    {
+        builder.RegisterInstance(new FatCatCacheOptions<IpLookupCacheItem> { MaximumItems = 50_000 });
+    }
+}
+```
+
+- When a new key arrives at a full cache, expired entries are removed first, then the oldest entries by entry time (when the key was added or last updated; entries with the same entry time go in no particular order), down to about 90% of `MaximumItems`. Updating an existing key never evicts.
+- Under concurrent adds the cap may be exceeded by at most the number of concurrent writers. Eviction runs only when a new key is added, so that excess stays until then unless entries expire or are removed.
+- The cap takes effect only when the container loads the module that registers `FatCatCacheOptions<T>` (with `SystemScope`, its assembly must be in the list passed to `Initialize`) and can also resolve `IDateTimeUtilities`, which `SystemScope` registers. Without the options the cache is unbounded; without the clock the cache is built with the parameterless constructor and also stays unbounded.
+- Cap caches keyed by caller-controlled values such as IP addresses, phone numbers or nonces, where each new value adds an entry. Never cap a cache that holds live connections or in-flight work: an evicted entry is silently lost.
+- Expired entries are never returned. `Get` and `InCache` remove an expired entry they find. Other expired entries are removed by a sweep that runs at most once per `SweepInterval` (default 30 seconds, also set on `FatCatCacheOptions<T>`), during an `Add`, `Get`, `GetAll`, `InCache` or `Remove` call once the interval has passed (a new cache sweeps on its first call), and also when a new key arrives at a full capped cache. There is no background thread.
 
 ---
 

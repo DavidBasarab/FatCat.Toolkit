@@ -28,12 +28,12 @@ public class FakeFatCatCache<T> : IFatCatCache<T>
 
 	public void Add(T cacheItem, TimeSpan? timeout = null)
 	{
-		Cache.Add(cacheItem);
+		Cache.Add(cacheItem, timeout);
 	}
 
 	public void Add(List<T> cacheItems, TimeSpan? timeout = null)
 	{
-		Cache.Add(cacheItems);
+		Cache.Add(cacheItems, timeout);
 	}
 
 	public void Clear()
@@ -79,24 +79,34 @@ public class FakeFatCatCache<T> : IFatCatCache<T>
 	{
 		if (expectedItem == null)
 		{
-			A.CallTo(() => Cache.Add(A<T>._, default)).MustHaveHappened();
+			A.CallTo(() => Cache.Add(A<T>._, A<TimeSpan?>._)).MustHaveHappened();
 		}
 		else
 		{
-			A.CallTo(() => Cache.Add(expectedItem, default)).MustHaveHappened();
+			A.CallTo(() => Cache.Add(expectedItem, A<TimeSpan?>._)).MustHaveHappened();
 		}
+	}
+
+	public void VerifyAdd(T expectedItem, TimeSpan? expectedTimeout)
+	{
+		A.CallTo(() => Cache.Add(expectedItem, expectedTimeout)).MustHaveHappened();
 	}
 
 	public void VerifyAddList(List<T>? expectedItems = null)
 	{
 		if (expectedItems == null)
 		{
-			A.CallTo(() => Cache.Add(A<List<T>>._, default)).MustHaveHappened();
+			A.CallTo(() => Cache.Add(A<List<T>>._, A<TimeSpan?>._)).MustHaveHappened();
 		}
 		else
 		{
-			A.CallTo(() => Cache.Add(expectedItems, default)).MustHaveHappened();
+			A.CallTo(() => Cache.Add(expectedItems, A<TimeSpan?>._)).MustHaveHappened();
 		}
+	}
+
+	public void VerifyAddList(List<T> expectedItems, TimeSpan? expectedTimeout)
+	{
+		A.CallTo(() => Cache.Add(expectedItems, expectedTimeout)).MustHaveHappened();
 	}
 
 	public void VerifyClear()
@@ -108,11 +118,11 @@ public class FakeFatCatCache<T> : IFatCatCache<T>
 	{
 		if (expectedItem == null)
 		{
-			A.CallTo(() => Cache.Add(A<T>._, default)).MustNotHaveHappened();
+			A.CallTo(() => Cache.Add(A<T>._, A<TimeSpan?>._)).MustNotHaveHappened();
 		}
 		else
 		{
-			A.CallTo(() => Cache.Add(expectedItem, default)).MustNotHaveHappened();
+			A.CallTo(() => Cache.Add(expectedItem, A<TimeSpan?>._)).MustNotHaveHappened();
 		}
 	}
 
@@ -120,11 +130,11 @@ public class FakeFatCatCache<T> : IFatCatCache<T>
 	{
 		if (expectedItems == null)
 		{
-			A.CallTo(() => Cache.Add(A<List<T>>._, default)).MustNotHaveHappened();
+			A.CallTo(() => Cache.Add(A<List<T>>._, A<TimeSpan?>._)).MustNotHaveHappened();
 		}
 		else
 		{
-			A.CallTo(() => Cache.Add(expectedItems, default)).MustNotHaveHappened();
+			A.CallTo(() => Cache.Add(expectedItems, A<TimeSpan?>._)).MustNotHaveHappened();
 		}
 	}
 

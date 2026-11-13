@@ -10,6 +10,7 @@
 - **Never push.** The one exception is the branch-creation procedure in the user's global `CLAUDE.md`, if it is needed in Preconditions. That procedure pushes an empty start commit and opens the PR. No phase commit is ever pushed.
 - **Never edit a `VersionPrefix` and never run `PushNugetPackages.ps1`.** The owner releases after the plan is done.
 - **Never edit `C:\Code\Fog`.** Phases read it only.
+- **Security gate (ADR-13):** a phase fails the gate only if it introduces or worsens a vulnerability. Findings that were already there are listed in the phase report, not fixed. `code-security-review` is always run screen-only.
 - The solution is **`src\ToolKit.slnx`**; run `dotnet` commands from `src\`.
 - Plans live under `src\task\` (singular). The template's `tasks\todo` / `tasks\done` mean `src\task\todo` / `src\task\done`.
 

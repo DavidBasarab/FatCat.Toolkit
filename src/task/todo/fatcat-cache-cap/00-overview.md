@@ -74,7 +74,7 @@ The full requirement list (R1–R9) and acceptance criteria are in the task spec
 
 ### ADR-3 — Lazy, throttled sweep claimed with `Interlocked`
 
-- **Decision:** a `long` holding the ticks of the last sweep, initialised to construction time. At the start of each public call, if `now - lastSweep >= SweepInterval`, `Interlocked.CompareExchange` claims the sweep; only the winning thread walks the dictionary. No timer, no background thread.
+- **Decision:** a `long` holding the ticks of the last sweep, initialised to `0` (so the first call sweeps a near-empty cache, which is harmless; this matches phase 01). At the start of each public call, if `now - lastSweep >= SweepInterval`, `Interlocked.CompareExchange` claims the sweep; only the winning thread walks the dictionary. No timer, no background thread.
 - **Rejected:** a timer or `IThread` loop (lifetime and disposal on a `SingleInstance`, and unobserved exceptions on a background path); keeping `timeoutEnabled` (racy).
 
 ### ADR-4 — Per-key expiry using `TryRemove(KeyValuePair)`
@@ -120,6 +120,18 @@ Only the sweep-and-trim block inside "make room" takes a private `Lock` (C# 13+ 
 ### ADR-12 — No version bump, no publish
 
 The owner releases after all phases are done and records the version in Fog's tracker. No phase edits a `VersionPrefix` or runs `PushNugetPackages.ps1`.
+
+### ADR-13 — Security gate: only new findings block (owner decision, 2026-11-13, after wave 1)
+
+`code-security-review` scans the whole tree, and phase 02's run reported findings that were already there and that this plan does not touch: H1/H2 (TLS certificate validation disabled), M1–M4 (including M4, test fakes possibly registered by `SystemScope`'s scan), and L1–L10. **A phase passes the security gate when it introduces or worsens no vulnerability.** Existing findings do not block, but each phase report lists any it sees, for a separate toolkit task. Run the review screen-only, so no report file lands outside a phase's `## Touches`.
+
+### ADR-14 — Thread-safe throttle comparison (from wave-1 phase 01 failure)
+
+The sweep throttle compares `now.Ticks - lastSweep < sweepInterval.Ticks` and has **no** "clock moved backward" branch. Attempt 1 added a `< 0` branch, and code review showed it also fires when threads race: a thread holding a `now` read just before another thread swept sees a negative gap and runs a second sweep. A backward wall clock is an accepted limitation: sweeps pause until the clock passes the last sweep again, and per-key expiry on reads still works.
+
+### ADR-15 — Phase 02's deferred test hardening moves to phase 05 (owner decision)
+
+Phase 02's third `code-review` suggested test-only facts that were not added because the correction cap was reached. Phase 05 adds them; see its step 6.
 
 ## Assumptions
 

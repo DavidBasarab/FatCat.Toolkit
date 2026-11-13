@@ -54,7 +54,19 @@ Re-run the checks in `consumer-compatibility.md` against `C:\Code\Fog` **as it i
 
 Check every claim in the README Caching section against the final `FatCatCache.cs`: names, the about-90% low-water mark, update-never-evicts, the transient overshoot, the 30-second default sweep. Fix any README wording that drifted. Fixing the README is in this phase's footprint. Changing the code to match the README is **not**; if the code is wrong, stop and report.
 
-### 5. Acceptance criteria roll-up
+### 5. Phase 02's deferred test hardening (ADR-15)
+
+These are tests only; do not change `src/ToolKit/Testing/FakeFatCatCache.cs`. Add these facts to the existing classes in `src/Tests.ToolKit/Testing/FakeFatCatCacheSpecs/`:
+
+- `VerifyAddTests.PassForAnItemAddedWithoutATimeout`: `Add(item)` then `VerifyAdd(item)` passes.
+- `VerifyAddTests.PassForAnyItemAddedWithoutATimeout`: `Add(item)` then `VerifyAdd()` passes.
+- `VerifyAddListTests.PassForAListAddedWithoutATimeout` and `PassForAnyListAddedWithoutATimeout`: the list equivalents.
+- `VerifyDidNotAddTests.FailWhenTheItemWasAddedWithoutATimeout`: `Add(item)` then `VerifyDidNotAdd(item)` throws `ExpectationException`.
+- `VerifyAddTests.FailWhenOnlyAListWasAdded`: `Add(items)` then `VerifyAdd()` throws, because a list add is not an item add.
+
+These pin existing behaviour, so they are expected to pass straight away. Prove each can fail with a temporary mutation of the matcher (as phase 02 did), restore the file, and record the mutation evidence in the report.
+
+### 6. Acceptance criteria roll-up
 
 Write `src/task/todo/fatcat-cache-cap/05-walk-report.md`. List every acceptance criterion from the task spec, each with its evidence: the test class and fact name, the walk output, or the grep result. It also records:
 
@@ -67,6 +79,7 @@ Write `src/task/todo/fatcat-cache-cap/05-walk-report.md`. List every acceptance 
 
 - `src/OneOffToolkitOnly/CacheCapWorker.cs`, `src/OneOffToolkitOnly/CappedSampleItem.cs`, `src/OneOffToolkitOnly/UncappedSampleItem.cs`, `src/OneOffToolkitOnly/CacheCapSampleModule.cs` (create)
 - `src/OneOffToolkitOnly/Program.cs` (modify: argument routing only)
+- `src/Tests.ToolKit/Testing/FakeFatCatCacheSpecs/{VerifyAddTests,VerifyAddListTests,VerifyDidNotAddTests}.cs` (modify: step 5 facts only)
 - `README.md` (modify, only if step 4 finds drift). Hotspot.
 - `src/task/todo/fatcat-cache-cap/05-walk-report.md` (create)
 - Exclusive runtime resources: runs the sample host locally (no ports, no database). Reads `C:\Code\Fog`.

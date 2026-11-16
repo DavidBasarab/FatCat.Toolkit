@@ -16,4 +16,13 @@ public class GetTests : WebCallerTests
 	{
 		return await webCaller.Get(path);
 	}
+
+	protected override async Task<FatWebResponse> MakeCallToWeb(
+		string path,
+		TimeSpan timeout,
+		CancellationToken cancellationToken
+	)
+	{
+		return await webCaller.Get(path, timeout, cancellationToken);
+	}
 }

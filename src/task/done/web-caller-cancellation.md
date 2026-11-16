@@ -3,7 +3,7 @@
 > **Origin:** raised by a consumer — `C:\Code\Apostil`, security review
 > `vulnerabilities/unresolved/2026-11-16-141444-curate-to-fix.md` finding 1 (**High**), while closing that
 > repository's `corrections_authoring` plan.
-> **Status:** not started (2026-11-16).
+> **Status:** done (2026-11-16), branch `web-caller-cancel`. See **Outcome** at the end.
 >
 > **Blocking:** Apostil's `corrections_authoring` phase 11
 > (`tasks/todo/corrections_authoring/11-ask-and-transport-hardening.md`) cannot start until this ships. It is
@@ -131,3 +131,24 @@ pass the generation `CancellationToken` through in `ClaudeLanguageModel.RequestC
   by default and Apostil never enables it, so nothing leaks today, but logging only the length (already logged on
   the line above) would make that safe by construction. Likewise the hub client logs whole payloads when
   `ToolkitLogger.Enabled` is on. Worth a separate small task.
+
+## Outcome (2026-11-16)
+
+- The full symmetric set shipped: 10 new `IWebCaller` / `WebCaller` overloads (`Get`, `Delete`, and 4 each of `Post` / `Put`).
+  The old timeout overloads delegate with `CancellationToken.None`; the `Timeout`-property overloads call
+  `SendWebRequest` with `CancellationToken.None` directly.
+- **Deviation from the sketch above:** the caller-cancelled arm does **not** `throw;`. `HttpClient` rethrows with its
+  own linked token, so a bare rethrow would carry the linked token and not the caller's. The arm rethrows
+  `new OperationCanceledException(exception.Message, exception, cancellationToken)` so that
+  `exception.CancellationToken == cancellationToken` holds. A mutation run confirmed the spec fails with the bare rethrow.
+- `SendWebRequest` calls `cancellationToken.ThrowIfCancellationRequested()` first, so an already-cancelled token never
+  reaches the handler.
+- Specs: `WebCallerTests` (run for all four verbs) now covers mid-flight cancel throwing `OperationCanceledException`,
+  the exception carrying the caller's token (mid-flight and pre-cancelled), no request sent when the token is already
+  cancelled, timeout still returning `FatWebResponse.Timeout()` with a live token, and success with a live token.
+  `PostTests` / `PutTests` cover each remaining new overload: it sends its data and forwards the token.
+  `FakeHttpBin` gained `RequestCount` and `DelayStarted`.
+- README: new "Cancelling a Request" subsection under the HTTP Client section.
+- Consumer re-verify (2026-11-16): the implementer grep across `C:\Code\Apostil`, `C:\Code\Fog` and `C:\Code\Fog-wt`
+  found no class implementing `IWebCaller` (only an ADR comment in Apostil's end-to-end helpers).
+- **Not done here:** the patch version bump, a deliberate release step.

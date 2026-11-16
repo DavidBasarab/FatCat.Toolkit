@@ -14,11 +14,71 @@ public abstract class WebCallerTests
 	private const string BasicUserName = "This is a UserName";
 	private const string BearerToken = "12345890";
 
+	protected readonly CancellationTokenSource cancellationSource = new();
+	protected readonly FakeHttpBin httpBin = new();
+
 	protected HttpBinResponse response;
 
-	protected WebCaller webCaller = CreateWebCaller("https://httpbin.org");
+	protected WebCaller webCaller;
 
 	protected abstract string BasicPath { get; }
+
+	protected WebCallerTests()
+	{
+		webCaller = CreateWebCaller("https://httpbin.org");
+	}
+
+	[Fact]
+	public async Task CarryTheCallerTokenWhenTheCallerCancels()
+	{
+		var exception = await Assert.ThrowsAnyAsync<OperationCanceledException>(CallThenCancelOnceInFlight);
+
+		VerifyCarriesTheCallerToken(exception);
+	}
+
+	[Fact]
+	public async Task CarryTheCallerTokenWhenTheTokenIsAlreadyCancelled()
+	{
+		await cancellationSource.CancelAsync();
+
+		var exception = await Assert.ThrowsAnyAsync<OperationCanceledException>(CallWithTheCallerToken);
+
+		VerifyCarriesTheCallerToken(exception);
+	}
+
+	[Fact]
+	public async Task NotSendTheRequestWhenTheTokenIsAlreadyCancelled()
+	{
+		await cancellationSource.CancelAsync();
+
+		await Assert.ThrowsAnyAsync<OperationCanceledException>(CallWithTheCallerToken);
+
+		httpBin.RequestCount.Should().Be(0);
+	}
+
+	[Fact]
+	public async Task ReturnTimeoutWhenTheTimeoutPassesWithAnUncancelledToken()
+	{
+		var result = await MakeCallToWeb("delay/3", 200.Milliseconds(), cancellationSource.Token);
+
+		result.StatusCode.Should().Be(HttpStatusCode.RequestTimeout);
+	}
+
+	[Fact]
+	public async Task SucceedWithAnUncancelledToken()
+	{
+		var result = await CallWithTheCallerToken();
+
+		result.IsSuccessful.Should().BeTrue();
+	}
+
+	[Fact]
+	public async Task ThrowWhenTheCallerCancelsMidFlight()
+	{
+		Func<Task> callAction = CallThenCancelOnceInFlight;
+
+		await Assert.ThrowsAnyAsync<OperationCanceledException>(callAction);
+	}
 
 	[Fact]
 	public async Task BasicCall()
@@ -174,6 +234,12 @@ public abstract class WebCallerTests
 
 	protected abstract Task<FatWebResponse> MakeCallToWeb(string path);
 
+	protected abstract Task<FatWebResponse> MakeCallToWeb(
+		string path,
+		TimeSpan timeout,
+		CancellationToken cancellationToken
+	);
+
 	protected void VerifyBasicQueryStrings()
 	{
 		response.QueryParameters["first"].GetString().Should().Be("12");
@@ -185,6 +251,11 @@ public abstract class WebCallerTests
 		response.AuthorizationHeader.Should().Be($"Bearer {BearerToken}");
 	}
 
+	protected void VerifyCarriesTheCallerToken(OperationCanceledException exception)
+	{
+		(exception.CancellationToken == cancellationSource.Token).Should().BeTrue();
+	}
+
 	protected void VerifyStatusListQueryParameters()
 	{
 		var statusList = response.GetQueryParameterAsList("status");
@@ -194,11 +265,26 @@ public abstract class WebCallerTests
 		statusList.Should().BeEquivalentTo(new List<string> { "1", "2", "3" });
 	}
 
-	private static WebCaller CreateWebCaller(string baseUrl)
+	private async Task<FatWebResponse> CallThenCancelOnceInFlight()
+	{
+		var call = MakeCallToWeb("delay/3", 1.Minutes(), cancellationSource.Token);
+
+		await httpBin.DelayStarted;
+		await cancellationSource.CancelAsync();
+
+		return await call;
+	}
+
+	private Task<FatWebResponse> CallWithTheCallerToken()
+	{
+		return MakeCallToWeb(BasicPath, 1.Minutes(), cancellationSource.Token);
+	}
+
+	private WebCaller CreateWebCaller(string baseUrl)
 	{
 		var caller = new WebCaller(new Uri(baseUrl), new JsonOperations(), A.Fake<IToolkitLogger>());
 
-		caller.SetClient(new HttpClient(new FakeHttpBin()));
+		caller.SetClient(new HttpClient(httpBin));
 
 		return caller;
 	}

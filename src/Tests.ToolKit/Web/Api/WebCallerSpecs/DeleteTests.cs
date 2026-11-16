@@ -16,4 +16,13 @@ public class DeleteTests : WebCallerTests
 	{
 		return await webCaller.Delete(path);
 	}
+
+	protected override async Task<FatWebResponse> MakeCallToWeb(
+		string path,
+		TimeSpan timeout,
+		CancellationToken cancellationToken
+	)
+	{
+		return await webCaller.Delete(path, timeout, cancellationToken);
+	}
 }

@@ -7,6 +7,13 @@
 >
 > **Status:** planned into phases (2026-08-06). Phases 1–3 below; runbook in `orchestrator.md`;
 > consumer verification in `consumer-compatibility.md`.
+>
+> **Note (2026-11-16):** phases 1 and 2 have shipped (`3ba7457`, `5ff1fb5`; both hooks are in the published
+> 1.0.354 package) even though this folder is still under `todo/`. Phase 3 (query-string redaction) is the only
+> part outstanding. `C:\Code\Apostil` is a second consumer: its security review
+> (`vulnerabilities/unresolved/2026-11-16-141444-curate-to-fix.md`, findings 1 and 5) uses the two shipped hooks
+> for named rate-limit policies on `api/ask`, `api/session` and `api/authentication/login`, and needs nothing
+> further from this task.
 
 ## Work Item
 

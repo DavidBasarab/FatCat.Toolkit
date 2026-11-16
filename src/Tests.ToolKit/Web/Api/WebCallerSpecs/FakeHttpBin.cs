@@ -8,11 +8,27 @@ namespace Tests.FatCat.Toolkit.Web.Api.WebCallerSpecs;
 
 public class FakeHttpBin : HttpMessageHandler
 {
+	private readonly TaskCompletionSource delayStarted = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+	private int requestCount;
+
+	public Task DelayStarted
+	{
+		get { return delayStarted.Task; }
+	}
+
+	public int RequestCount
+	{
+		get { return Volatile.Read(ref requestCount); }
+	}
+
 	protected override async Task<HttpResponseMessage> SendAsync(
 		HttpRequestMessage request,
 		CancellationToken cancellationToken
 	)
 	{
+		Interlocked.Increment(ref requestCount);
+
 		var segments = request.RequestUri.AbsolutePath.Trim('/').Split('/');
 		var endpoint = segments[0];
 
@@ -117,11 +133,13 @@ public class FakeHttpBin : HttpMessageHandler
 		);
 	}
 
-	private static async Task<HttpResponseMessage> WaitForCancellation(CancellationToken cancellationToken)
+	private async Task<HttpResponseMessage> WaitForCancellation(CancellationToken cancellationToken)
 	{
 		var cancelled = new TaskCompletionSource<HttpResponseMessage>();
 
 		using var _ = cancellationToken.Register(() => cancelled.TrySetCanceled(cancellationToken));
+
+		delayStarted.TrySetResult();
 
 		return await cancelled.Task;
 	}

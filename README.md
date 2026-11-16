@@ -399,6 +399,25 @@ await caller.Put($"/users/{id}", updatedUser);
 await caller.Delete($"/users/{id}");
 ```
 
+### Cancelling a Request
+
+Every overload that takes a `TimeSpan timeout` has a matching overload with a trailing `CancellationToken`. Pass the token of the work the call belongs to, for example `HttpContext.RequestAborted`, so an abandoned inbound request also stops the outbound one:
+
+```csharp
+try
+{
+    var response = await caller.Post("v1/messages", request, 2.Minutes(), cancellationToken);
+}
+catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+{
+    // The caller cancelled; this is not a timeout
+}
+```
+
+- **Caller cancelled:** `OperationCanceledException` is thrown, and its `CancellationToken` is the token you passed. A token that is already cancelled throws before anything is sent.
+- **Timeout reached:** `FatWebResponse.Timeout()` (status `RequestTimeout`) is returned, exactly as with the overloads that take no token.
+- Cancelling aborts the outbound HTTP request. Whether the remote service stops its own work when the connection drops is up to that service.
+
 ---
 
 ## Cryptography

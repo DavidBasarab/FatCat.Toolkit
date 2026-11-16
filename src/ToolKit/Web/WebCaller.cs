@@ -22,9 +22,13 @@ public interface IWebCaller
 
 	public Task<FatWebResponse> Delete(string url, TimeSpan timeout);
 
+	public Task<FatWebResponse> Delete(string url, TimeSpan timeout, CancellationToken cancellationToken);
+
 	public Task<FatWebResponse> Get(string url);
 
 	public Task<FatWebResponse> Get(string url, TimeSpan timeout);
+
+	public Task<FatWebResponse> Get(string url, TimeSpan timeout, CancellationToken cancellationToken);
 
 	public Task<FatWebResponse> Post<T>(string url, T data);
 
@@ -44,6 +48,20 @@ public interface IWebCaller
 
 	public Task<FatWebResponse> Post(string url, string data, TimeSpan timeout, string contentType);
 
+	public Task<FatWebResponse> Post<T>(string url, T data, TimeSpan timeout, CancellationToken cancellationToken);
+
+	public Task<FatWebResponse> Post<T>(string url, List<T> data, TimeSpan timeout, CancellationToken cancellationToken);
+
+	public Task<FatWebResponse> Post(string url, TimeSpan timeout, CancellationToken cancellationToken);
+
+	public Task<FatWebResponse> Post(
+		string url,
+		string data,
+		TimeSpan timeout,
+		string contentType,
+		CancellationToken cancellationToken
+	);
+
 	public Task<FatWebResponse> Put<T>(string url, T data);
 
 	public Task<FatWebResponse> Put<T>(string url, List<T> data);
@@ -61,6 +79,20 @@ public interface IWebCaller
 	public Task<FatWebResponse> Put(string url, TimeSpan timeout);
 
 	public Task<FatWebResponse> Put(string url, string data, TimeSpan timeout, string contentType);
+
+	public Task<FatWebResponse> Put<T>(string url, T data, TimeSpan timeout, CancellationToken cancellationToken);
+
+	public Task<FatWebResponse> Put<T>(string url, List<T> data, TimeSpan timeout, CancellationToken cancellationToken);
+
+	public Task<FatWebResponse> Put(string url, TimeSpan timeout, CancellationToken cancellationToken);
+
+	public Task<FatWebResponse> Put(
+		string url,
+		string data,
+		TimeSpan timeout,
+		string contentType,
+		CancellationToken cancellationToken
+	);
 
 	public void SetClient(HttpClient client);
 
@@ -104,7 +136,12 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 	public async Task<FatWebResponse> Delete(string url, TimeSpan timeout)
 	{
-		return await SendWebRequest(HttpMethod.Delete, url, timeout);
+		return await Delete(url, timeout, CancellationToken.None);
+	}
+
+	public async Task<FatWebResponse> Delete(string url, TimeSpan timeout, CancellationToken cancellationToken)
+	{
+		return await SendWebRequest(HttpMethod.Delete, url, timeout, cancellationToken);
 	}
 
 	public Task<FatWebResponse> Get(string url)
@@ -114,7 +151,12 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 	public async Task<FatWebResponse> Get(string url, TimeSpan timeout)
 	{
-		return await SendWebRequest(HttpMethod.Get, url, timeout);
+		return await Get(url, timeout, CancellationToken.None);
+	}
+
+	public async Task<FatWebResponse> Get(string url, TimeSpan timeout, CancellationToken cancellationToken)
+	{
+		return await SendWebRequest(HttpMethod.Get, url, timeout, cancellationToken);
 	}
 
 	public Uri GetFullUrl(string url)
@@ -156,84 +198,136 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 	public async Task<FatWebResponse> Post<T>(string url, T data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data);
-
-		return await SendWebRequest(HttpMethod.Post, url, timeout, json, "application/json");
+		return await Post(url, data, timeout, CancellationToken.None);
 	}
 
 	public async Task<FatWebResponse> Post<T>(string url, List<T> data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data);
-
-		return await SendWebRequest(HttpMethod.Post, url, timeout, json, "application/json");
+		return await Post(url, data, timeout, CancellationToken.None);
 	}
 
 	public async Task<FatWebResponse> Post(string url, TimeSpan timeout)
 	{
-		return await SendWebRequest(HttpMethod.Post, url, timeout);
+		return await Post(url, timeout, CancellationToken.None);
 	}
 
 	public async Task<FatWebResponse> Post(string url, string data, TimeSpan timeout, string contentType)
 	{
-		return await SendWebRequest(HttpMethod.Post, url, timeout, data, contentType);
+		return await Post(url, data, timeout, contentType, CancellationToken.None);
 	}
 
 	public async Task<FatWebResponse> Post(string url, string data, TimeSpan timeout)
 	{
-		return await SendWebRequest(HttpMethod.Post, url, timeout, data);
+		return await SendWebRequest(HttpMethod.Post, url, timeout, CancellationToken.None, data);
+	}
+
+	public async Task<FatWebResponse> Post<T>(string url, T data, TimeSpan timeout, CancellationToken cancellationToken)
+	{
+		var json = jsonOperations.Serialize(data);
+
+		return await SendWebRequest(HttpMethod.Post, url, timeout, cancellationToken, json, "application/json");
+	}
+
+	public async Task<FatWebResponse> Post<T>(string url, List<T> data, TimeSpan timeout, CancellationToken cancellationToken)
+	{
+		var json = jsonOperations.Serialize(data);
+
+		return await SendWebRequest(HttpMethod.Post, url, timeout, cancellationToken, json, "application/json");
+	}
+
+	public async Task<FatWebResponse> Post(string url, TimeSpan timeout, CancellationToken cancellationToken)
+	{
+		return await SendWebRequest(HttpMethod.Post, url, timeout, cancellationToken);
+	}
+
+	public async Task<FatWebResponse> Post(
+		string url,
+		string data,
+		TimeSpan timeout,
+		string contentType,
+		CancellationToken cancellationToken
+	)
+	{
+		return await SendWebRequest(HttpMethod.Post, url, timeout, cancellationToken, data, contentType);
 	}
 
 	public Task<FatWebResponse> Put<T>(string url, T data)
 	{
 		var json = jsonOperations.Serialize(data);
 
-		return SendWebRequest(HttpMethod.Put, url, Timeout, json);
+		return SendWebRequest(HttpMethod.Put, url, Timeout, CancellationToken.None, json);
 	}
 
 	public Task<FatWebResponse> Put<T>(string url, List<T> data)
 	{
 		var json = jsonOperations.Serialize(data);
 
-		return SendWebRequest(HttpMethod.Put, url, Timeout, json);
+		return SendWebRequest(HttpMethod.Put, url, Timeout, CancellationToken.None, json);
 	}
 
 	public Task<FatWebResponse> Put(string url)
 	{
-		return SendWebRequest(HttpMethod.Put, url, Timeout);
+		return SendWebRequest(HttpMethod.Put, url, Timeout, CancellationToken.None);
 	}
 
 	public Task<FatWebResponse> Put(string url, string data)
 	{
-		return SendWebRequest(HttpMethod.Put, url, Timeout, data);
+		return SendWebRequest(HttpMethod.Put, url, Timeout, CancellationToken.None, data);
 	}
 
 	public Task<FatWebResponse> Put(string url, string data, string contentType)
 	{
-		return SendWebRequest(HttpMethod.Put, url, Timeout, data, contentType);
+		return SendWebRequest(HttpMethod.Put, url, Timeout, CancellationToken.None, data, contentType);
 	}
 
 	public Task<FatWebResponse> Put<T>(string url, T data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data);
-
-		return SendWebRequest(HttpMethod.Put, url, timeout, json);
+		return Put(url, data, timeout, CancellationToken.None);
 	}
 
 	public Task<FatWebResponse> Put<T>(string url, List<T> data, TimeSpan timeout)
 	{
-		var json = jsonOperations.Serialize(data);
-
-		return SendWebRequest(HttpMethod.Put, url, timeout, json);
+		return Put(url, data, timeout, CancellationToken.None);
 	}
 
 	public Task<FatWebResponse> Put(string url, TimeSpan timeout)
 	{
-		return SendWebRequest(HttpMethod.Put, url, timeout);
+		return Put(url, timeout, CancellationToken.None);
 	}
 
 	public Task<FatWebResponse> Put(string url, string data, TimeSpan timeout, string contentType)
 	{
-		return SendWebRequest(HttpMethod.Put, url, timeout, data, contentType);
+		return Put(url, data, timeout, contentType, CancellationToken.None);
+	}
+
+	public Task<FatWebResponse> Put<T>(string url, T data, TimeSpan timeout, CancellationToken cancellationToken)
+	{
+		var json = jsonOperations.Serialize(data);
+
+		return SendWebRequest(HttpMethod.Put, url, timeout, cancellationToken, json);
+	}
+
+	public Task<FatWebResponse> Put<T>(string url, List<T> data, TimeSpan timeout, CancellationToken cancellationToken)
+	{
+		var json = jsonOperations.Serialize(data);
+
+		return SendWebRequest(HttpMethod.Put, url, timeout, cancellationToken, json);
+	}
+
+	public Task<FatWebResponse> Put(string url, TimeSpan timeout, CancellationToken cancellationToken)
+	{
+		return SendWebRequest(HttpMethod.Put, url, timeout, cancellationToken);
+	}
+
+	public Task<FatWebResponse> Put(
+		string url,
+		string data,
+		TimeSpan timeout,
+		string contentType,
+		CancellationToken cancellationToken
+	)
+	{
+		return SendWebRequest(HttpMethod.Put, url, timeout, cancellationToken, data, contentType);
 	}
 
 	public void SetClient(HttpClient client)
@@ -305,10 +399,13 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 		HttpMethod httpMethod,
 		string url,
 		TimeSpan timeout,
+		CancellationToken cancellationToken,
 		string data = null,
 		string contentType = null
 	)
 	{
+		cancellationToken.ThrowIfCancellationRequested();
+
 		logger.Debug("Creating http client");
 
 		var httpClient = localClient ?? HttpClientFactory.Get();
@@ -333,13 +430,14 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 
 		logger.Debug($"Timeout is := <{timeout}>");
 
-		using var tokenSource = new CancellationTokenSource(timeout);
+		using var timeoutSource = new CancellationTokenSource(timeout);
+		using var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutSource.Token, cancellationToken);
 
 		try
 		{
 			logger.Debug($"Sending request to <{requestUri}>");
 
-			var response = await httpClient.SendAsync(requestMessage, tokenSource.Token);
+			var response = await httpClient.SendAsync(requestMessage, linkedSource.Token);
 
 			logger.Debug("Creating web result from response");
 
@@ -361,6 +459,12 @@ public class WebCaller(Uri uri, IJsonOperations jsonOperations, IToolkitLogger l
 			}
 
 			throw;
+		}
+		catch (OperationCanceledException exception) when (cancellationToken.IsCancellationRequested)
+		{
+			logger.Debug($"Request to {requestUri} was cancelled by the caller");
+
+			throw new OperationCanceledException(exception.Message, exception, cancellationToken);
 		}
 		catch (TaskCanceledException)
 		{

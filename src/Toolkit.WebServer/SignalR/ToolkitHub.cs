@@ -10,18 +10,12 @@ public class ToolkitHub : Hub
 {
 	private IToolkitHubServer HubServer
 	{
-		get
-		{
-			return SystemScope.Container.Resolve<IToolkitHubServer>();
-		}
+		get { return SystemScope.Container.Resolve<IToolkitHubServer>(); }
 	}
 
 	private IToolkitLogger Logger
 	{
-		get
-		{
-			return SystemScope.Container.Resolve<IToolkitLogger>();
-		}
+		get { return SystemScope.Container.Resolve<IToolkitLogger>(); }
 	}
 
 	public async Task ClientDataBufferMessage(int messageType, string sessionId, string data, byte[] dataBuffer)
@@ -40,14 +34,9 @@ public class ToolkitHub : Hub
 			MessageType = messageType,
 		};
 
-		var responseMessage = await ToolkitWebApplication.Settings.OnOnClientDataBufferMessage(
-			toolkitMessage,
-			dataBuffer
-		);
+		var responseMessage = await ToolkitWebApplication.Settings.OnOnClientDataBufferMessage(toolkitMessage, dataBuffer);
 
-		Logger.Debug(
-			$"Response for message | <{responseMessage}> | Sending to ConnectionId {Context.ConnectionId}"
-		);
+		Logger.Debug($"Response for message | <{responseMessage}> | Sending to ConnectionId {Context.ConnectionId}");
 
 		await Clients
 			.Client(Context.ConnectionId)

@@ -9,10 +9,7 @@ internal class FatCatTokenHandler : TokenHandler
 {
 	private readonly JwtSecurityTokenHandler tokenHandler = new();
 
-	public override Task<TokenValidationResult> ValidateTokenAsync(
-		string token,
-		TokenValidationParameters validationParameters
-	)
+	public override Task<TokenValidationResult> ValidateTokenAsync(string token, TokenValidationParameters validationParameters)
 	{
 		try
 		{
@@ -27,10 +24,7 @@ internal class FatCatTokenHandler : TokenHandler
 				new TokenValidationResult
 				{
 					IsValid = true,
-					ClaimsIdentity = new ClaimsIdentity(
-						jwtSecurityToken.Claims,
-						JwtBearerDefaults.AuthenticationScheme
-					),
+					ClaimsIdentity = new ClaimsIdentity(jwtSecurityToken.Claims, JwtBearerDefaults.AuthenticationScheme),
 
 					// If you do not add SecurityToken to the result, then our validator will fire, return a positive result,
 					// but the authentication, in general, will fail.

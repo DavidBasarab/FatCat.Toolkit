@@ -43,9 +43,7 @@ public static class ToolkitWebApplication
 
 		applicationStartUp.ConfigureServices(builder.Services);
 
-		builder.Host.ConfigureContainer<ContainerBuilder>(
-			(a, b) => SystemScope.Initialize(b, Settings.ContainerAssemblies)
-		);
+		builder.Host.ConfigureContainer<ContainerBuilder>((a, b) => SystemScope.Initialize(b, Settings.ContainerAssemblies));
 
 		var app = builder.Build();
 
@@ -95,14 +93,8 @@ public static class ToolkitWebApplication
 
 		builder.Services.AddCors(options =>
 		{
-			options.AddPolicy(
-				CorsPolicyName,
-				policy =>
-					policy
-						.WithOrigins(Settings.CorsSevers.ToArray())
-						.AllowAnyHeader()
-						.AllowAnyMethod()
-						.AllowCredentials()
+			options.AddPolicy(CorsPolicyName, policy =>
+				policy.WithOrigins(Settings.CorsSevers.ToArray()).AllowAnyHeader().AllowAnyMethod().AllowCredentials()
 			);
 		});
 	}
@@ -111,13 +103,11 @@ public static class ToolkitWebApplication
 	{
 		builder.Services.AddCors(options =>
 		{
-			options.AddPolicy(
-				CorsPolicyName,
-				policy =>
-					policy
-						.AllowAnyOrigin() // Allows all domains
-						.AllowAnyMethod() // Allows all HTTP methods
-						.AllowAnyHeader()
+			options.AddPolicy(CorsPolicyName, policy =>
+				policy
+					.AllowAnyOrigin() // Allows all domains
+					.AllowAnyMethod() // Allows all HTTP methods
+					.AllowAnyHeader()
 			);
 		});
 	}

@@ -202,10 +202,7 @@ public class WebResultClosedOverAssertions<T>(WebResult<T> result)
 		return this;
 	}
 
-	private WebResultClosedOverAssertions<T> HaveOneOfStatusCode(
-		HttpStatusCode[] acceptableStatusCodes,
-		string? because = null
-	)
+	private WebResultClosedOverAssertions<T> HaveOneOfStatusCode(HttpStatusCode[] acceptableStatusCodes, string? because = null)
 	{
 		SubjectAsObject.Not.BeNull();
 

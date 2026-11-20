@@ -26,10 +26,7 @@ internal static class OAuthExtensions
 				// If the request is for our hub...
 				var path = context.HttpContext.Request.Path;
 
-				if (
-					!string.IsNullOrEmpty(accessToken)
-					&& path.StartsWithSegments(ToolkitWebApplication.Settings.SignalRPath)
-				)
+				if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments(ToolkitWebApplication.Settings.SignalRPath))
 				{
 					// Read the token out of the query string
 					context.Token = accessToken;

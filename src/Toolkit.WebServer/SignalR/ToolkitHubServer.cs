@@ -133,13 +133,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 
 		await hubContext
 			.Clients.Client(connectionId)
-			.SendAsync(
-				ToolkitHubMethodNames.ServerDataBufferMessage,
-				message.MessageType,
-				sessionId,
-				message.Data,
-				dataBuffer
-			);
+			.SendAsync(ToolkitHubMethodNames.ServerDataBufferMessage, message.MessageType, sessionId, message.Data, dataBuffer);
 
 		return await WaitForClientResponse(message, timeout, sessionId, completionSource);
 	}
@@ -167,20 +161,15 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 	{
 		var sessionId = generator.NewId();
 
-		await hubContext
-			.Clients.All.SendAsync(
-				ToolkitHubMethodNames.ServerOriginatedMessage,
-				message.MessageType,
-				sessionId,
-				message.Data
-			);
+		await hubContext.Clients.All.SendAsync(
+			ToolkitHubMethodNames.ServerOriginatedMessage,
+			message.MessageType,
+			sessionId,
+			message.Data
+		);
 	}
 
-	public async Task<ToolkitMessage> SendToClient(
-		string connectionId,
-		ToolkitMessage message,
-		TimeSpan? timeout = null
-	)
+	public async Task<ToolkitMessage> SendToClient(string connectionId, ToolkitMessage message, TimeSpan? timeout = null)
 	{
 		var sessionId = generator.NewId();
 
@@ -210,12 +199,7 @@ public class ToolkitHubServer(IHubContext<ToolkitHub> hubContext, IGenerator gen
 	{
 		await hubContext
 			.Clients.Client(connectionId)
-			.SendAsync(
-				ToolkitHubMethodNames.ServerOriginatedMessage,
-				message.MessageType,
-				sessionId,
-				message.Data
-			);
+			.SendAsync(ToolkitHubMethodNames.ServerOriginatedMessage, message.MessageType, sessionId, message.Data);
 	}
 
 	private TaskCompletionSource<ToolkitMessage> CreateResponseCompletionSource(string sessionId)

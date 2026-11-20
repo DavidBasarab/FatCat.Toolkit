@@ -8,8 +8,7 @@ public abstract class Endpoint : Controller
 {
 	protected string AuthToken
 	{
-		get =>
-			Request.Headers.TryGetValue("Authorization", out var values) ? values.FirstOrDefault() : string.Empty;
+		get => Request.Headers.TryGetValue("Authorization", out var values) ? values.FirstOrDefault() : string.Empty;
 	}
 
 	protected WebResult BadRequest(string message = null)

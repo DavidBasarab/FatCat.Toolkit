@@ -34,10 +34,7 @@ public class TestModelBindingContext(TestValueProvider testValueProvider) : Mode
 
 	public override IValueProvider ValueProvider
 	{
-		get
-		{
-			return TestValueProvider;
-		}
+		get { return TestValueProvider; }
 		set { }
 	}
 
@@ -49,12 +46,7 @@ public class TestModelBindingContext(TestValueProvider testValueProvider) : Mode
 		TestValueProvider.AddTestValues(name, value);
 	}
 
-	public override NestedScope EnterNestedScope(
-		ModelMetadata modelMetadata,
-		string fieldName,
-		string modelName,
-		object model
-	)
+	public override NestedScope EnterNestedScope(ModelMetadata modelMetadata, string fieldName, string modelName, object model)
 	{
 		throw new NotImplementedException();
 	}

@@ -9,16 +9,15 @@ public interface IToolkitHubConnectedClients
 	public Task SendMessage(string clientId, int messageType, string data, string? sessionId = null);
 }
 
-public class ToolkitHubConnectedClients(IHubContext<ToolkitHub> hubContext, IGenerator generator)
-	: IToolkitHubConnectedClients
+public class ToolkitHubConnectedClients(IHubContext<ToolkitHub> hubContext, IGenerator generator) : IToolkitHubConnectedClients
 {
 	public async Task SendMessage(string clientId, int messageType, string data, string? sessionId = null)
 	{
 		var client = hubContext.Clients.Client(clientId);
 
 		await client.SendCoreAsync(
-									ToolkitHubMethodNames.ServerResponseMessage,
-									[messageType, data, sessionId ?? generator.NewId()]
-								);
+			ToolkitHubMethodNames.ServerResponseMessage,
+			[messageType, data, sessionId ?? generator.NewId()]
+		);
 	}
 }

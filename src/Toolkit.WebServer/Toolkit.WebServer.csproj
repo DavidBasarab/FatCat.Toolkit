@@ -54,7 +54,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="11.0.0" />
 		<PackageReference Include="MongoDB.Driver" Version="3.14.1" />
 		<PackageReference Include="MongoDB.Driver.Core.Extensions.DiagnosticSources" Version="3.0.0" />
-		<PackageReference Include="System.IO.Abstractions" Version="23.0.1" />
+		<PackageReference Include="System.IO.Abstractions" Version="23.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="11.0.0" />
 	</ItemGroup>
 	<PropertyGroup>
